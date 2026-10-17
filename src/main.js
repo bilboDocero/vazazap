@@ -32,6 +32,8 @@ import { renderCommercialDetail } from './components/CommercialDetail.js';
 import { renderVitrinePanel } from './components/VitrinePanel.js';
 import { renderVitrineDetail } from './components/VitrineDetail.js';
 import { getVitrinesCatalog } from './lib/commercial-content.js';
+import { renderAgendaPanel } from './components/AgendaPanel.js';
+import { renderAgendaDetail } from './components/AgendaDetail.js';
 import { loadCachedStatuses } from './lib/status-db.js';
 import { exportUrl, EXPORT_ALL_URL, downloadFile } from './lib/export.js';
 import { copyText } from './lib/utils.js';
@@ -487,7 +489,7 @@ async function init() {
       closeSettings();
       sidebar.showChats?.();
       navRail.setActive('chats');
-      if (['calls', 'status', 'channels', 'communities', 'vitrine', 'anunciar'].includes(router.getCurrentRoute().route)) router.navigate('home');
+      if (['calls', 'status', 'channels', 'communities', 'vitrine', 'anunciar', 'agenda'].includes(router.getCurrentRoute().route)) router.navigate('home');
       sidebar.querySelector('.sidebar-search-input').focus();
     },
     onCalls: () => router.navigate('calls'),
@@ -499,8 +501,8 @@ async function init() {
     avatarSrc: '/assets/avatar-dv.jpg',
     onSettings: openSettings,
     onChat: () => {
-      // From the calls/communities/commercial screen, this is the way back to the list.
-      if (['calls', 'status', 'channels', 'communities', 'vitrine', 'anunciar'].includes(router.getCurrentRoute().route)) { router.navigate('home'); return; }
+      // From the calls/communities/commercial/agenda screen, this is the way back to the list.
+      if (['calls', 'status', 'channels', 'communities', 'vitrine', 'anunciar', 'agenda'].includes(router.getCurrentRoute().route)) { router.navigate('home'); return; }
       closeProfile();
       closeSettings();
     },
@@ -521,6 +523,7 @@ async function init() {
     onCommunities: () => router.navigate('communities'),
     onVitrine: () => router.navigate('vitrine'),
     onAnunciar: () => router.navigate('anunciar'),
+    onAgenda: () => router.navigate('agenda'),
     onSelect: (id) => {
       // Close profile/settings if open before navigating
       closeProfile();
@@ -700,6 +703,35 @@ async function init() {
       onConversation: (convId) => router.navigate('chat', convId),
       onGoToAnunciar: () => router.navigate('anunciar'),
       onShowToast: (msg) => showToast(mainArea, msg),
+    });
+  });
+
+  // ── Agenda de Contatos (Folha de S.Paulo) ───────────
+  let activeAgenda = null;
+  router.on('agenda', contactId => {
+    closeAll();
+    currentConversationId = null;
+    setActiveConversation(sidebar, null);
+
+    if (!activeAgenda?.panel.isConnected) {
+      const panel = renderAgendaPanel({
+        selectedId: contactId,
+        onSelect: selected => router.navigate('agenda', selected),
+        onOpenConversation: convId => router.navigate('chat', convId),
+        onBack: () => router.navigate('home'),
+      });
+      sidebar.showAgenda?.(panel);
+      activeAgenda = { panel };
+    } else {
+      activeAgenda.panel.setActive(contactId);
+    }
+
+    container.classList.toggle('chat-open', !!contactId);
+
+    renderAgendaDetail(mainArea, {
+      contactId,
+      onBack: () => router.navigate('agenda'),
+      onOpenConversation: convId => router.navigate('chat', convId),
     });
   });
 

@@ -23,7 +23,7 @@ export const FAVORITE_CONVERSATIONS = new Set(['alexandre-de-moraes', 'martha-gr
  * @param {function} options.onSelect - called with conversation id
  * @param {Set<string>} [options.readConversations] - ids already opened
  */
-export function renderSidebar(container, { conversations, onSelect, onProfile, onAbout, onExportAll, onCalls, onChats, onStatus, onChannels, onCommunities, onVitrine, onAnunciar, readConversations = new Set() }) {
+export function renderSidebar(container, { conversations, onSelect, onProfile, onAbout, onExportAll, onCalls, onChats, onStatus, onChannels, onCommunities, onVitrine, onAnunciar, onAgenda, readConversations = new Set() }) {
   const el = document.createElement('aside');
   el.className = 'sidebar';
   el.setAttribute('role', 'navigation');
@@ -33,7 +33,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   el.innerHTML = `
     <div class="sidebar-header">
       <span class="sidebar-header-title">Conversas</span>
-      <button class="sidebar-find-btn" aria-label="Encontrar conversa" title="Encontrar conversa">
+      <button class="sidebar-find-btn" aria-label="Agenda de contatos" title="Nova conversa · Agenda de contatos">
         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11v6a2 2 0 0 1-2 2H8l-5 3V5a2 2 0 0 1 2-2h8M19 2v6m-3-3h6"/></svg>
       </button>
       <button class="sidebar-menu-btn" aria-label="Menu">${ICON_MEETBALL}</button>
@@ -65,7 +65,10 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   const list = el.querySelector('.conversation-list');
   const searchInput = el.querySelector('.sidebar-search-input');
   const searchClear = el.querySelector('.sidebar-search-clear');
-  el.querySelector('.sidebar-find-btn').addEventListener('click', () => searchInput.focus());
+  el.querySelector('.sidebar-find-btn').addEventListener('click', () => {
+    if (onAgenda) onAgenda();
+    else searchInput.focus();
+  });
 
   // Show/hide clear button based on input content
   searchInput.addEventListener('input', () => {
@@ -260,13 +263,14 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
 
   el.showSection = (kind, panel) => {
     closeSidebarMenu();
-    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel, .commercial-panel, .vitrine-panel').forEach(p => p.remove());
+    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel, .commercial-panel, .vitrine-panel, .agenda-panel').forEach(p => p.remove());
     el.insertBefore(panel, bottomNav);
     el.classList.add('sidebar--section');
     el.classList.toggle('sidebar--calls', kind === 'calls');
     el.classList.toggle('sidebar--communities', kind === 'communities');
     el.classList.toggle('sidebar--vitrine', kind === 'vitrine');
     el.classList.toggle('sidebar--anunciar', kind === 'anunciar');
+    el.classList.toggle('sidebar--agenda', kind === 'agenda');
     callsTag?.classList.toggle('active', kind === 'calls');
     selectTab(kind);
   };
@@ -275,9 +279,10 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   el.showVitrine = panel => el.showSection('vitrine', panel);
   el.showAnunciar = panel => el.showSection('anunciar', panel);
   el.showCommercial = panel => el.showSection('anunciar', panel);
+  el.showAgenda = panel => el.showSection('agenda', panel);
   el.showChats = () => {
-    el.classList.remove('sidebar--calls', 'sidebar--section', 'sidebar--communities', 'sidebar--vitrine', 'sidebar--anunciar', 'sidebar--commercial');
-    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel, .commercial-panel, .vitrine-panel').forEach(p => p.remove());
+    el.classList.remove('sidebar--calls', 'sidebar--section', 'sidebar--communities', 'sidebar--vitrine', 'sidebar--anunciar', 'sidebar--commercial', 'sidebar--agenda');
+    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel, .commercial-panel, .vitrine-panel, .agenda-panel').forEach(p => p.remove());
     callsTag?.classList.remove('active');
     selectTab('chats');
   };
