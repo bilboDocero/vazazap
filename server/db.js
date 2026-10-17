@@ -89,7 +89,7 @@ function sortBoostedFirst(list, boostKey = 'status_impulsionado') {
 
 export async function getStatusPurchases() {
   if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases?select=*&order=published_at.desc`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases?select=*&payment_status=neq.pending&order=published_at.desc`, {
       headers: supabaseHeaders(),
     });
     if (!res.ok) {
@@ -103,6 +103,7 @@ export async function getStatusPurchases() {
   if (pgPool) {
     const result = await pgPool.query(`
       SELECT * FROM status_purchases
+      WHERE payment_status != 'pending'
       ORDER BY
         CASE WHEN plan_type = 'status_impulsionado' THEN 0 ELSE 1 END ASC,
         published_at DESC
@@ -149,6 +150,44 @@ export async function createStatusPurchaseRecord(data) {
   return data;
 }
 
+export async function getStatusPurchaseById(id) {
+  if (isSupabaseRest) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases?id=eq.${encodeURIComponent(id)}`, {
+      headers: supabaseHeaders(),
+    });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return rows[0] || null;
+  }
+  if (pgPool) {
+    const res = await pgPool.query('SELECT * FROM status_purchases WHERE id = $1', [id]);
+    return res.rows[0] || null;
+  }
+  return null;
+}
+
+export async function updateStatusPurchasePayment(id, { payment_status = 'approved', media_files }) {
+  const updateData = { payment_status };
+  if (media_files) updateData.media_files = media_files;
+
+  if (isSupabaseRest) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: supabaseHeaders(),
+      body: JSON.stringify(updateData),
+    });
+    return res.ok;
+  }
+  if (pgPool) {
+    const res = await pgPool.query(
+      'UPDATE status_purchases SET payment_status = $1 WHERE id = $2 RETURNING id',
+      [payment_status, id]
+    );
+    return res.rowCount > 0;
+  }
+  return false;
+}
+
 export async function deleteStatusPurchaseRecord(id) {
   if (isSupabaseRest) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases?id=eq.${encodeURIComponent(id)}`, {
@@ -170,7 +209,7 @@ export async function deleteStatusPurchaseRecord(id) {
 
 export async function getVitrinePurchases() {
   if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases?select=*&order=published_at.desc`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases?select=*&payment_status=neq.pending&order=published_at.desc`, {
       headers: supabaseHeaders(),
     });
     if (!res.ok) {
@@ -184,6 +223,7 @@ export async function getVitrinePurchases() {
   if (pgPool) {
     const result = await pgPool.query(`
       SELECT * FROM vitrine_purchases
+      WHERE payment_status != 'pending'
       ORDER BY
         CASE WHEN plan_type = 'vitrine_impulsionado' THEN 0 ELSE 1 END ASC,
         published_at DESC
@@ -192,6 +232,44 @@ export async function getVitrinePurchases() {
   }
 
   return [];
+}
+
+export async function getVitrinePurchaseById(id) {
+  if (isSupabaseRest) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases?id=eq.${encodeURIComponent(id)}`, {
+      headers: supabaseHeaders(),
+    });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return rows[0] || null;
+  }
+  if (pgPool) {
+    const res = await pgPool.query('SELECT * FROM vitrine_purchases WHERE id = $1', [id]);
+    return res.rows[0] || null;
+  }
+  return null;
+}
+
+export async function updateVitrinePurchasePayment(id, { payment_status = 'approved', media_files }) {
+  const updateData = { payment_status };
+  if (media_files) updateData.media_files = media_files;
+
+  if (isSupabaseRest) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: supabaseHeaders(),
+      body: JSON.stringify(updateData),
+    });
+    return res.ok;
+  }
+  if (pgPool) {
+    const res = await pgPool.query(
+      'UPDATE vitrine_purchases SET payment_status = $1 WHERE id = $2 RETURNING id',
+      [payment_status, id]
+    );
+    return res.rowCount > 0;
+  }
+  return false;
 }
 
 export async function createVitrinePurchaseRecord(data) {
