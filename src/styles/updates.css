@@ -195,7 +195,16 @@
   color: #FFFFFF;
   font-size: 26px;
   cursor: pointer;
-  padding: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: background .15s ease;
+}
+
+.story-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .story-media-box {

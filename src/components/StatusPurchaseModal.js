@@ -180,6 +180,9 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           <button type="button" class="status-btn-primary btn-proceed-publish">
             Prosseguir para Edição do Story &rarr;
           </button>
+          <button type="button" class="status-btn-secondary btn-back-to-step1" style="margin-top: 10px; width: 100%; border-radius: 24px; padding: 10px; border: 1px solid #D1D7DB; background: #FFF; color: #54656F; font-size: 13.5px; font-weight: 500; cursor: pointer;">
+            Alterar Plano ou Quantidade
+          </button>
         </div>
       `;
     }
@@ -396,6 +399,12 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       modalEl.querySelectorAll('.status-file-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           fileCount = Number(btn.dataset.count);
+          if (uploadedFiles.length > fileCount) {
+            uploadedFiles = uploadedFiles.slice(0, fileCount);
+            if (activeFileIndex >= uploadedFiles.length) {
+              activeFileIndex = uploadedFiles.length - 1;
+            }
+          }
           render();
         });
       });
@@ -407,6 +416,10 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
     } else if (currentStep === 2) {
       modalEl.querySelector('.btn-proceed-publish')?.addEventListener('click', () => {
         currentStep = 3;
+        render();
+      });
+      modalEl.querySelector('.btn-back-to-step1')?.addEventListener('click', () => {
+        currentStep = 1;
         render();
       });
     } else if (currentStep === 3) {
