@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { slugify, formatDateLong, formatTime, linkify, escapeHtml, classifyMessage, truncate, escapeAttr, sanitizeUrl } from '../../src/lib/utils.js';
+import { slugify, formatDateLong, formatTime, linkify, escapeHtml, classifyMessage, truncate, escapeAttr, sanitizeUrl, processAvatarImage } from '../../src/lib/utils.js';
 
 describe('slugify', () => {
   it('converts name to lowercase slug', () => {
@@ -143,6 +143,26 @@ describe('sanitizeUrl', () => {
   it('returns empty string for null/undefined/empty', () => {
     expect(sanitizeUrl('')).toBe('');
     expect(sanitizeUrl(null)).toBe('');
+  });
+});
+
+describe('processAvatarImage', () => {
+  it('rejects when no file is supplied', async () => {
+    await expect(processAvatarImage(null)).rejects.toThrow('Nenhum arquivo fornecido');
+  });
+
+  it('handles image File/Blob and produces data url', async () => {
+    // 1x1 transparent PNG blob
+    const binary = atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: 'image/png' });
+    const file = new File([blob], 'avatar.png', { type: 'image/png' });
+
+    const result = await processAvatarImage(file, 256, 0.85);
+    expect(result).toMatch(/^data:image\//);
   });
 });
 

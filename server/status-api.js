@@ -124,7 +124,7 @@ export function statusApiMiddleware(req, res, next) {
               cpfCnpj: customerData.cpfCnpj || '00000000000',
               postalCode: body.creditCardHolderInfo?.postalCode || '01001-000',
               addressNumber: body.creditCardHolderInfo?.addressNumber || '1',
-              phone: customerData.phone || '11999999999',
+              phone: customerData.phone || '11987654321',
             },
           });
 

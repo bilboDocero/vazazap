@@ -12,7 +12,7 @@ import {
   buildSocialLink,
   createStatusPurchase,
 } from '../lib/status-db.js';
-import { escapeHtml, sanitizeUrl, escapeAttr, copyText } from '../lib/utils.js';
+import { escapeHtml, sanitizeUrl, escapeAttr, copyText, processAvatarImage } from '../lib/utils.js';
 
 const ICON_CHECK_CIRCLE = `<svg viewBox="0 0 24 24" width="48" height="48" fill="none"><circle cx="12" cy="12" r="11" fill="#00A884"/><path d="M7 12.5l3.5 3.5 7-7" stroke="#FFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const ICON_PLUS_SIGN = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
@@ -288,12 +288,6 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
                     <span>Adicionar</span>
                   </label>
                 ` : ''}
-              </div>
-
-              <div class="status-quick-samples">
-                <button type="button" class="status-btn-samples">
-                  + Preencher com fotos de exemplo
-                </button>
               </div>
             </div>
 
@@ -625,8 +619,8 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         });
       });
 
-      // Profile pic upload
-      profilePicInput?.addEventListener('change', (e) => {
+      // Profile pic upload (processed via Canvas API to ~256x256 square crop)
+      profilePicInput?.addEventListener('change', async (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
 
@@ -643,15 +637,16 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         }
 
         uploadError = '';
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          profilePicData = ev.target.result;
+        try {
+          profilePicData = await processAvatarImage(file, 256, 0.85);
           const preview = modalEl.querySelector('.status-avatar-preview');
           if (preview) {
             preview.innerHTML = `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" class="status-avatar-img" />`;
           }
-        };
-        reader.readAsDataURL(file);
+        } catch (err) {
+          uploadError = 'Erro ao processar imagem de avatar: ' + err.message;
+          render();
+        }
       });
 
       // Media attachment upload
@@ -694,36 +689,6 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           };
           reader.readAsDataURL(file);
         }
-      });
-
-      // Quick sample button
-      modalEl.querySelector('.status-btn-samples')?.addEventListener('click', () => {
-        const sampleImages = [
-          'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80',
-          'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800&q=80',
-          'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80',
-          'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80',
-        ];
-
-        while (uploadedFiles.length < fileCount) {
-          const idx = uploadedFiles.length;
-          uploadedFiles.push({
-            id: `sample-${Date.now()}-${idx}`,
-            name: `Foto 9:16 #${idx + 1}.jpg`,
-            url: sampleImages[idx % sampleImages.length],
-            type: 'image/jpeg',
-            caption: '',
-          });
-        }
-        activeFileIndex = uploadedFiles.length - 1;
-        caption = '';
-        if (nameInput) profileName = nameInput.value;
-        if (handleInput) userHandle = handleInput.value.trim();
-        uploadError = '';
-        render();
-        setTimeout(() => {
-          modalEl.querySelector('.input-caption')?.focus();
-        }, 50);
       });
 
       // Delete uploaded file

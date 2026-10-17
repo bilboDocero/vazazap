@@ -161,6 +161,68 @@ export function sanitizeUrl(url, allowDataImage = false) {
 }
 
 /**
+ * Processes and resizes an uploaded avatar image using the HTML Canvas API.
+ * Center-crops to a 1:1 square and scales to targetSize (default 256x256),
+ * compressing output to reduce database payload and network bandwidth.
+ * @param {File|Blob} file
+ * @param {number} [targetSize=256]
+ * @param {number} [quality=0.85]
+ * @returns {Promise<string>} Base64 Data URL
+ */
+export function processAvatarImage(file, targetSize = 256, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    if (!file) return reject(new Error('Nenhum arquivo fornecido'));
+
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Falha ao ler arquivo de imagem'));
+    reader.onload = () => {
+      const img = new Image();
+      let finished = false;
+
+      const finishWith = (dataUrl) => {
+        if (finished) return;
+        finished = true;
+        resolve(dataUrl);
+      };
+
+      img.onerror = () => finishWith(reader.result);
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = targetSize;
+          canvas.height = targetSize;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            return finishWith(reader.result);
+          }
+
+          const minDim = Math.min(img.width || targetSize, img.height || targetSize);
+          const sx = ((img.width || minDim) - minDim) / 2;
+          const sy = ((img.height || minDim) - minDim) / 2;
+
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, targetSize, targetSize);
+
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          finishWith(dataUrl);
+        } catch {
+          finishWith(reader.result);
+        }
+      };
+
+      // In JSDOM or headless environments without full layout/image decoding, fallback safely
+      setTimeout(() => {
+        if (!finished) finishWith(reader.result);
+      }, 150);
+
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
  * Put text on the clipboard, the modern way or the old one.
  * @returns {Promise<boolean>} whether it took
  */

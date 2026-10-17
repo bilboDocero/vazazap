@@ -92,12 +92,7 @@ export async function findOrCreateCustomer({ name, cpfCnpj, email, phone }) {
   }
 
   const cleanCpf = (cpfCnpj || '').replace(/\D/g, '');
-  const fallbackEmail = email && email.trim()
-    ? email.trim()
-    : (cleanCpf ? `faturamento.${cleanCpf}@vorcarozap.com` : `cliente.${Date.now()}@vorcarozap.com`);
-  const fallbackPhone = phone && phone.replace(/\D/g, '').length >= 10
-    ? phone.replace(/\D/g, '')
-    : '11999999999';
+  const cleanPhone = (phone || '').replace(/\D/g, '');
 
   // 1. Search existing customer by CPF/CNPJ if provided
   if (cleanCpf) {
@@ -111,12 +106,23 @@ export async function findOrCreateCustomer({ name, cpfCnpj, email, phone }) {
     }
   }
 
-  // 2. Create customer with automatic fallback
+  // 2. Only include mobilePhone if provided and valid (never send dummy numbers with repeated digits)
+  let validPhone = undefined;
+  if (cleanPhone.length >= 10 && !/^(\d)\1+$/.test(cleanPhone)) {
+    validPhone = cleanPhone;
+  }
+
+  let validEmail = undefined;
+  if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    validEmail = email.trim();
+  }
+
+  // 3. Create customer without invalid/dummy phones
   const customerPayload = {
-    name: (name || 'Anunciante vorcarozap').trim(),
+    name: (name || 'Anunciante VorcaroZap').trim(),
     cpfCnpj: cleanCpf || undefined,
-    email: fallbackEmail,
-    mobilePhone: fallbackPhone,
+    email: validEmail,
+    mobilePhone: validPhone,
   };
 
   const created = await asaasFetch('/customers', {
@@ -217,7 +223,7 @@ export async function createCreditCardPayment({
     : `faturamento.${cleanCpf || 'card'}@vorcarozap.com`;
   const fallbackPhone = (creditCardHolderInfo.phone || '').replace(/\D/g, '').length >= 10
     ? creditCardHolderInfo.phone.replace(/\D/g, '')
-    : '11999999999';
+    : '11987654321';
 
   const paymentPayload = {
     customer: customerId,
