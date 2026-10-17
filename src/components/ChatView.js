@@ -126,6 +126,8 @@ function avatarEl(src, name, size, className) {
     const img = document.createElement('img');
     img.src = src;
     img.alt = name;
+    img.loading = 'lazy';
+    img.decoding = 'async';
     wrap.appendChild(img);
   } else {
     wrap.innerHTML = defaultAvatarSvg(name || '?', size);
@@ -199,6 +201,8 @@ function renderLocationCard(msg) {
   img.className = 'chat-location-map';
   img.src = MAP_PIN;
   img.alt = 'Mapa';
+  img.loading = 'lazy';
+  img.decoding = 'async';
   a.appendChild(img);
 
   const body = document.createElement('div');
@@ -242,6 +246,8 @@ function renderLinkMessage(msg) {
     img.className = 'chat-link-thumb';
     img.src = MAP_PLACEHOLDER;
     img.alt = '';
+    img.loading = 'lazy';
+    img.decoding = 'async';
     card.appendChild(img);
   }
   const body = document.createElement('div');

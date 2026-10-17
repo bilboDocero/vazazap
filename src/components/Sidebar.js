@@ -100,7 +100,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
 
     // Use real avatar if available, otherwise default SVG
     const avatarHtml = conv.avatar
-      ? `<img src="${conv.avatar}" alt="${displayName}" class="conversation-item-avatar-img" />`
+      ? `<img src="${conv.avatar}" alt="${displayName}" class="conversation-item-avatar-img" loading="lazy" decoding="async" />`
       : defaultAvatarSvg(conv.id);
 
     // Escaped user-facing data inserted via innerHTML

@@ -598,9 +598,15 @@ async function init() {
   app.appendChild(wrapper);
 
   const elapsed = Date.now() - loadStart;
-  const minLoading = 2500;
+  const isFirstVisit = typeof window !== 'undefined' && !sessionStorage.getItem('masterwhats_loaded');
+  const minLoading = isFirstVisit ? 600 : 0;
   if (elapsed < minLoading) {
     await new Promise(r => setTimeout(r, minLoading - elapsed));
+  }
+  try {
+    sessionStorage.setItem('masterwhats_loaded', '1');
+  } catch {
+    // Ignore storage errors in private browsing/sandboxed contexts
   }
 
   if (loadingScreen) loadingScreen.remove();

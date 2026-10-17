@@ -40,7 +40,8 @@
   <meta name="theme-color" content="#1DAA61">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-  <!-- Fonts -->
+  <!-- Resource Preload -->
+  <link rel="preload" href="/data/conversations.json" as="fetch" crossorigin="anonymous">
 
   <!-- Styles -->
   <link rel="stylesheet" href="/src/styles/wds-tokens.css">
@@ -177,7 +178,14 @@
       <p><strong>Este site requer JavaScript para funcionar.</strong></p>
     </div>
   </noscript>
-  <script defer src="/_vercel/insights/script.js"></script>
+  <script type="module">
+    if (window.location.hostname.includes('masterwhats.com.br')) {
+      const s = document.createElement('script');
+      s.src = '/_vercel/insights/script.js';
+      s.defer = true;
+      document.head.appendChild(s);
+    }
+  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
