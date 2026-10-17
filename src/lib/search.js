@@ -10,6 +10,40 @@ let _index = null;
 let _indexId = null;
 let _loading = null;
 let _loadingId = null;
+const _normalizedCache = new WeakMap();
+
+function getNormalized(entry) {
+  let val = _normalizedCache.get(entry);
+  if (val === undefined) {
+    val = normalize(entry.content || '');
+    _normalizedCache.set(entry, val);
+  }
+  return val;
+}
+
+function warmNormalizedCache(entries) {
+  if (!entries || !entries.length) return;
+  let i = 0;
+  const chunk = 5000;
+  function step() {
+    const end = Math.min(i + chunk, entries.length);
+    for (; i < end; i++) {
+      getNormalized(entries[i]);
+    }
+    if (i < entries.length) {
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(step, { timeout: 100 });
+      } else {
+        setTimeout(step, 0);
+      }
+    }
+  }
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(step, { timeout: 100 });
+  } else {
+    setTimeout(step, 0);
+  }
+}
 
 /**
  * Load the search index for a conversation.
@@ -38,6 +72,7 @@ export async function loadSearchIndex(conversationId, basePath = '/data') {
         _index = data;
         _indexId = conversationId;
         _loading = null;
+        warmNormalizedCache(data);
       }
       return data;
     })
@@ -112,7 +147,7 @@ export function search(query, { limit = 50, sender } = {}) {
   for (const entry of _index) {
     if (sender && entry.sender !== sender) continue;
 
-    const normalizedContent = normalize(entry.content);
+    const normalizedContent = getNormalized(entry);
     const matchStart = normalizedContent.indexOf(normalizedQuery);
 
     if (matchStart !== -1) {

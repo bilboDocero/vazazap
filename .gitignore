@@ -14,6 +14,9 @@ ref/
 .DS_Store
 Thumbs.db
 
+# Source binaries (linked externally, not served by site)
+data/source/*.pdf
+
 # Editor
 .idea/
 *.swp

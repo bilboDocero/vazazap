@@ -12,7 +12,9 @@ import JSZip from 'jszip';
 
 const ROOT = join(import.meta.dirname, '../..');
 const DATA_DIR = join(ROOT, 'public/data');
-const EXPORT_DIR = join(ROOT, 'public/export');
+const EXPORT_DIR = existsSync(join(ROOT, 'dist/export'))
+  ? join(ROOT, 'dist/export')
+  : join(ROOT, 'public/export');
 
 const conversations = JSON.parse(
   readFileSync(join(DATA_DIR, 'conversations.json'), 'utf-8')

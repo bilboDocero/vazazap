@@ -127,6 +127,7 @@ def write_json(path, data):
 
 REPORT_PDF = "data/source/IPJ-A-3298613-2026.pdf"
 REPORT_PAGES_FALLBACK = 218
+REPORT_SHA256_FALLBACK = "23cfdfa410c47ab09cbb2b443965e3a3095d9bc3dc5fb266efff76d6f5192b60"
 
 
 def describe_report_document():
@@ -136,17 +137,17 @@ def describe_report_document():
     reads the same values from conversations.json instead of recomputing.
     """
     path = ROOT / REPORT_PDF
-    if not path.exists():
-        return None
-    sha = hashlib.sha256(path.read_bytes()).hexdigest()
+    sha = REPORT_SHA256_FALLBACK
     pages = REPORT_PAGES_FALLBACK
-    try:
-        info = subprocess.run(["pdfinfo", str(path)], capture_output=True, text=True, timeout=30)
-        m = re.search(r"^Pages:\s+(\d+)", info.stdout, re.M)
-        if m:
-            pages = int(m.group(1))
-    except (OSError, subprocess.SubprocessError):
-        pass
+    if path.exists():
+        sha = hashlib.sha256(path.read_bytes()).hexdigest()
+        try:
+            info = subprocess.run(["pdfinfo", str(path)], capture_output=True, text=True, timeout=30)
+            m = re.search(r"^Pages:\s+(\d+)", info.stdout, re.M)
+            if m:
+                pages = int(m.group(1))
+        except (OSError, subprocess.SubprocessError):
+            pass
     # The path is the repository's; the site does not serve the PDF. Say where it is.
     return {
         "file": REPORT_PDF,

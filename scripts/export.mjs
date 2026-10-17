@@ -12,8 +12,8 @@
  * saying the same thing — a profile edited in one place is edited in both.
  */
 
-import { writeFileSync, mkdirSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
+import { join, isAbsolute } from 'node:path';
 import JSZip from 'jszip';
 
 import { getContactProfile, VORCARO_PROFILE, SOURCES } from '../src/lib/profile-content.js';
@@ -24,7 +24,10 @@ import {
   urlsIn, linksToMarkdown, longDate, phonePretty, MEDIA,
 } from './lib/corpus.mjs';
 
-const OUT = join(ROOT, 'public/export');
+const targetArg = process.argv[2];
+const OUT = targetArg
+  ? (isAbsolute(targetArg) ? targetArg : join(ROOT, targetArg))
+  : join(ROOT, 'dist/export');
 const FORMAT_VERSION = 1;
 const generatedAt = new Date().toISOString();
 
