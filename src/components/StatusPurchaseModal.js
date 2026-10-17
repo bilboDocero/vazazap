@@ -38,7 +38,8 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
   let profileName = '';
   let userHandle = '';
   let caption = '';
-  let uploadedFiles = []; // array of { id, name, url, type }
+  let uploadedFiles = []; // array of { id, name, url, type, caption }
+  let activeFileIndex = -1; // currently selected attachment for editing its caption
   let selectedNetwork = 'instagram';
   let previewActiveIdx = 0;
   let uploadError = '';
@@ -186,6 +187,10 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
     if (currentStep === 3) {
       // Step 3: Media Upload and Social Profile Setup
       const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
+      const activeFile = (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length)
+        ? uploadedFiles[activeFileIndex]
+        : null;
+      const currentCaption = activeFile ? (activeFile.caption || '') : (caption || '');
 
       return `
         <div class="status-step-upload">
@@ -255,7 +260,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
 
               <div class="status-files-dropzone">
                 ${uploadedFiles.map((file, idx) => `
-                  <div class="status-uploaded-tile">
+                  <div class="status-uploaded-tile ${idx === activeFileIndex ? 'selected' : ''}" data-id="${file.id}" role="button" tabindex="0" title="Clique para editar a legenda desta imagem">
                     <img src="${file.url}" alt="${escapeHtml(file.name)}" class="status-tile-img" />
                     <span class="status-tile-badge">#${idx + 1}</span>
                     <button type="button" class="status-tile-delete-btn" data-id="${file.id}" aria-label="Remover anexo" title="Remover anexo">&times;</button>
@@ -280,7 +285,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
 
             <label class="status-field-label">
               <span>Legenda do status (opcional)</span>
-              <textarea class="input-caption" rows="2" placeholder="Digite uma legenda para este status...">${escapeHtml(caption)}</textarea>
+              <textarea class="input-caption" rows="2" placeholder="Digite uma legenda para este status...">${escapeHtml(currentCaption)}</textarea>
             </label>
 
             <div class="status-form-actions">
@@ -300,10 +305,11 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
     const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
     const mediaList = uploadedFiles.length > 0
       ? uploadedFiles
-      : [{ id: 'sample', name: 'Foto Exemplo', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80' }];
+      : [{ id: 'sample', name: 'Foto Exemplo', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80', caption: '' }];
 
     const safeIdx = Math.min(previewActiveIdx, mediaList.length - 1);
     const activeMedia = mediaList[safeIdx];
+    const activeCaption = activeMedia?.caption || caption || '';
     const generatedUrl = buildSocialLink(selectedNetwork, userHandle || 'usuario');
 
     return `
@@ -347,9 +353,9 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             </div>
 
             <footer class="story-footer">
-              ${caption ? `
+              ${activeCaption ? `
                 <div class="story-caption-box">
-                  <p class="story-caption-text">${escapeHtml(caption)}</p>
+                  <p class="story-caption-text">${escapeHtml(activeCaption)}</p>
                 </div>
               ` : ''}
 
@@ -431,10 +437,37 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       });
 
       captionInput?.addEventListener('input', () => {
-        caption = captionInput.value;
+        const val = captionInput.value;
+        caption = val;
+        if (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length) {
+          uploadedFiles[activeFileIndex].caption = val;
+        }
       });
 
       updateLink();
+
+      // Click on uploaded tile to switch active attachment and show its caption
+      modalEl.querySelectorAll('.status-uploaded-tile').forEach((tile) => {
+        tile.addEventListener('click', (e) => {
+          if (e.target.closest('.status-tile-delete-btn')) return;
+          const fileId = tile.dataset.id;
+          const foundIdx = uploadedFiles.findIndex(f => f.id === fileId);
+          if (foundIdx !== -1) {
+            if (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length && captionInput) {
+              uploadedFiles[activeFileIndex].caption = captionInput.value;
+            }
+            activeFileIndex = foundIdx;
+            caption = uploadedFiles[foundIdx].caption || '';
+            if (captionInput) {
+              captionInput.value = caption;
+              captionInput.focus();
+            }
+            modalEl.querySelectorAll('.status-uploaded-tile').forEach(t => {
+              t.classList.toggle('selected', t.dataset.id === fileId);
+            });
+          }
+        });
+      });
 
       // Social network switch (icon only)
       modalEl.querySelectorAll('.status-network-btn').forEach(btn => {
@@ -442,7 +475,10 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           selectedNetwork = btn.dataset.net;
           profileName = nameInput.value;
           userHandle = handleInput.value.trim();
-          caption = captionInput.value;
+          if (captionInput && activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length) {
+            uploadedFiles[activeFileIndex].caption = captionInput.value;
+          }
+          caption = captionInput ? captionInput.value : '';
           render();
         });
       });
@@ -499,16 +535,22 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           uploadError = '';
           const reader = new FileReader();
           reader.onload = (ev) => {
-            uploadedFiles.push({
+            const newFile = {
               id: `file-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
               name: file.name,
               url: ev.target.result,
               type: file.type || 'image/jpeg',
-            });
+              caption: '', // Clean for new attachment!
+            };
+            uploadedFiles.push(newFile);
+            activeFileIndex = uploadedFiles.length - 1; // Newly added is selected
+            caption = ''; // Clear caption awaiting new text!
             profileName = nameInput.value;
             userHandle = handleInput.value.trim();
-            caption = captionInput.value;
             render();
+            setTimeout(() => {
+              modalEl.querySelector('.input-caption')?.focus();
+            }, 50);
           };
           reader.readAsDataURL(file);
         }
@@ -530,22 +572,32 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             name: `Foto 9:16 #${idx + 1}.jpg`,
             url: sampleImages[idx % sampleImages.length],
             type: 'image/jpeg',
+            caption: '',
           });
         }
+        activeFileIndex = uploadedFiles.length - 1;
+        caption = '';
         profileName = nameInput.value;
         userHandle = handleInput.value.trim();
-        caption = captionInput.value;
         uploadError = '';
         render();
+        setTimeout(() => {
+          modalEl.querySelector('.input-caption')?.focus();
+        }, 50);
       });
 
       // Remove uploaded file
       modalEl.querySelectorAll('.status-tile-delete-btn, .status-remove-file-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          uploadedFiles = uploadedFiles.filter(f => f.id !== btn.dataset.id);
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const delId = btn.dataset.id;
+          uploadedFiles = uploadedFiles.filter(f => f.id !== delId);
+          if (activeFileIndex >= uploadedFiles.length) {
+            activeFileIndex = uploadedFiles.length - 1;
+          }
+          caption = activeFileIndex >= 0 ? (uploadedFiles[activeFileIndex].caption || '') : '';
           profileName = nameInput.value;
           userHandle = handleInput.value.trim();
-          caption = captionInput.value;
           render();
         });
       });
@@ -562,7 +614,11 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         e.preventDefault();
         profileName = nameInput.value.trim() || 'Anunciante';
         userHandle = handleInput.value.trim() || 'usuario';
-        caption = captionInput.value.trim();
+
+        if (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length && captionInput) {
+          uploadedFiles[activeFileIndex].caption = captionInput.value.trim();
+        }
+        caption = captionInput ? captionInput.value.trim() : '';
 
         if (uploadedFiles.length === 0) {
           uploadedFiles.push({
@@ -570,7 +626,9 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             name: 'Story Vertical 9:16.jpg',
             url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80',
             type: 'image/jpeg',
+            caption: caption || '',
           });
+          activeFileIndex = 0;
         }
 
         previewActiveIdx = 0;

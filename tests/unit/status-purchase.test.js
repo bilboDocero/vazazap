@@ -127,5 +127,26 @@ describe('Status Purchase & Pricing Calculator', () => {
       const cached = loadCachedStatuses();
       expect(cached.some(c => c.id === created.id)).toBe(true);
     });
+
+    it('supports individual captions for each media item', async () => {
+      const created = await createStatusPurchase({
+        plan_type: 'status_normal',
+        file_count: 2,
+        unit_price: 4.90,
+        discount_amount: 0.50,
+        total_price: 9.30,
+        profile_name: 'Juliana Silva Tech',
+        user_handle: '@julianadev',
+        social_network: 'instagram',
+        caption: 'Legenda da primeira foto',
+        media_files: [
+          { id: '1', name: 'foto1.jpg', url: 'https://example.com/1.jpg', caption: 'Legenda da primeira foto' },
+          { id: '2', name: 'foto2.jpg', url: 'https://example.com/2.jpg', caption: 'Legenda diferente da segunda foto' },
+        ],
+      });
+
+      expect(created.media_files[0].caption).toBe('Legenda da primeira foto');
+      expect(created.media_files[1].caption).toBe('Legenda diferente da segunda foto');
+    });
   });
 });
