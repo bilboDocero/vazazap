@@ -1,0 +1,1351 @@
+/* Component styles — shared UI elements */
+
+/* ── Date separator badge (enhanced for Batch 5) ─ */
+/* Additional date badge styles live in chat.css (.chat-date-badge) */
+
+/* ── Bubble tail visibility — only show on first message of a group ── */
+.chat-msg-row + .chat-msg-row.incoming > .chat-msg-bubble.incoming {
+  border-top-left-radius: 8px;
+}
+
+.chat-msg-row + .chat-msg-row.incoming > .chat-msg-bubble.incoming .chat-msg-tail {
+  display: none;
+}
+
+.chat-msg-row + .chat-msg-row.outgoing > .chat-msg-bubble.outgoing {
+  border-top-right-radius: 8px;
+}
+
+.chat-msg-row + .chat-msg-row.outgoing > .chat-msg-bubble.outgoing .chat-msg-tail {
+  display: none;
+}
+
+/* ── Consecutive same-direction spacing ──────── */
+.chat-msg-row.incoming + .chat-msg-row.incoming,
+.chat-msg-row.outgoing + .chat-msg-row.outgoing {
+  margin-top: 1px;
+}
+
+/* Extra gap between direction changes */
+.chat-msg-row.incoming + .chat-msg-row.outgoing,
+.chat-msg-row.outgoing + .chat-msg-row.incoming {
+  margin-top: 6px;
+}
+
+/* ── Context Menu ────────────────────────────── */
+.context-menu {
+  position: fixed;
+  z-index: 100;
+  min-width: 160px;
+  padding: 6px 0;
+  background-color: var(--WDS-surface-elevated-default);
+  border-radius: 10px;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, .15),
+    0 0 1px rgba(0, 0, 0, .1);
+  overflow: hidden;
+  animation: contextMenuIn 120ms ease-out;
+}
+
+@keyframes contextMenuIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.context-menu-icon {
+  display: inline-flex;
+  align-items: center;
+  width: 20px;
+  flex-shrink: 0;
+  color: var(--WDS-content-deemphasized);
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 20px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--WDS-content-default);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 80ms;
+}
+
+.context-menu-item:hover {
+  background-color: var(--WDS-surface-highlight);
+}
+
+.context-menu-item:active {
+  background-color: var(--WDS-surface-pressed);
+}
+
+/* ── Shared drawer base ──────────────────────── */
+/* Drawers are flex children of .main-area — they push the chat view aside */
+.msg-info-drawer,
+.contact-info-drawer {
+  width: 0;
+  min-width: 0;
+  height: 100%;
+  background-color: var(--WDS-background-wash-plain);
+  border-left: 1px solid var(--WDS-lines-divider);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.msg-info-drawer.open,
+.contact-info-drawer.open {
+  width: 40%;
+  min-width: 300px;
+  transition: width 250ms ease-out, min-width 250ms ease-out;
+}
+
+/* ── Message Info Drawer ─────────────────────── */
+.msg-info-drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 24px;
+  height: 59px;
+  background-color: var(--WDS-background-wash-plain);
+  border-bottom: 1px solid var(--WDS-lines-divider);
+  flex-shrink: 0;
+}
+
+.msg-info-drawer-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--WDS-content-deemphasized);
+  padding: 4px;
+  line-height: 1;
+}
+
+.msg-info-drawer-close:hover {
+  color: var(--WDS-content-default);
+}
+
+.msg-info-drawer-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--WDS-content-default);
+}
+
+.msg-info-preview {
+  margin: 20px 24px;
+  padding: 8px 10px;
+  background-color: var(--WDS-systems-bubble-surface-outgoing);
+  border-radius: 8px;
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, .1);
+}
+
+.msg-info-preview-content {
+  font-size: 14px;
+  color: var(--WDS-content-default);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.msg-info-preview-meta {
+  display: block;
+  text-align: right;
+  font-size: 11px;
+  color: var(--WDS-systems-bubble-content-deemphasized);
+  margin-top: 4px;
+}
+
+.msg-info-fields {
+  padding: 0 24px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Stacked layout: title on top, value below — like WhatsApp info drawer */
+.msg-info-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 0;
+}
+
+.msg-info-field-label {
+  font-size: 14px;
+  color: var(--WDS-content-default);
+  font-weight: 500;
+}
+
+.msg-info-field-value {
+  font-size: 13px;
+  color: var(--WDS-content-deemphasized);
+}
+
+@media (max-width: 600px) {
+  .msg-info-drawer.open,
+  .contact-info-drawer.open,
+  .chat-search-drawer.open {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* ── Contact Info Drawer ─────────────────────── */
+.contact-info-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 24px;
+  height: 59px;
+  background-color: var(--WDS-background-wash-plain);
+  border-bottom: 1px solid var(--WDS-lines-divider);
+  flex-shrink: 0;
+}
+
+.contact-info-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--WDS-content-deemphasized);
+  padding: 4px;
+  line-height: 1;
+}
+
+.contact-info-close:hover {
+  color: var(--WDS-content-default);
+}
+
+.contact-info-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--WDS-content-default);
+}
+
+.contact-info-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.contact-info-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 24px 20px;
+}
+
+.contact-info-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.contact-info-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contact-info-name {
+  font-size: 21px;
+  font-weight: 500;
+  color: var(--WDS-content-default);
+  margin-bottom: 4px;
+}
+
+.contact-info-phone {
+  font-size: 14px;
+  color: var(--WDS-content-deemphasized);
+  margin-bottom: 16px;
+}
+
+.contact-info-search-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--WDS-lines-outline-deemphasized);
+  border-radius: 20px;
+  color: var(--WDS-accent);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 80ms;
+}
+
+.contact-info-search-btn:hover {
+  background-color: var(--WDS-surface-highlight);
+}
+
+.contact-info-divider {
+  height: 8px;
+  background-color: var(--WDS-surface-emphasized);
+}
+
+.contact-info-section {
+  padding: 16px 24px;
+}
+
+.contact-info-section-label {
+  font-size: 13px;
+  color: var(--WDS-content-deemphasized);
+  margin-bottom: 4px;
+}
+
+.contact-info-section-value {
+  font-size: 16px;
+  color: var(--WDS-content-default);
+}
+
+.contact-info-actions {
+  padding: 4px 0;
+}
+
+.contact-info-action-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+  cursor: default;
+}
+
+.contact-info-action-icon {
+  flex-shrink: 0;
+  color: var(--WDS-content-deemphasized);
+}
+
+.contact-info-action-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-info-action-label {
+  font-size: 15px;
+  color: var(--WDS-content-default);
+}
+
+.contact-info-action-detail {
+  font-size: 13px;
+  color: var(--WDS-content-deemphasized);
+  margin-top: 2px;
+}
+
+.contact-info-toggle {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: var(--WDS-neutral-gray-300);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.contact-info-action-item.disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.contact-info-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--WDS-white);
+  transition: transform 120ms;
+}
+
+/* ── Chat Search Drawer ──────────────────────── */
+.chat-search-drawer {
+  width: 0;
+  min-width: 0;
+  height: 100%;
+  background-color: var(--WDS-background-wash-plain);
+  border-left: 1px solid var(--WDS-lines-divider);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.chat-search-drawer.open {
+  width: 40%;
+  min-width: 300px;
+  transition: width 250ms ease-out, min-width 250ms ease-out;
+}
+
+.chat-search-drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 24px;
+  height: 59px;
+  background-color: var(--WDS-background-wash-plain);
+  border-bottom: 1px solid var(--WDS-lines-divider);
+  flex-shrink: 0;
+}
+
+.chat-search-drawer-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--WDS-content-deemphasized);
+  padding: 4px;
+  line-height: 1;
+}
+
+.chat-search-drawer-close:hover {
+  color: var(--WDS-content-default);
+}
+
+.chat-search-drawer-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--WDS-content-default);
+}
+
+.chat-search-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--WDS-lines-divider);
+}
+
+.chat-search-input-icon {
+  flex-shrink: 0;
+  color: var(--WDS-content-deemphasized);
+}
+
+.chat-search-input {
+  flex: 1;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--WDS-content-default);
+  outline: none;
+  padding: 6px 0;
+}
+
+.chat-search-input::placeholder {
+  color: var(--WDS-content-deemphasized);
+}
+
+.chat-search-clear-btn,
+.chat-search-calendar-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--WDS-content-deemphasized);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chat-search-clear-btn:hover,
+.chat-search-calendar-btn:hover {
+  background-color: var(--WDS-surface-highlight);
+  color: var(--WDS-content-default);
+}
+
+.chat-search-results {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-search-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--WDS-content-deemphasized);
+  font-size: 14px;
+}
+
+.chat-search-result-item {
+  padding: 10px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--WDS-lines-divider);
+  transition: background-color 80ms;
+}
+
+.chat-search-result-item:hover {
+  background-color: var(--WDS-surface-highlight);
+}
+
+.chat-search-result-meta {
+  font-size: 12px;
+  color: var(--WDS-content-deemphasized);
+  margin-bottom: 3px;
+}
+
+.chat-search-result-content {
+  font-size: 14px;
+  color: var(--WDS-content-default);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Calendar Picker ─────────────────────────── */
+.chat-calendar {
+  position: absolute;
+  top: 118px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  padding: 16px;
+  background-color: var(--WDS-surface-elevated-default);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .18);
+  z-index: 70;
+}
+
+.chat-calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.chat-calendar-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--WDS-content-default);
+  text-transform: capitalize;
+}
+
+.chat-calendar-nav-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--WDS-content-deemphasized);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.chat-calendar-nav-btn:hover {
+  background-color: var(--WDS-surface-highlight);
+}
+
+.chat-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.chat-calendar-header {
+  font-size: 11px;
+  color: var(--WDS-content-deemphasized);
+  padding: 4px 0;
+  font-weight: 500;
+}
+
+.chat-calendar-day {
+  font-size: 13px;
+  padding: 6px 0;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-family: inherit;
+  color: var(--WDS-content-default);
+}
+
+.chat-calendar-day.has-messages {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.chat-calendar-day.has-messages:hover {
+  background-color: var(--WDS-surface-highlight);
+}
+
+.chat-calendar-day.today {
+  color: var(--WDS-accent);
+  font-weight: 700;
+}
+
+.chat-calendar-day.disabled {
+  color: var(--WDS-content-disabled);
+  cursor: default;
+}
+
+.chat-calendar-day.empty {
+  visibility: hidden;
+}
+
+/* Mobile handled in shared drawer media query above */
+
+/* ── Profile Placeholder (main area when profile is open) ── */
+.profile-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  color: var(--WDS-content-deemphasized);
+  gap: 12px;
+  z-index: 1;
+  position: relative;
+  background-color: var(--WDS-surface-emphasized);
+}
+
+.profile-placeholder svg {
+  color: var(--WDS-warm-gray-300);
+}
+
+.profile-placeholder-text {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--WDS-content-default);
+  letter-spacing: -0.014em;
+}
+
+/* ── Profile Drawer (DV profile, replaces sidebar) ── */
+.profile-drawer {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  min-width: 340px;
+  max-width: 500px;
+  height: 100%;
+  background-color: var(--WDS-background-wash-plain);
+  border-right: 1px solid var(--WDS-lines-divider);
+  overflow: hidden;
+}
+
+.profile-drawer.open {
+  transition: none;
+}
+
+.profile-drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 24px;
+  height: 59px;
+  background-color: var(--WDS-background-wash-plain);
+  border-bottom: 1px solid var(--WDS-lines-divider);
+  flex-shrink: 0;
+}
+
+.profile-drawer-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--WDS-content-deemphasized);
+  padding: 4px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.profile-drawer-close:hover {
+  color: var(--WDS-content-default);
+}
+
+/* Desktop: show X, hide arrow */
+.drawer-close-arrow {
+  display: none;
+}
+
+.drawer-close-x {
+  display: inline;
+}
+
+.profile-drawer-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--WDS-content-default);
+}
+
+.profile-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.profile-drawer-avatar-section {
+  display: flex;
+  justify-content: center;
+  padding: 28px 0 16px;
+}
+
+.profile-drawer-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-drawer-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-drawer-field {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--WDS-lines-divider);
+}
+
+.profile-drawer-field-label {
+  font-size: 13px;
+  color: var(--WDS-content-deemphasized);
+  margin-bottom: 4px;
+}
+
+.profile-drawer-field-value {
+  font-size: 16px;
+  color: var(--WDS-content-default);
+}
+
+/* ── Settings Drawer Logo ────────────────────── */
+.settings-logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 24px 20px;
+}
+
+.settings-logo-img {
+  border-radius: 16px;
+  margin-bottom: 12px;
+}
+
+.settings-logo-name {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--WDS-accent);
+  margin-bottom: 4px;
+}
+
+.settings-logo-sub {
+  font-size: 13px;
+  color: var(--WDS-content-deemphasized);
+}
+
+/* ── Profile Sections (shared) ───────────────── */
+.profile-sections {
+  padding: 16px 24px 32px;
+}
+
+.profile-section {
+  margin-bottom: 20px;
+}
+
+.profile-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--WDS-content-default);
+  margin-bottom: 10px;
+}
+
+.profile-section-text {
+  font-size: 14px;
+  color: var(--WDS-content-default);
+  line-height: 1.65;
+  margin-bottom: 12px;
+}
+
+.profile-section-text a,
+.profile-action-link {
+  color: var(--WDS-green-700);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.profile-section-text a:hover,
+.profile-action-link:hover {
+  text-decoration: underline;
+}
+
+.profile-sources {
+  margin-top: 24px;
+  font-size: 13px;
+}
+
+.profile-sources summary {
+  cursor: pointer;
+  color: var(--WDS-content-deemphasized);
+  font-weight: 500;
+  padding: 8px 0;
+}
+
+.profile-sources ul {
+  list-style: none;
+  padding: 8px 0;
+}
+
+.profile-sources li {
+  padding: 4px 0;
+}
+
+.profile-sources a {
+  color: var(--WDS-green-700);
+  text-decoration: none;
+  font-size: 12.5px;
+}
+
+.profile-sources a:hover {
+  text-decoration: underline;
+}
+
+.profile-credits {
+  margin-top: 24px;
+  padding: 16px 0;
+  border-top: 1px solid var(--WDS-lines-divider);
+  font-size: 12px;
+  color: var(--WDS-content-deemphasized);
+  line-height: 1.5;
+}
+
+/* ── Search Results (sidebar) ────────────────── */
+.search-results {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.search-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--WDS-content-deemphasized);
+  font-size: 14px;
+}
+
+.search-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--WDS-lines-divider);
+  transition: background-color 80ms;
+}
+
+.search-result-item:hover {
+  background-color: var(--WDS-surface-highlight);
+}
+
+.search-result-item:focus-visible {
+  outline: 2px solid var(--WDS-accent);
+  outline-offset: -2px;
+}
+
+.search-result-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.search-result-sender {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--WDS-content-default);
+}
+
+.search-result-date {
+  font-size: 12px;
+  color: var(--WDS-content-deemphasized);
+  white-space: nowrap;
+}
+
+.search-result-content {
+  font-size: 13px;
+  color: var(--WDS-content-deemphasized);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.search-highlight {
+  background-color: var(--WDS-yellow-200);
+  color: var(--WDS-content-default);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* ── Image preview ────────────────────────────── */
+/* Shown when the platform will neither share the file nor take it on the
+   clipboard: the image goes on the page so the browser's own long-press menu
+   can reach it. */
+
+.image-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  background-color: #0b141a;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.image-preview.open {
+  opacity: 1;
+}
+
+.image-preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.image-preview-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.image-preview-close:active {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.image-preview-title {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* The image gets the space that is left, never more: the hint and the buttons
+   below are laid out first, so nothing ends up on top of them. */
+.image-preview-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 16px;
+}
+
+.image-preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.image-preview-footer {
+  flex-shrink: 0;
+  padding: 14px 16px;
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+}
+
+.image-preview-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.image-preview-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.image-preview-actions:not(:empty) {
+  margin-top: 14px;
+}
+
+.image-preview-action {
+  min-width: 180px;
+  padding: 12px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 22px;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.image-preview-action.primary {
+  border-color: transparent;
+  background-color: var(--WDS-primary-strong, #1daa61);
+}
+
+.image-preview-action:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ── Contacts sheet: the list behind "Ver todos" on a contact card ───────── */
+.contacts-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  background: var(--WDS-white);
+  color: var(--WDS-content-default);
+}
+
+.contacts-sheet-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--WDS-lines-outline-deemphasized);
+}
+
+.contacts-sheet-back {
+  display: flex;
+  padding: 4px;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.contacts-sheet-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.contacts-sheet-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--WDS-warm-gray-75);
+}
+
+.contacts-sheet-item {
+  background: var(--WDS-white);
+  margin-bottom: 8px;
+}
+
+.contacts-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--WDS-lines-outline-deemphasized);
+}
+
+.contacts-sheet-avatar img,
+.contacts-sheet-avatar > svg {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.contacts-sheet-name {
+  font-size: 17px;
+}
+
+.contacts-sheet-phone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+}
+
+.contacts-sheet-phone-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.contacts-sheet-phone-text small {
+  color: var(--WDS-content-deemphasized);
+  font-size: 12px;
+}
+
+.contacts-sheet-action {
+  display: flex;
+  padding: 6px;
+  border: none;
+  background: none;
+  color: var(--WDS-accent);
+  cursor: pointer;
+}
+
+.contacts-sheet-action:disabled {
+  color: var(--WDS-content-deemphasized);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Calls screen ──────────────────────────────────────────────────────────
+   Takes the chat list's place in the sidebar; the header, search and filter
+   tabs are the list's, so they step aside. */
+.sidebar--calls .sidebar-header,
+.sidebar--calls .sidebar-search,
+.sidebar--calls .sidebar-tags,
+.sidebar--calls .conversation-list {
+  display: none;
+}
+
+.sidebar--section > .sidebar-header,
+.sidebar--section > .sidebar-search,
+.sidebar--section > .sidebar-tags,
+.sidebar--section > .conversation-list,
+.sidebar--section > .search-results {
+  display: none;
+}
+
+.calls-panel {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--WDS-white);
+}
+
+.sidebar--calls .calls-panel {
+  display: flex;
+}
+
+.calls-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px 8px 16px;
+}
+
+.calls-title {
+  flex: 1;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--WDS-content-default);
+}
+
+.calls-header-btn {
+  display: flex;
+  padding: 8px;
+  border: none;
+  background: none;
+  color: var(--WDS-content-default);
+}
+
+.calls-header-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.calls-actions {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 8px 16px;
+}
+
+.calls-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: none;
+  color: var(--WDS-content-default);
+  font: inherit;
+  font-size: 13px;
+}
+
+.calls-action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.calls-action-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--WDS-warm-gray-75);
+}
+
+.calls-recent {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--WDS-content-default);
+}
+
+.calls-item {
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+}
+
+.calls-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.calls-item-main:hover,
+.calls-item-kind:hover {
+  background: var(--WDS-surface-highlight);
+}
+
+.calls-item-avatar img,
+.calls-item-avatar > svg {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.calls-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.calls-item-name {
+  font-size: 16px;
+  color: var(--WDS-content-default);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calls-item.missed .calls-item-name {
+  color: #e53935;
+}
+
+.calls-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--WDS-content-deemphasized);
+}
+
+.calls-item-arrow {
+  display: flex;
+  color: var(--WDS-accent);
+}
+
+.calls-item.missed .calls-item-arrow {
+  color: #e53935;
+}
+
+.calls-item-kind {
+  display: flex;
+  padding: 12px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--WDS-content-default);
+  cursor: pointer;
+}
+
+.calls-foot {
+  padding: 12px 16px 24px;
+  font-size: 12px;
+  color: var(--WDS-content-deemphasized);
+}
+
+.sidebar-bottom-tab {
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* On a wide screen WhatsApp Web opens shared contacts as a centred dialog
+   over the chat, not as a page; the phone keeps the full screen. */
+@media (min-width: 601px) {
+  .contacts-sheet {
+    background: rgba(17, 27, 33, 0.55);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .contacts-sheet-bar,
+  .contacts-sheet-list {
+    width: min(480px, calc(100vw - 48px));
+    background: var(--WDS-white);
+  }
+
+  .contacts-sheet-bar {
+    border-radius: 12px 12px 0 0;
+    box-sizing: border-box;
+  }
+
+  .contacts-sheet-list {
+    flex: 0 1 auto;
+    max-height: 70vh;
+    border-radius: 0 0 12px 12px;
+    box-sizing: border-box;
+  }
+
+  .contacts-sheet-item:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.contacts-sheet-back .is-close { display: none; }
+@media (min-width: 601px) {
+  .contacts-sheet-back .is-back { display: none; }
+  .contacts-sheet-back .is-close { display: flex; }
+}
