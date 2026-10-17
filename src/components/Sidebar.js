@@ -8,7 +8,7 @@ import { formatTime, escapeHtml, formatNumber, formatRelativeDate } from '../lib
 
 import { ICON_SEARCH as SEARCH_ICON, ICON_MEETBALL } from '../lib/icons.js';
 import { defaultAvatarSvg } from '../lib/avatar.js';
-import { ICON_CHAT, ICON_CALLS, ICON_STATUS, ICON_CHANNELS, ICON_COMMUNITIES } from './NavRail.js';
+import { ICON_CHAT, ICON_CALLS, ICON_STATUS, ICON_CHANNELS, ICON_COMMUNITIES, ICON_STORE, ICON_ADVERTISE } from './NavRail.js';
 
 /**
  * The two conversations pinned under "Favoritas" — the leaks this project is
@@ -23,7 +23,7 @@ export const FAVORITE_CONVERSATIONS = new Set(['alexandre-de-moraes', 'martha-gr
  * @param {function} options.onSelect - called with conversation id
  * @param {Set<string>} [options.readConversations] - ids already opened
  */
-export function renderSidebar(container, { conversations, onSelect, onProfile, onAbout, onExportAll, onCalls, onChats, onStatus, onChannels, onCommunities, readConversations = new Set() }) {
+export function renderSidebar(container, { conversations, onSelect, onProfile, onAbout, onExportAll, onCalls, onChats, onStatus, onChannels, onCommunities, onVitrine, onAnunciar, readConversations = new Set() }) {
   const el = document.createElement('aside');
   el.className = 'sidebar';
   el.setAttribute('role', 'navigation');
@@ -57,6 +57,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
       <button class="sidebar-tag" data-filter="nao-lidas">Não lidas <span class="sidebar-tag-count"></span></button>
       <button class="sidebar-tag" data-filter="favoritas">Favoritas</button>
       <button class="sidebar-tag disabled" disabled title="Este acervo não contém grupos">Grupos</button>
+      <button class="sidebar-tag sidebar-tag--calls" data-action="calls" data-tab="calls" aria-label="Ver chamadas">Chamadas</button>
     </div>
     <div class="conversation-list" role="list"></div>
   `;
@@ -216,6 +217,11 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   tagButtons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === activeFilter)));
   refreshReadState();
 
+  const callsTag = el.querySelector('.sidebar-tag--calls');
+  callsTag?.addEventListener('click', () => {
+    onCalls?.();
+  });
+
   // main.js marks a conversation read when it opens; this lets it repaint the
   // badges and the tally without rebuilding the whole sidebar.
   el.refreshReadState = refreshReadState;
@@ -229,13 +235,15 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
     ['status', 'Status', ICON_STATUS, onStatus],
     ['channels', 'Canais', ICON_CHANNELS, onChannels],
     ['communities', 'Comunidades', ICON_COMMUNITIES, onCommunities],
-    ['calls', 'Chamadas', ICON_CALLS, onCalls],
+    ['vitrine', 'Vitrine', ICON_STORE, onVitrine],
+    ['anunciar', 'Anunciar', ICON_ADVERTISE, onAnunciar],
   ]) {
     const tab = document.createElement('button');
     tab.className = 'sidebar-bottom-tab';
     tab.dataset.tab = key;
     tab.setAttribute('aria-label', label);
-    tab.innerHTML = `${icon}<span>${label}</span>`; // Static SVGs and labels.
+    tab.title = label;
+    tab.innerHTML = `<span class="sidebar-bottom-tab-icon">${icon}</span>`;
     tab.addEventListener('click', () => action?.());
     bottomNav.appendChild(tab);
   }
@@ -252,18 +260,25 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
 
   el.showSection = (kind, panel) => {
     closeSidebarMenu();
-    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel').forEach(p => p.remove());
+    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel, .commercial-panel, .vitrine-panel').forEach(p => p.remove());
     el.insertBefore(panel, bottomNav);
     el.classList.add('sidebar--section');
     el.classList.toggle('sidebar--calls', kind === 'calls');
     el.classList.toggle('sidebar--communities', kind === 'communities');
+    el.classList.toggle('sidebar--vitrine', kind === 'vitrine');
+    el.classList.toggle('sidebar--anunciar', kind === 'anunciar');
+    callsTag?.classList.toggle('active', kind === 'calls');
     selectTab(kind);
   };
   el.showCalls = panel => el.showSection('calls', panel);
   el.showCommunities = panel => el.showSection('communities', panel);
+  el.showVitrine = panel => el.showSection('vitrine', panel);
+  el.showAnunciar = panel => el.showSection('anunciar', panel);
+  el.showCommercial = panel => el.showSection('anunciar', panel);
   el.showChats = () => {
-    el.classList.remove('sidebar--calls', 'sidebar--section', 'sidebar--communities');
-    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel').forEach(p => p.remove());
+    el.classList.remove('sidebar--calls', 'sidebar--section', 'sidebar--communities', 'sidebar--vitrine', 'sidebar--anunciar', 'sidebar--commercial');
+    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel, .commercial-panel, .vitrine-panel').forEach(p => p.remove());
+    callsTag?.classList.remove('active');
     selectTab('chats');
   };
 

@@ -66,7 +66,7 @@ test.describe('Getting there', () => {
     await expect(page.locator('.conversation-item').first()).toBeVisible();
     const isMobile = page.viewportSize().width <= 600;
     if (isMobile) {
-      await page.locator('.sidebar-bottom-tab[data-tab="calls"]').click();
+      await page.locator('.sidebar-tag--calls, .sidebar-bottom-tab[data-tab="calls"]').first().click();
     } else {
       await page.locator('.nav-rail button[aria-label="Chamadas"], button[aria-label="Chamadas"]').first().click();
     }

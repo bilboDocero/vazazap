@@ -27,6 +27,11 @@ import { createUpdatesCatalog } from './lib/updates-content.js';
 import { renderCommunitiesPanel } from './components/CommunitiesPanel.js';
 import { renderCommunitiesDetail } from './components/CommunitiesDetail.js';
 import { getCommunitiesData, findCommunitySelection } from './lib/communities-content.js';
+import { renderCommercialPanel } from './components/CommercialPanel.js';
+import { renderCommercialDetail } from './components/CommercialDetail.js';
+import { renderVitrinePanel } from './components/VitrinePanel.js';
+import { renderVitrineDetail } from './components/VitrineDetail.js';
+import { getVitrinesCatalog } from './lib/commercial-content.js';
 import { exportUrl, EXPORT_ALL_URL, downloadFile } from './lib/export.js';
 import { copyText } from './lib/utils.js';
 
@@ -481,18 +486,20 @@ async function init() {
       closeSettings();
       sidebar.showChats?.();
       navRail.setActive('chats');
-      if (['calls', 'status', 'channels', 'communities'].includes(router.getCurrentRoute().route)) router.navigate('home');
+      if (['calls', 'status', 'channels', 'communities', 'vitrine', 'anunciar'].includes(router.getCurrentRoute().route)) router.navigate('home');
       sidebar.querySelector('.sidebar-search-input').focus();
     },
     onCalls: () => router.navigate('calls'),
     onStatus: () => router.navigate('status'),
     onChannels: () => router.navigate('channels'),
     onCommunities: () => router.navigate('communities'),
+    onVitrine: () => router.navigate('vitrine'),
+    onAnunciar: () => router.navigate('anunciar'),
     avatarSrc: '/assets/avatar-dv.jpg',
     onSettings: openSettings,
     onChat: () => {
-      // From the calls screen, this is the way back to the list.
-      if (['calls', 'status', 'channels', 'communities'].includes(router.getCurrentRoute().route)) { router.navigate('home'); return; }
+      // From the calls/communities/commercial screen, this is the way back to the list.
+      if (['calls', 'status', 'channels', 'communities', 'vitrine', 'anunciar'].includes(router.getCurrentRoute().route)) { router.navigate('home'); return; }
       closeProfile();
       closeSettings();
     },
@@ -511,6 +518,8 @@ async function init() {
     onStatus: () => router.navigate('status'),
     onChannels: () => router.navigate('channels'),
     onCommunities: () => router.navigate('communities'),
+    onVitrine: () => router.navigate('vitrine'),
+    onAnunciar: () => router.navigate('anunciar'),
     onSelect: (id) => {
       // Close profile/settings if open before navigating
       closeProfile();
@@ -619,6 +628,73 @@ async function init() {
       onBack: () => router.navigate('communities'),
       onCreateCommunity: () => activeCommunities?.panel.openCreateModal(),
       onSelectGroup: (groupId) => router.navigate('communities', groupId),
+    });
+  });
+
+  // ── Anunciar (Ferramentas comerciais) ───────────────
+  let activeCommercial = null;
+  router.on('anunciar', sectionId => {
+    closeAll();
+    currentConversationId = null;
+    setActiveConversation(sidebar, null);
+
+    const activeItem = sectionId || 'anunciar';
+
+    if (!activeCommercial?.panel.isConnected) {
+      const panel = renderCommercialPanel({
+        selectedId: activeItem,
+        onSelect: selected => router.navigate('anunciar', selected),
+      });
+      sidebar.showAnunciar?.(panel);
+      activeCommercial = { panel };
+    } else {
+      activeCommercial.panel.setActive(activeItem);
+    }
+
+    navRail.setActive('anunciar');
+    container.classList.toggle('chat-open', true);
+
+    renderCommercialDetail(mainArea, {
+      activeSection: activeItem,
+      onBack: () => router.navigate('home'),
+      onNavigateTab: (targetRoute) => router.navigate(targetRoute),
+      onShowToast: (msg) => showToast(mainArea, msg),
+    });
+  });
+
+  // ── Vitrine (Semelhante à aba Canais) ───────────────
+  let activeVitrine = null;
+  const vitrinesCatalog = getVitrinesCatalog();
+  router.on('vitrine', id => {
+    closeAll();
+    currentConversationId = null;
+    setActiveConversation(sidebar, null);
+
+    const vitrinesList = vitrinesCatalog.vitrines;
+    const entry = vitrinesList.find(item => item.id === id) || null;
+
+    if (!activeVitrine?.panel.isConnected) {
+      const panel = renderVitrinePanel({
+        vitrines: vitrinesList,
+        selectedId: id,
+        onSelect: selectedId => router.navigate('vitrine', selectedId),
+        onNewVitrine: () => router.navigate('anunciar'),
+      });
+      sidebar.showVitrine?.(panel);
+      activeVitrine = { panel };
+    } else {
+      activeVitrine.panel.setActive(entry?.id);
+    }
+
+    navRail.setActive('vitrine');
+    container.classList.toggle('chat-open', !!entry);
+
+    renderVitrineDetail(mainArea, {
+      entry,
+      onBack: () => router.navigate('vitrine'),
+      onConversation: (convId) => router.navigate('chat', convId),
+      onGoToAnunciar: () => router.navigate('anunciar'),
+      onShowToast: (msg) => showToast(mainArea, msg),
     });
   });
 

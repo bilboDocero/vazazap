@@ -1151,24 +1151,36 @@
 .calls-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 14px 8px 8px 16px;
+  justify-content: space-between;
+  height: 64px;
+  padding: 12px 20px;
+  flex-shrink: 0;
 }
 
 .calls-title {
   flex: 1;
   margin: 0;
   font-size: 22px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--WDS-content-default);
 }
 
 .calls-header-btn {
-  display: flex;
-  padding: 8px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border: none;
   background: none;
+  border-radius: 50%;
   color: var(--WDS-content-default);
+  cursor: pointer;
+  transition: background-color 120ms;
+}
+
+.calls-header-btn:hover {
+  background-color: var(--WDS-surface-highlight);
 }
 
 .calls-header-btn:disabled {
@@ -1348,4 +1360,33 @@
 @media (min-width: 601px) {
   .contacts-sheet-back .is-back { display: none; }
   .contacts-sheet-back .is-close { display: flex; }
+}
+
+/* ── Standardized Sidebar Scrollbars across all tabs ─ */
+.sidebar::-webkit-scrollbar,
+.conversation-list::-webkit-scrollbar,
+.calls-panel::-webkit-scrollbar,
+.updates-list::-webkit-scrollbar,
+.communities-scroll-area::-webkit-scrollbar,
+.commercial-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.conversation-list::-webkit-scrollbar-thumb,
+.calls-panel::-webkit-scrollbar-thumb,
+.updates-list::-webkit-scrollbar-thumb,
+.communities-scroll-area::-webkit-scrollbar-thumb,
+.commercial-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.conversation-list::-webkit-scrollbar-track,
+.calls-panel::-webkit-scrollbar-track,
+.updates-list::-webkit-scrollbar-track,
+.communities-scroll-area::-webkit-scrollbar-track,
+.commercial-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
 }

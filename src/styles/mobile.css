@@ -64,25 +64,71 @@
     background-color: var(--WDS-background-wash-plain);
   }
 
-  .sidebar-header { height: 72px; padding: 14px 16px; }
-  .sidebar-header-title { color: var(--WDS-accent); font-size: 25px; }
+  .sidebar-header { height: 64px; padding: 12px 16px; }
+  .sidebar-header-title { color: var(--WDS-content-default); font-size: 22px; font-weight: 600; }
   .sidebar-tags { gap: 6px; }
-  .sidebar-tag { padding: 6px 10px; }
+  .sidebar-tag { padding: 6px 12px; }
   .sidebar-tag-count { font-size: 10px; }
-
-  .sidebar-bottom-nav {
-    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-    min-height: 70px;
+  .sidebar-tag--calls {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: var(--WDS-surface-emphasized);
+    color: var(--WDS-content-deemphasized);
+  }
+  .sidebar-tag--calls.active {
+    background-color: var(--WDS-components-filter-surface-selected);
+    color: var(--WDS-accent);
+    font-weight: 500;
   }
 
-  .sidebar-bottom-tab { gap: 4px; font-size: 12px; font-weight: 500; }
-  .sidebar-bottom-tab.active { color: var(--WDS-accent-emphasized); }
-  .sidebar-bottom-tab.active svg {
-    box-sizing: content-box;
-    padding: 4px 20px;
-    margin: -4px -20px 0;
-    background: var(--WDS-components-filter-surface-selected);
-    border-radius: 18px;
+  .sidebar-bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    min-height: 64px;
+    padding: 10px 6px max(18px, env(safe-area-inset-bottom, 18px));
+    background-color: var(--WDS-white, #FFFFFF);
+    border-top: 1px solid var(--WDS-lines-divider);
+    box-sizing: border-box;
+  }
+
+  .sidebar-bottom-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 44px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+
+  .sidebar-bottom-tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 32px;
+    border-radius: 16px;
+    background-color: transparent;
+    color: var(--WDS-content-deemphasized);
+    transition: background-color 150ms ease, color 150ms ease;
+    box-sizing: border-box;
+  }
+
+  .sidebar-bottom-tab-icon svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+  }
+
+  .sidebar-bottom-tab.active .sidebar-bottom-tab-icon {
+    background-color: var(--WDS-components-filter-surface-selected);
+    color: var(--WDS-accent-emphasized);
   }
 
   .chat-header { height: 64px; gap: 8px; padding-inline: 8px; }

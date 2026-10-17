@@ -15,7 +15,7 @@ export class HashRouter {
 
   /**
    * Register a route handler.
-   * @param {'home'|'chat'|'calls'|'channels'|'status'|'communities'} route
+   * @param {'home'|'chat'|'calls'|'channels'|'status'|'communities'|'vitrine'|'anunciar'} route
    * @param {function} handler - called with (param, messageId)
    */
   on(route, handler) {
@@ -36,12 +36,12 @@ export class HashRouter {
 
   /**
    * Navigate to a route by updating the hash.
-   * @param {'home'|'chat'|'calls'|'channels'|'status'|'communities'} route
+   * @param {'home'|'chat'|'calls'|'channels'|'status'|'communities'|'vitrine'|'anunciar'} route
    * @param {string} [param]
    * @param {string|number} [messageId]
    */
   navigate(route, param, messageId) {
-    if (['calls', 'channels', 'status', 'communities'].includes(route)) {
+    if (['calls', 'channels', 'status', 'communities', 'vitrine', 'anunciar'].includes(route)) {
       window.location.hash = `#/${route}${param && route !== 'calls' ? `/${param}` : ''}`;
     } else if (route === 'home') {
       window.location.hash = '#/';
@@ -68,7 +68,7 @@ export class HashRouter {
     const cleaned = hash.replace(/^#\/?/, '');
     if (!cleaned) return { route: 'home', param: null, messageId: null };
     if (cleaned === 'calls') return { route: 'calls', param: null, messageId: null };
-    const updatesMatch = cleaned.match(/^(channels|status|communities)(?:\/([^/]+))?$/);
+    const updatesMatch = cleaned.match(/^(channels|status|communities|vitrine|anunciar)(?:\/([^/]+))?$/);
     if (updatesMatch) return { route: updatesMatch[1], param: updatesMatch[2] || null, messageId: null };
 
     // Match #/chat/:id/msg/:msgId
