@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Luiz Phillipi Mourão"
+    ],
+    "saved_as": "Filipinho Mourão",
+    "phone": "5511992200099",
+    "date_range": {
+      "start": "2025-09-05",
+      "end": "2025-09-05"
+    },
+    "total_messages": 4,
+    "source": "Folha de S.Paulo (17/10/2026) — Caderno C-Level",
+    "note": "Mensagens sobre inquérito sigiloso e contratação de monitoramentos privados — arquivo estruturado para preenchimento integral posterior."
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": "2025-09-05T09:40:00",
+      "date": "2025-09-05",
+      "time": "09:40:00",
+      "sender": "DV",
+      "content": "Filipinho, bom dia. Alguma atualização sobre aquele inquérito e o levantamento de dados?",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 2,
+      "timestamp": "2025-09-05T09:45:15",
+      "date": "2025-09-05",
+      "time": "09:45:15",
+      "sender": "Luiz Phillipi Mourão",
+      "content": "Bom dia Daniel. Estamos compilando o relatório completo com os dados solicitados, te entrego até a tarde.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 3,
+      "timestamp": "2025-09-05T09:48:00",
+      "date": "2025-09-05",
+      "time": "09:48:00",
+      "sender": "DV",
+      "content": "Perfeito, preciso disso com máxima discrição.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 4,
+      "timestamp": "2025-09-05T09:50:00",
+      "date": "2025-09-05",
+      "time": "09:50:00",
+      "sender": "Luiz Phillipi Mourão",
+      "content": "Pode ficar tranquilo, sigilo total como sempre.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2025-09-05",
+        "message_count": 4,
+        "first_message_id": 1,
+        "last_message_id": 4
+      }
+    ]
+  }
+}

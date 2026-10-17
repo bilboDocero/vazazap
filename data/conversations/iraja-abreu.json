@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Irajá Abreu"
+    ],
+    "saved_as": "Irajá Senador",
+    "phone": "5561996600055",
+    "date_range": {
+      "start": "2025-05-18",
+      "end": "2025-05-18"
+    },
+    "total_messages": 4,
+    "source": "UOL (30/09/2026) — Mensagens privadas apreendidas",
+    "note": "Troca de mensagens diretas entre o senador e Daniel Vorcaro — arquivo estruturado para preenchimento integral posterior."
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": "2025-05-18T15:00:00",
+      "date": "2025-05-18",
+      "time": "15:00:00",
+      "sender": "Irajá Abreu",
+      "content": "Daniel, boa tarde! Consegue me atender rapidamente para falarmos daquele tema?",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 2,
+      "timestamp": "2025-05-18T15:05:20",
+      "date": "2025-05-18",
+      "time": "15:05:20",
+      "sender": "DV",
+      "content": "Senador, boa tarde. Estou finalizando uma call aqui e já te ligo em 10 minutos.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 3,
+      "timestamp": "2025-05-18T15:20:10",
+      "date": "2025-05-18",
+      "time": "15:20:10",
+      "sender": "DV",
+      "content": "Te ligando agora.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 4,
+      "timestamp": "2025-05-18T15:35:00",
+      "date": "2025-05-18",
+      "time": "15:35:00",
+      "sender": "Irajá Abreu",
+      "content": "Beleza, combinado como falamos na ligação.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2025-05-18",
+        "message_count": 4,
+        "first_message_id": 1,
+        "last_message_id": 4
+      }
+    ]
+  }
+}

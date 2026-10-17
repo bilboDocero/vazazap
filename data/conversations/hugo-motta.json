@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Hugo Motta"
+    ],
+    "saved_as": "Hugo Motta",
+    "phone": "5561999900033",
+    "date_range": {
+      "start": "2025-09-12",
+      "end": "2025-09-12"
+    },
+    "total_messages": 4,
+    "source": "Folha de S.Paulo (29/09/2026) — Mensagens apreendidas",
+    "note": "Diálogos que indicam proximidade entre Daniel Vorcaro e o parlamentar — arquivo estruturado para preenchimento integral posterior."
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": "2025-09-12T16:45:00",
+      "date": "2025-09-12",
+      "time": "16:45:00",
+      "sender": "DV",
+      "content": "Hugo, tudo bem? Como estão as coisas por aí em Brasília?",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 2,
+      "timestamp": "2025-09-12T16:50:15",
+      "date": "2025-09-12",
+      "time": "16:50:15",
+      "sender": "Hugo Motta",
+      "content": "Fala Daniel! Semana bem puxada por aqui na Câmara. Queria estar mesmo era em Mônaco com você kkk",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 3,
+      "timestamp": "2025-09-12T16:52:00",
+      "date": "2025-09-12",
+      "time": "16:52:00",
+      "sender": "DV",
+      "content": "Haha com certeza, na próxima você vem junto sem falta!",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 4,
+      "timestamp": "2025-09-12T16:55:00",
+      "date": "2025-09-12",
+      "time": "16:55:00",
+      "sender": "Hugo Motta",
+      "content": "Combinado meu amigo, vamos nos falando.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2025-09-12",
+        "message_count": 4,
+        "first_message_id": 1,
+        "last_message_id": 4
+      }
+    ]
+  }
+}

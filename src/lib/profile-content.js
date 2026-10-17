@@ -397,6 +397,105 @@ export const OTHER_PROFILES = {
       ],
     }],
   },
+
+  'nikolas-ferreira': {
+    about: 'Deputado Federal',
+    sections: [{
+      title: 'Nikolas Ferreira',
+      paragraphs: [
+        { text: 'Deputado federal mais votado do Brasil em 2022 por Minas Gerais (PL). Teve diálogos com Daniel Vorcaro em 2025 identificados em perícia da Polícia Federal e divulgados pela EBC em 3 de setembro de 2026.' },
+        { text: 'As conversas tratam de encontros e interlocuções em Belo Horizonte, base eleitoral de ambos.' },
+      ],
+    }],
+  },
+
+  'flavio-bolsonaro': {
+    about: 'Senador',
+    sections: [{
+      title: 'Flávio Bolsonaro',
+      paragraphs: [
+        { text: 'Senador da República pelo Rio de Janeiro (PL). Teve mensagens e áudios apreendidos pela Polícia Federal divulgados pela CNN Brasil em 12 de setembro de 2026.' },
+        { text: 'As mensagens envolvem tratativas sobre a captação e direcionamento de recursos para a Dark Horse e outros negócios de investimento.' },
+      ],
+    }],
+  },
+
+  'hugo-motta': {
+    about: 'Presidente da Câmara',
+    sections: [{
+      title: 'Hugo Motta',
+      paragraphs: [
+        { text: 'Deputado federal pela Paraíba (Republicanos) e presidente da Câmara dos Deputados. Teve mensagens privadas com Vorcaro divulgadas pela Folha de S.Paulo em 29 de setembro de 2026.' },
+        { text: 'As mensagens revelam proximidade e convivência social entre o banqueiro e o parlamentar, além da participação conjunta no grupo de WhatsApp com Ciro Nogueira e Fábio Faria.' },
+      ],
+    }],
+  },
+
+  'joao-doria': {
+    about: 'LIDE',
+    sections: [{
+      title: 'João Doria',
+      paragraphs: [
+        { text: 'Empresário, fundador do LIDE e ex-governador de São Paulo. Teve mensagens apreendidas divulgadas pela Folha de S.Paulo em 5 de março de 2026.' },
+        { text: 'Nos diálogos, Doria orienta Vorcaro sobre posicionamento público e reação rápida a rumores de mercado que antecederam a intervenção no Banco Master.' },
+      ],
+    }],
+  },
+
+  'iraja-abreu': {
+    about: 'Senador',
+    sections: [{
+      title: 'Irajá Abreu',
+      paragraphs: [
+        { text: 'Senador da República pelo Tocantins (PSD). Mensagens diretas com Daniel Vorcaro foram divulgadas pelo portal UOL em 30 de setembro de 2026.' },
+        { text: 'As conversas registram tratativas de alinhamento e contatos telefônicos diretos entre o senador e o banqueiro.' },
+      ],
+    }],
+  },
+
+  'luciano-huck': {
+    about: 'Apresentador',
+    sections: [{
+      title: 'Luciano Huck',
+      paragraphs: [
+        { text: 'Apresentador de TV e investidor. Teve mensagens privadas com Daniel Vorcaro divulgadas pelo portal Poder360 em 30 de setembro de 2026.' },
+        { text: 'As conversas confirmam a realização de jantares e encontros privados em São Paulo, também citados por Vorcaro a Martha Graeff em outubro de 2024.' },
+      ],
+    }],
+  },
+
+  'frederic-kachar': {
+    about: 'Editora Globo',
+    sections: [{
+      title: 'Frederic Kachar',
+      paragraphs: [
+        { text: 'Diretor-geral da Editora Globo e do Sistema Globo de Rádio. Teve troca de mensagens com Daniel Vorcaro divulgada pelo portal UOL em 15 de outubro de 2026.' },
+        { text: 'As mensagens envolvem demandas editoriais, cronogramas de veiculação institucional e interlocuções de mídia do Banco Master.' },
+      ],
+    }],
+  },
+
+  'yasmin-brunet': {
+    about: 'Empresária',
+    sections: [{
+      title: 'Yasmin Brunet',
+      paragraphs: [
+        { text: 'Modelo e empresária. Teve mensagens apreendidas pela perícia divulgadas pelo portal UOL Splash em 10 de outubro de 2026.' },
+        { text: 'As mensagens registram diálogos sobre eventos sociais e conexões institucionais com o banqueiro.' },
+      ],
+    }],
+  },
+
+  'luiz-phillipi-mourao': {
+    about: 'Investigador privado',
+    sections: [{
+      title: 'Luiz Phillipi Mourão (Filipinho)',
+      paragraphs: [
+        { text: 'Investigador privado citado em reportagem da Folha de S.Paulo em 17 de outubro de 2026 (Caderno C-Level).' },
+        { text: 'As mensagens revelam contratação de serviços de monitoramento, espionagem privada e acesso a informações de inquéritos sigilosos.' },
+      ],
+    }],
+  },
 };
 
 /**

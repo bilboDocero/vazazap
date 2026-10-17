@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Nikolas Ferreira"
+    ],
+    "saved_as": "Nikolas Ferreira",
+    "phone": "5531988220011",
+    "date_range": {
+      "start": "2025-06-15",
+      "end": "2025-06-15"
+    },
+    "total_messages": 4,
+    "source": "EBC / Agência Brasil (03/09/2026) — Laudo Complementar PF",
+    "note": "Trechos de diálogo de 2025 divulgados pela imprensa pública — arquivo estruturado para preenchimento integral posterior."
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": "2025-06-15T14:10:00",
+      "date": "2025-06-15",
+      "time": "14:10:00",
+      "sender": "DV",
+      "content": "Fala Nikolas, tudo bem? Quando estiver por BH me avisa pra almoçarmos.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 2,
+      "timestamp": "2025-06-15T14:15:20",
+      "date": "2025-06-15",
+      "time": "14:15:20",
+      "sender": "Nikolas Ferreira",
+      "content": "Fala Daniel, beleza pura! Semana que vem devo passar aí sim, te dou um toque.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 3,
+      "timestamp": "2025-06-15T14:16:05",
+      "date": "2025-06-15",
+      "time": "14:16:05",
+      "sender": "DV",
+      "content": "Combinado. Qualquer coisa que precisar em BH estamos à disposição.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 4,
+      "timestamp": "2025-06-15T14:18:00",
+      "date": "2025-06-15",
+      "time": "14:18:00",
+      "sender": "Nikolas Ferreira",
+      "content": "Valeu demais, forte abraço!",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2025-06-15",
+        "message_count": 4,
+        "first_message_id": 1,
+        "last_message_id": 4
+      }
+    ]
+  }
+}

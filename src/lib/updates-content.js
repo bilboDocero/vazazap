@@ -25,7 +25,7 @@ export function createUpdatesCatalog(conversations) {
   };
 }
 
-const FOLLOWED_KEY = 'masterwhats:followed-channels';
+const FOLLOWED_KEY = 'vorcarozap:followed-channels';
 
 export function loadFollowedChannels() {
   try {

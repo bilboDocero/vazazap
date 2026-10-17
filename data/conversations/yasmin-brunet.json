@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Yasmin Brunet"
+    ],
+    "saved_as": "Yasmin Brunet",
+    "phone": "5521993300088",
+    "date_range": {
+      "start": "2025-02-14",
+      "end": "2025-02-14"
+    },
+    "total_messages": 4,
+    "source": "UOL Splash (10/10/2026) — Mensagens apreendidas",
+    "note": "Interações citadas nas apurações públicas do caso — arquivo estruturado para preenchimento integral posterior."
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": "2025-02-14T17:00:00",
+      "date": "2025-02-14",
+      "time": "17:00:00",
+      "sender": "DV",
+      "content": "Oi Yasmin, tudo bem? Conseguiram ver aqueles detalhes do evento?",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 2,
+      "timestamp": "2025-02-14T17:10:20",
+      "date": "2025-02-14",
+      "time": "17:10:20",
+      "sender": "Yasmin Brunet",
+      "content": "Oi Daniel! Sim, a equipe me passou tudo aqui, vai ficar incrível.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 3,
+      "timestamp": "2025-02-14T17:12:00",
+      "date": "2025-02-14",
+      "time": "17:12:00",
+      "sender": "DV",
+      "content": "Maravilha, qualquer dúvida me avisa direto.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 4,
+      "timestamp": "2025-02-14T17:15:00",
+      "date": "2025-02-14",
+      "time": "17:15:00",
+      "sender": "Yasmin Brunet",
+      "content": "Pode deixar, obrigada!",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2025-02-14",
+        "message_count": 4,
+        "first_message_id": 1,
+        "last_message_id": 4
+      }
+    ]
+  }
+}

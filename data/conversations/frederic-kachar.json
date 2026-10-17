@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Frederic Kachar"
+    ],
+    "saved_as": "Frederic Kachar",
+    "phone": "5521994400077",
+    "date_range": {
+      "start": "2025-07-14",
+      "end": "2025-07-14"
+    },
+    "total_messages": 4,
+    "source": "UOL (15/10/2026) — Coluna Milly Lacombe",
+    "note": "Troca de mensagens entre o executivo da Editora Globo e Daniel Vorcaro — arquivo estruturado para preenchimento integral posterior."
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": "2025-07-14T11:00:00",
+      "date": "2025-07-14",
+      "time": "11:00:00",
+      "sender": "Frederic Kachar",
+      "content": "Daniel, bom dia. Como ficaram aqueles temas editoriais e as demandas de veiculação?",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 2,
+      "timestamp": "2025-07-14T11:05:40",
+      "date": "2025-07-14",
+      "time": "11:05:40",
+      "sender": "DV",
+      "content": "Frederic, bom dia. O time de marketing já alinhou o cronograma com vocês, qualquer ajuste me fala.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 3,
+      "timestamp": "2025-07-14T11:10:00",
+      "date": "2025-07-14",
+      "time": "11:10:00",
+      "sender": "Frederic Kachar",
+      "content": "Ótimo, vamos acompanhar o cronograma aqui. Um abraço.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    },
+    {
+      "id": 4,
+      "timestamp": "2025-07-14T11:12:00",
+      "date": "2025-07-14",
+      "time": "11:12:00",
+      "sender": "DV",
+      "content": "Um abraço e boa semana.",
+      "type": "text",
+      "is_edited": false,
+      "attachment": null,
+      "urls": []
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2025-07-14",
+        "message_count": 4,
+        "first_message_id": 1,
+        "last_message_id": 4
+      }
+    ]
+  }
+}
