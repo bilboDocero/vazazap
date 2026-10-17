@@ -5,6 +5,8 @@ import { loadFollowedChannels, saveFollowedChannels } from '../lib/updates-conte
 import {
   fetchPublishedStatuses,
   loadCachedStatuses,
+  sortStatusesForClient,
+  getMyLastPurchasedStatusId,
   SOCIAL_NETWORKS,
 } from '../lib/status-db.js';
 import { openStatusPurchaseModal } from './StatusPurchaseModal.js';
@@ -146,22 +148,26 @@ export function renderUpdatesPanel(options = {}) {
     addCard.addEventListener('click', triggerCreateStatus);
     carouselContainer.appendChild(addCard);
 
-    // 2. Published statuses from PostgreSQL / Supabase / IndexedDB cache
+    // 2. ONLY advertiser/purchased statuses recovered from the database / cache
     const published = loadCachedStatuses();
-    const filteredPublished = published.filter(p =>
+    const myLastId = getMyLastPurchasedStatusId();
+    const clientSorted = sortStatusesForClient(published, myLastId);
+
+    const filteredPublished = clientSorted.filter(p =>
       !query ||
       normalize(p.profile_name).includes(query) ||
       normalize(p.user_handle).includes(query)
     );
 
     filteredPublished.forEach(pub => {
+      const isMyStatus = pub.id === myLastId;
       const isImp = pub.plan_type === 'status_impulsionado';
       const card = document.createElement('div');
-      card.className = `status-card status-card--story${pub.id === selectedId ? ' active' : ''}`;
+      card.className = `status-card status-card--story${pub.id === selectedId ? ' active' : ''}${isMyStatus ? ' is-my-status' : ''}`;
       card.dataset.id = pub.id;
       card.setAttribute('role', 'button');
       card.setAttribute('tabindex', '0');
-      card.setAttribute('aria-label', `Ver status de ${pub.profile_name || 'Usuário'}`);
+      card.setAttribute('aria-label', `${isMyStatus ? 'Seu status: ' : ''}Ver status de ${pub.profile_name || 'Usuário'}`);
 
       const mediaUrl = (pub.media_files && pub.media_files[0]?.url)
         || pub.profile_pic
@@ -171,13 +177,20 @@ export function renderUpdatesPanel(options = {}) {
         ? `<img src="${sanitizeUrl(pub.profile_pic, true)}" alt="" />`
         : defaultAvatarSvg(pub.id, 34);
 
+      let badgeMarkup = '';
+      if (isMyStatus) {
+        badgeMarkup = '<span class="status-card-boost-badge status-card-my-badge">VOCÊ</span>';
+      } else if (isImp) {
+        badgeMarkup = '<span class="status-card-boost-badge">PRO</span>';
+      }
+
       card.innerHTML = `
         <img src="${sanitizeUrl(mediaUrl, true)}" alt="" class="status-card-bg" />
         <div class="status-card-overlay"></div>
-        <div class="status-card-avatar ${isImp ? 'is-impulsionado' : ''}">
+        <div class="status-card-avatar ${isImp || isMyStatus ? 'is-impulsionado' : ''}">
           ${avatarMarkup}
         </div>
-        ${isImp ? '<span class="status-card-boost-badge">PRO</span>' : ''}
+        ${badgeMarkup}
         <span class="status-card-name">${escapeHtml(pub.profile_name || pub.user_handle || 'Status')}</span>
       `;
 
@@ -188,38 +201,21 @@ export function renderUpdatesPanel(options = {}) {
       carouselContainer.appendChild(card);
     });
 
-    // 3. Contact simulation stories (from status entries)
-    const contacts = resolvedStatusEntries.filter(entry => entry.id !== 'vorcaro');
-    const filteredContacts = contacts.filter(c => !query || normalize(c.name).includes(query));
-
-    filteredContacts.forEach(contact => {
-      const card = document.createElement('div');
-      card.className = `status-card status-card--story status-card--contact${contact.id === selectedId ? ' active' : ''}`;
-      card.dataset.id = contact.id;
-      card.setAttribute('role', 'button');
-      card.setAttribute('tabindex', '0');
-      card.setAttribute('aria-label', `Status de ${contact.name}`);
-
-      const bgUrl = contact.avatar || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=500&q=80';
-      const avatarMarkup = contact.avatar
-        ? `<img src="${sanitizeUrl(contact.avatar, true)}" alt="" />`
-        : defaultAvatarSvg(contact.id, 34);
-
-      card.innerHTML = `
-        <img src="${sanitizeUrl(bgUrl, true)}" alt="" class="status-card-bg" />
-        <div class="status-card-overlay"></div>
-        <div class="status-card-avatar">
-          ${avatarMarkup}
-        </div>
-        <span class="status-card-name">${escapeHtml(contact.name)}</span>
+    // If there are no published statuses yet, display a prompt card
+    if (filteredPublished.length === 0 && !query) {
+      const emptyCard = document.createElement('div');
+      emptyCard.className = 'status-card status-card--empty-prompt';
+      emptyCard.setAttribute('role', 'button');
+      emptyCard.setAttribute('tabindex', '0');
+      emptyCard.setAttribute('aria-label', 'Anuncie seu Status aqui');
+      emptyCard.innerHTML = `
+        <div class="status-card-empty-icon">${ICON_CAMERA_ACTION}</div>
+        <span class="status-card-empty-title">Anuncie seu Status</span>
+        <span class="status-card-empty-desc">Toque para publicar</span>
       `;
-
-      card.addEventListener('click', () => {
-        panel.setActive(contact.id);
-        onSelectStatus?.(contact.id);
-      });
-      carouselContainer.appendChild(card);
-    });
+      emptyCard.addEventListener('click', triggerCreateStatus);
+      carouselContainer.appendChild(emptyCard);
+    }
   }
 
   function drawChannelsList() {
@@ -432,7 +428,7 @@ export function renderUpdatesDetail(container, { kind = 'status', entry, onBack,
 }
 
 function renderStoryViewer(container, { entry, onBack, onSelectStatus }) {
-  const publishedList = loadCachedStatuses();
+  const publishedList = sortStatusesForClient(loadCachedStatuses());
   const currentClientIdx = publishedList.findIndex(item => item.id === entry.id);
 
   const nextClient = (currentClientIdx !== -1 && currentClientIdx < publishedList.length - 1)

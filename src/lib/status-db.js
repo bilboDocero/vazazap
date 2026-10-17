@@ -109,6 +109,27 @@ function formatCurrency(val) {
 }
 
 const LOCAL_STORAGE_KEY = 'vorcarozap:published_status';
+const MY_LAST_STATUS_KEY = 'vorcarozap:my_last_purchased_status_id';
+
+export function getMyLastPurchasedStatusId() {
+  try {
+    return localStorage.getItem(MY_LAST_STATUS_KEY) || null;
+  } catch {
+    return null;
+  }
+}
+
+export function setMyLastPurchasedStatusId(id) {
+  try {
+    if (id) {
+      localStorage.setItem(MY_LAST_STATUS_KEY, String(id));
+    } else {
+      localStorage.removeItem(MY_LAST_STATUS_KEY);
+    }
+  } catch {
+    // Ignore storage issues
+  }
+}
 
 /**
  * Sorts statuses so impulsionados always stay at the top,
@@ -122,6 +143,25 @@ export function sortStatuses(list) {
     if (aBoost !== bBoost) return aBoost - bBoost;
     return new Date(b.published_at || b.created_at || 0) - new Date(a.published_at || a.created_at || 0);
   });
+}
+
+/**
+ * Sorts statuses for client presentation:
+ * - If client has recently purchased a status (myLastId), that status comes FIRST (position 0).
+ * - Otherwise (or following that status):
+ *   1. Impulsionados (status_impulsionado) by published_at DESC.
+ *   2. Normais (status_normal) by published_at DESC.
+ */
+export function sortStatusesForClient(list, myLastId = getMyLastPurchasedStatusId()) {
+  if (!Array.isArray(list)) return [];
+  const baseSorted = sortStatuses(list);
+  if (!myLastId) return baseSorted;
+
+  const myItem = baseSorted.find(item => item.id === myLastId);
+  if (!myItem) return baseSorted;
+
+  const others = baseSorted.filter(item => item.id !== myLastId);
+  return [myItem, ...others];
 }
 
 let memoryStatuses = null;
@@ -222,6 +262,9 @@ export async function createStatusPurchase(payload) {
     published_at: new Date().toISOString(),
     created_at: new Date().toISOString(),
   };
+
+  // Set as this client's recently purchased status
+  setMyLastPurchasedStatusId(createdRecord.id);
 
   // Add to local list and sort so impulsionados always stay at the top
   const sortedList = sortStatuses([createdRecord, ...localList.filter(item => item.id !== createdRecord.id)]);

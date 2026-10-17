@@ -6,6 +6,9 @@ import {
   saveCachedStatuses,
   createStatusPurchase,
   sortStatuses,
+  sortStatusesForClient,
+  getMyLastPurchasedStatusId,
+  setMyLastPurchasedStatusId,
 } from '../../src/lib/status-db.js';
 
 describe('Status Purchase & Pricing Calculator', () => {
@@ -163,6 +166,27 @@ describe('Status Purchase & Pricing Calculator', () => {
       expect(sorted[1].plan_type).toBe('status_impulsionado');
       expect(sorted[2].plan_type).toBe('status_normal');
       expect(sorted[3].plan_type).toBe('status_normal');
+    });
+
+    it('places client newly purchased status at the very top (first place) even if normal', () => {
+      const normal1 = { id: 'n1', plan_type: 'status_normal', published_at: '2026-10-17T10:00:00Z' };
+      const normal2 = { id: 'n2', plan_type: 'status_normal', published_at: '2026-10-17T12:00:00Z' };
+      const boost1 = { id: 'b1', plan_type: 'status_impulsionado', published_at: '2026-10-17T09:00:00Z' };
+      const boost2 = { id: 'b2', plan_type: 'status_impulsionado', published_at: '2026-10-17T11:00:00Z' };
+
+      // Client recently bought n1
+      const clientSorted = sortStatusesForClient([normal1, boost1, normal2, boost2], 'n1');
+
+      // n1 must be first, followed by impulsionados, followed by normal2
+      expect(clientSorted.map(s => s.id)).toEqual(['n1', 'b2', 'b1', 'n2']);
+    });
+
+    it('falls back to impulsionados first when no recent status was purchased by client', () => {
+      const normal1 = { id: 'n1', plan_type: 'status_normal', published_at: '2026-10-17T10:00:00Z' };
+      const boost1 = { id: 'b1', plan_type: 'status_impulsionado', published_at: '2026-10-17T09:00:00Z' };
+
+      const clientSorted = sortStatusesForClient([normal1, boost1], null);
+      expect(clientSorted.map(s => s.id)).toEqual(['b1', 'n1']);
     });
   });
 });
