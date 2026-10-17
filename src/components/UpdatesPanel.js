@@ -8,7 +8,7 @@ import {
   SOCIAL_NETWORKS,
 } from '../lib/status-db.js';
 import { openStatusPurchaseModal } from './StatusPurchaseModal.js';
-import { escapeHtml } from '../lib/utils.js';
+import { escapeHtml, sanitizeUrl, escapeAttr } from '../lib/utils.js';
 
 const ICON_PLUS = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/></svg>';
 const ICON_BACK = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 5-7 7 7 7"/></svg>';
@@ -381,7 +381,7 @@ function renderStoryViewer(container, { entry, onBack, onSelectStatus }) {
         <div class="story-header-user">
           <div class="story-header-avatar">
             ${entry.profile_pic
-              ? `<img src="${entry.profile_pic}" alt="${escapeHtml(entry.profile_name)}" />`
+              ? `<img src="${sanitizeUrl(entry.profile_pic, true)}" alt="${escapeHtml(entry.profile_name)}" />`
               : defaultAvatarSvg(entry.id)
             }
           </div>
@@ -390,14 +390,14 @@ function renderStoryViewer(container, { entry, onBack, onSelectStatus }) {
               ${escapeHtml(entry.profile_name)}
               ${entry.plan_type === 'status_impulsionado' ? '<span class="updates-status-badge-boost">Impulsionado</span>' : ''}
             </div>
-            <div class="story-header-meta">${escapeHtml(entry.user_handle)} · ${net.name}</div>
+            <div class="story-header-meta">${escapeHtml(entry.user_handle)} · ${escapeHtml(net.name)}</div>
           </div>
         </div>
         <button type="button" class="story-close-btn" aria-label="Fechar status">&times;</button>
       </header>
 
       <div class="story-media-box">
-        <img src="${currentMedia.url}" alt="${escapeHtml(currentMedia.name)}" class="story-media-image" />
+        <img src="${sanitizeUrl(currentMedia.url, true)}" alt="${escapeHtml(currentMedia.name)}" class="story-media-image" />
 
         <button type="button" class="story-nav-btn prev" aria-label="Mídia anterior" ${hasPrev ? '' : 'style="display:none;"'}>&#10094;</button>
         <button type="button" class="story-nav-btn next" aria-label="Próxima mídia" ${hasNext ? '' : 'style="display:none;"'}>&#10095;</button>
@@ -410,9 +410,9 @@ function renderStoryViewer(container, { entry, onBack, onSelectStatus }) {
           </div>
         ` : ''}
 
-        <a href="${entry.social_link}" target="_blank" rel="noopener noreferrer" class="story-social-btn" style="background: ${net.color};">
+        <a href="${sanitizeUrl(entry.social_link)}" target="_blank" rel="noopener noreferrer" class="story-social-btn" style="background: ${escapeAttr(net.color)};">
           ${net.icon}
-          <span>Visitar perfil no ${net.name} (${escapeHtml(entry.user_handle)}) ↗</span>
+          <span>Visitar perfil no ${escapeHtml(net.name)} (${escapeHtml(entry.user_handle)}) ↗</span>
         </a>
 
         <button type="button" class="story-publish-more-btn">

@@ -1,0 +1,81 @@
+-- ==============================================================================
+-- Schema Supabase / PostgreSQL para VorcaroZap
+-- Execute este script no SQL Editor do Supabase (https://supabase.com/dashboard)
+-- ==============================================================================
+
+-- 1. Tabela de Compras e Publicações de Status / Stories
+CREATE TABLE IF NOT EXISTS status_purchases (
+  id TEXT PRIMARY KEY,
+  plan_type VARCHAR(50) NOT NULL DEFAULT 'status_normal',
+  file_count INTEGER NOT NULL DEFAULT 1 CHECK (file_count BETWEEN 1 AND 4),
+  unit_price NUMERIC(10, 2) NOT NULL DEFAULT 4.90,
+  discount_amount NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
+  total_price NUMERIC(10, 2) NOT NULL DEFAULT 4.90,
+  payment_status VARCHAR(50) NOT NULL DEFAULT 'approved',
+  profile_name TEXT NOT NULL,
+  user_handle TEXT NOT NULL,
+  social_network VARCHAR(50) NOT NULL DEFAULT 'instagram',
+  social_link TEXT NOT NULL,
+  caption TEXT DEFAULT '',
+  profile_pic TEXT DEFAULT '',
+  media_files JSONB NOT NULL DEFAULT '[]'::jsonb,
+  published_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_status_purchases_ordering 
+  ON status_purchases (
+    (CASE WHEN plan_type = 'status_impulsionado' THEN 0 ELSE 1 END),
+    published_at DESC
+  );
+
+-- 2. Tabela de Vitrines Comerciais
+CREATE TABLE IF NOT EXISTS vitrine_purchases (
+  id TEXT PRIMARY KEY,
+  plan_type VARCHAR(50) NOT NULL DEFAULT 'vitrine_normal',
+  file_count INTEGER NOT NULL DEFAULT 1 CHECK (file_count BETWEEN 1 AND 4),
+  unit_price NUMERIC(10, 2) NOT NULL DEFAULT 4.90,
+  discount_amount NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
+  total_price NUMERIC(10, 2) NOT NULL DEFAULT 4.90,
+  payment_status VARCHAR(50) NOT NULL DEFAULT 'approved',
+  profile_name TEXT NOT NULL,
+  user_handle TEXT NOT NULL,
+  social_network VARCHAR(50) NOT NULL DEFAULT 'instagram',
+  social_link TEXT NOT NULL,
+  caption TEXT DEFAULT '',
+  profile_pic TEXT DEFAULT '',
+  media_files JSONB NOT NULL DEFAULT '[]'::jsonb,
+  published_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_vitrine_purchases_ordering 
+  ON vitrine_purchases (
+    (CASE WHEN plan_type = 'vitrine_impulsionado' THEN 0 ELSE 1 END),
+    published_at DESC
+  );
+
+-- 3. Habilita Row Level Security (RLS) se desejado, permitindo leitura e inserção
+ALTER TABLE status_purchases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE vitrine_purchases ENABLE ROW LEVEL SECURITY;
+
+-- Políticas de acesso anônimo para API pública (leitura e inserção)
+DROP POLICY IF EXISTS "Permitir leitura pública de status" ON status_purchases;
+CREATE POLICY "Permitir leitura pública de status" 
+  ON status_purchases FOR SELECT 
+  USING (true);
+
+DROP POLICY IF EXISTS "Permitir inserção pública de status" ON status_purchases;
+CREATE POLICY "Permitir inserção pública de status" 
+  ON status_purchases FOR INSERT 
+  WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Permitir leitura pública de vitrines" ON vitrine_purchases;
+CREATE POLICY "Permitir leitura pública de vitrines" 
+  ON vitrine_purchases FOR SELECT 
+  USING (true);
+
+DROP POLICY IF EXISTS "Permitir inserção pública de vitrines" ON vitrine_purchases;
+CREATE POLICY "Permitir inserção pública de vitrines" 
+  ON vitrine_purchases FOR INSERT 
+  WITH CHECK (true);

@@ -11,7 +11,7 @@ import {
   buildSocialLink,
   createStatusPurchase,
 } from '../lib/status-db.js';
-import { escapeHtml } from '../lib/utils.js';
+import { escapeHtml, sanitizeUrl, escapeAttr } from '../lib/utils.js';
 
 const ICON_CHECK_CIRCLE = `<svg viewBox="0 0 24 24" width="48" height="48" fill="none"><circle cx="12" cy="12" r="11" fill="#00A884"/><path d="M7 12.5l3.5 3.5 7-7" stroke="#FFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const ICON_PLUS_SIGN = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
@@ -155,8 +155,11 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           <div class="status-payment-success-icon">
             ${ICON_CHECK_CIRCLE}
           </div>
+          <div style="text-align: center; margin-bottom: 8px;">
+            <span class="status-test-mode-badge" style="display: inline-block; padding: 4px 12px; background: #E8F5E9; color: #008069; border: 1px solid #C8E6C9; border-radius: 12px; font-size: 12px; font-weight: 600;">Modo Teste · Aprovação Instantânea</span>
+          </div>
           <h2 class="status-payment-title">Pagamento Aprovado com Sucesso!</h2>
-          <p class="status-payment-subtitle">Seu pedido foi confirmado instantaneamente. Agora configure os arquivos e redes sociais para publicar.</p>
+          <p class="status-payment-subtitle">Seu pedido foi confirmado instantaneamente pelo simulador de testes. Agora configure os arquivos e redes sociais para publicar.</p>
 
           <div class="status-receipt-box">
             <div class="status-receipt-row">
@@ -173,15 +176,12 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             </div>
             <div class="status-receipt-row">
               <span>Status:</span>
-              <span class="status-receipt-badge">Aprovado</span>
+              <span class="status-receipt-badge">Aprovado (Simulação)</span>
             </div>
           </div>
 
           <button type="button" class="status-btn-primary btn-proceed-publish">
             Prosseguir para Edição do Story &rarr;
-          </button>
-          <button type="button" class="status-btn-secondary btn-back-to-step1" style="margin-top: 10px; width: 100%; border-radius: 24px; padding: 10px; border: 1px solid #D1D7DB; background: #FFF; color: #54656F; font-size: 13.5px; font-weight: 500; cursor: pointer;">
-            Alterar Plano ou Quantidade
           </button>
         </div>
       `;
@@ -202,15 +202,15 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
 
           <form class="status-publish-form">
             <div class="status-profile-section">
-              <div class="status-avatar-upload-box">
-                <label class="status-avatar-upload-label" title="Clique para enviar ou alterar foto de perfil">
+      f        <div class="status-avatar-upload-box">
                   <div class="status-avatar-preview">
                     ${profilePicData
-                      ? `<img src="${profilePicData}" alt="Avatar" class="status-avatar-img" />`
+                      ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" class="status-avatar-img" />`
                       : `<div class="status-avatar-placeholder">${ICON_CAMERA}</div>`
                     }
                   </div>
-                  <span class="status-avatar-btn-text">${profilePicData ? 'Alterar foto' : 'Enviar foto'}</span>
+                <label class="status-avatar-btn">
+                  <span>${profilePicData ? 'Alterar foto' : 'Enviar foto'}</span>
                   <input type="file" class="input-profile-pic" accept="image/jpeg,image/png,image/webp" style="display:none;" />
                 </label>
               </div>
@@ -252,7 +252,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             <div class="status-media-section">
               <div class="status-guidance-box">
                 <div class="status-guidance-badge">Dimensões Ideais</div>
-                <p>Recomendamos imagens verticais na proporção <strong>9:16 (1080 × 1920 px)</strong> para preencher toda a tela do status sem faixas. Vídeos não são aceitos no momento (máx. <strong>5 MB</strong> por anexo).</p>
+                <p>Recomendamos imagens verticais na proporção <strong>9:16 (1080 × 1920 px)</strong> para preencher toda a tela do status sem faixas. </br>Vídeos não são aceitos no momento (máx. <strong>5 MB</strong> por anexo).</p>
               </div>
 
               <label class="status-field-label">
@@ -347,7 +347,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             </header>
 
             <div class="status-preview-media-box">
-              <img src="${activeMedia.url}" alt="${escapeHtml(activeMedia.name)}" class="status-preview-media-img" />
+              <img src="${sanitizeUrl(activeMedia.url, true)}" alt="${escapeHtml(activeMedia.name)}" class="status-preview-media-img" />
 
               ${mediaList.length > 1 ? `
                 <button type="button" class="status-preview-nav prev" aria-label="Mídia anterior">&#10094;</button>
@@ -362,9 +362,9 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
                 </div>
               ` : ''}
 
-              <div class="story-social-btn" style="background: ${network.color};">
+              <div class="story-social-btn" style="background: ${escapeAttr(network.color)};">
                 ${network.icon}
-                <span>Visitar perfil no ${network.name} (${escapeHtml(userHandle || 'user')}) ↗</span>
+                <span>Visitar perfil no ${escapeHtml(network.name)} (${escapeHtml(userHandle || 'user')}) ↗</span>
               </div>
             </footer>
           </div>
@@ -399,12 +399,6 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       modalEl.querySelectorAll('.status-file-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           fileCount = Number(btn.dataset.count);
-          if (uploadedFiles.length > fileCount) {
-            uploadedFiles = uploadedFiles.slice(0, fileCount);
-            if (activeFileIndex >= uploadedFiles.length) {
-              activeFileIndex = uploadedFiles.length - 1;
-            }
-          }
           render();
         });
       });
@@ -416,10 +410,6 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
     } else if (currentStep === 2) {
       modalEl.querySelector('.btn-proceed-publish')?.addEventListener('click', () => {
         currentStep = 3;
-        render();
-      });
-      modalEl.querySelector('.btn-back-to-step1')?.addEventListener('click', () => {
-        currentStep = 1;
         render();
       });
     } else if (currentStep === 3) {
@@ -519,7 +509,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           profilePicData = ev.target.result;
           const preview = modalEl.querySelector('.status-avatar-preview');
           if (preview) {
-            preview.innerHTML = `<img src="${profilePicData}" alt="Avatar" class="status-avatar-img" />`;
+            preview.innerHTML = `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" class="status-avatar-img" />`;
           }
         };
         reader.readAsDataURL(file);

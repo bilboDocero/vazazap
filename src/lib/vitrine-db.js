@@ -4,6 +4,7 @@
  */
 
 import { SOCIAL_NETWORKS, buildSocialLink } from './status-db.js';
+import { idbGet, idbSet } from './idb-storage.js';
 
 export { SOCIAL_NETWORKS, buildSocialLink };
 
@@ -78,21 +79,61 @@ export function sortVitrines(list) {
   });
 }
 
+let memoryVitrines = null;
+let idbHydratedVitrines = false;
+
 export function loadCachedVitrines() {
-  try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return sortVitrines(parsed);
-  } catch {
-    return [];
+  if (memoryVitrines !== null) {
+    return memoryVitrines;
   }
+  try {
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(LOCAL_STORAGE_KEY) : null;
+    const parsed = raw ? JSON.parse(raw) : [];
+    memoryVitrines = sortVitrines(parsed);
+  } catch {
+    memoryVitrines = [];
+  }
+
+  if (!idbHydratedVitrines && typeof window !== 'undefined') {
+    idbHydratedVitrines = true;
+    idbGet(LOCAL_STORAGE_KEY).then(idbList => {
+      if (Array.isArray(idbList) && idbList.length > 0) {
+        memoryVitrines = sortVitrines(idbList);
+        if (typeof window.dispatchEvent === 'function') {
+          window.dispatchEvent(new CustomEvent('vitrine:cache-updated', { detail: memoryVitrines }));
+        }
+      }
+    }).catch(() => {});
+  }
+
+  return memoryVitrines;
 }
 
 export function saveCachedVitrines(list) {
+  const sorted = sortVitrines(list);
+  memoryVitrines = sorted;
+
+  // Primary quota-free persistence in IndexedDB
+  idbSet(LOCAL_STORAGE_KEY, sorted).catch(() => {});
+
+  // Best-effort synchronous persistence in localStorage
   try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sortVitrines(list)));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sorted));
   } catch {
-    // Ignore storage issues
+    try {
+      // Strip heavy data: URLs to prevent QuotaExceededError while retaining metadata
+      const lightweight = sorted.map(s => ({
+        ...s,
+        profile_pic: s.profile_pic && s.profile_pic.startsWith('data:') ? '' : s.profile_pic,
+        media_files: (s.media_files || []).map(m => ({
+          ...m,
+          url: m.url && m.url.startsWith('data:') ? '' : m.url,
+        })),
+      }));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(lightweight));
+    } catch {
+      // Ignore storage issues
+    }
   }
 }
 

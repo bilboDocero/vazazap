@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { slugify, formatDateLong, formatTime, linkify, escapeHtml, classifyMessage, truncate } from '../../src/lib/utils.js';
+import { slugify, formatDateLong, formatTime, linkify, escapeHtml, classifyMessage, truncate, escapeAttr, sanitizeUrl } from '../../src/lib/utils.js';
 
 describe('slugify', () => {
   it('converts name to lowercase slug', () => {
@@ -111,3 +111,38 @@ describe('truncate', () => {
     expect(truncate(undefined)).toBe('');
   });
 });
+
+describe('escapeAttr', () => {
+  it('escapes quotes and dangerous characters', () => {
+    expect(escapeAttr('hello "world" <script> & \'test\'')).toBe('hello &quot;world&quot; &lt;script&gt; &amp; &#39;test&#39;');
+  });
+
+  it('handles null/undefined safely', () => {
+    expect(escapeAttr(null)).toBe('');
+    expect(escapeAttr(undefined)).toBe('');
+  });
+});
+
+describe('sanitizeUrl', () => {
+  it('allows valid https and http URLs', () => {
+    expect(sanitizeUrl('https://instagram.com/user')).toBe('https://instagram.com/user');
+    expect(sanitizeUrl('http://example.com/page')).toBe('http://example.com/page');
+  });
+
+  it('blocks javascript: URLs', () => {
+    expect(sanitizeUrl('javascript:alert(1)')).toBe('#');
+    expect(sanitizeUrl('javascript:stealData()')).toBe('#');
+  });
+
+  it('blocks data: URLs unless allowDataImage is enabled', () => {
+    expect(sanitizeUrl('data:text/html,<script>alert(1)</script>')).toBe('#');
+    expect(sanitizeUrl('data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==')).toBe('#');
+    expect(sanitizeUrl('data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==', true)).toContain('data:image/png;base64,');
+  });
+
+  it('returns empty string for null/undefined/empty', () => {
+    expect(sanitizeUrl('')).toBe('');
+    expect(sanitizeUrl(null)).toBe('');
+  });
+});
+

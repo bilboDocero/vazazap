@@ -2,6 +2,8 @@
  * Status purchasing and PostgreSQL / LocalStorage synchronization layer.
  */
 
+import { idbGet, idbSet } from './idb-storage.js';
+
 export const SOCIAL_NETWORKS = {
   instagram: {
     id: 'instagram',
@@ -122,21 +124,61 @@ export function sortStatuses(list) {
   });
 }
 
+let memoryStatuses = null;
+let idbHydrated = false;
+
 export function loadCachedStatuses() {
-  try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return sortStatuses(parsed);
-  } catch {
-    return [];
+  if (memoryStatuses !== null) {
+    return memoryStatuses;
   }
+  try {
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(LOCAL_STORAGE_KEY) : null;
+    const parsed = raw ? JSON.parse(raw) : [];
+    memoryStatuses = sortStatuses(parsed);
+  } catch {
+    memoryStatuses = [];
+  }
+
+  if (!idbHydrated && typeof window !== 'undefined') {
+    idbHydrated = true;
+    idbGet(LOCAL_STORAGE_KEY).then(idbList => {
+      if (Array.isArray(idbList) && idbList.length > 0) {
+        memoryStatuses = sortStatuses(idbList);
+        if (typeof window.dispatchEvent === 'function') {
+          window.dispatchEvent(new CustomEvent('status:cache-updated', { detail: memoryStatuses }));
+        }
+      }
+    }).catch(() => {});
+  }
+
+  return memoryStatuses;
 }
 
 export function saveCachedStatuses(list) {
+  const sorted = sortStatuses(list);
+  memoryStatuses = sorted;
+
+  // Primary quota-free persistence in IndexedDB
+  idbSet(LOCAL_STORAGE_KEY, sorted).catch(() => {});
+
+  // Best-effort synchronous persistence in localStorage
   try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sortStatuses(list)));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sorted));
   } catch {
-    // Ignore storage issues
+    try {
+      // Strip heavy data: URLs to prevent QuotaExceededError while retaining metadata
+      const lightweight = sorted.map(s => ({
+        ...s,
+        profile_pic: s.profile_pic && s.profile_pic.startsWith('data:') ? '' : s.profile_pic,
+        media_files: (s.media_files || []).map(m => ({
+          ...m,
+          url: m.url && m.url.startsWith('data:') ? '' : m.url,
+        })),
+      }));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(lightweight));
+    } catch {
+      // Ignore storage issues
+    }
   }
 }
 

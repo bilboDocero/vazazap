@@ -123,6 +123,44 @@ export function formatRelativeDate(dateStr) {
 }
 
 /**
+ * Escape an attribute value to prevent attribute breakout / injection.
+ * @param {string} str
+ * @returns {string}
+ */
+export function escapeAttr(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/**
+ * Validate and sanitize URLs to prevent javascript: and dangerous schemas.
+ * @param {string} url
+ * @param {boolean} allowDataImage - whether to allow data:image/ safe URLs
+ * @returns {string} safe URL or '#' / ''
+ */
+export function sanitizeUrl(url, allowDataImage = false) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+
+  // Allow safe web protocols
+  if (/^https?:\/\//i.test(trimmed) || /^\/(?!\/)/.test(trimmed)) {
+    return escapeAttr(trimmed);
+  }
+
+  // Allow data:image URLs if explicitly requested (e.g. for user photos)
+  if (allowDataImage && /^data:image\/(jpeg|png|webp|gif|svg\+xml);base64,/i.test(trimmed)) {
+    return escapeAttr(trimmed);
+  }
+
+  return '#';
+}
+
+/**
  * Put text on the clipboard, the modern way or the old one.
  * @returns {Promise<boolean>} whether it took
  */

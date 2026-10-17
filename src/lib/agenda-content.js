@@ -28,7 +28,7 @@ export const AGENDA_CONTACTS = [
     name: 'Alexandre de Moraes',
     role: 'Ministro do STF · Vice-Presidente do STF',
     category: 'STF & Tribunais',
-    phone: '+55 61 9266-4093',
+    phone: '+55 61 9XXXX-XXXX',
     savedAs: 'Alexandre de Moraes BRASILIA',
     hasConversation: true,
     conversationId: 'alexandre-de-moraes',
