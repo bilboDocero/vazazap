@@ -628,7 +628,7 @@ export function renderChatView(container, { conversation, dateIndex, loadMessage
       { label: 'Exportar (.md)', icon: ICON_DOWNLOAD, action: () => onExport('md'), enabled: !!onExport },
       { label: 'Exportar (.json)', icon: ICON_DOWNLOAD, action: () => onExport('json'), enabled: !!onExport },
       { label: 'Fechar conversa', icon: ICON_CLOSE_CIRCULAR, action: onCloseChat || onBack, enabled: !!(onCloseChat || onBack) },
-      { label: 'Sobre o MasterWhats', icon: ICON_MASTERZAP_LOGO, action: onAbout, enabled: !!onAbout },
+      { label: 'Sobre o VorcaroZap', icon: ICON_MASTERZAP_LOGO, action: onAbout, enabled: !!onAbout },
     ];
 
     for (const item of items) {

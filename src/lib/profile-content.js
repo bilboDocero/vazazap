@@ -437,7 +437,7 @@ export const SOURCES = [
   { label: 'ND Mais — Quem é Alexandre de Moraes', url: 'https://ndmais.com.br/politica/quem-e-alexandre-de-moraes/' },
 ];
 
-export const CREDITS = 'Projeto feito por {Rafael Bressan}[https://linkedin.com/in/rafaelbressan] com Claude Code. {Código-fonte no GitHub}[https://github.com/rafaelbressan/masterzap]. As informações aqui compiladas são de domínio público, extraídas de reportagens jornalísticas e fontes abertas. Este projeto não tem vinculação com nenhuma das partes envolvidas.';
+export const CREDITS = 'As informa??es aqui compiladas s?o de dom?nio p?blico, extra?das de reportagens jornal?sticas e fontes abertas. Este projeto n?o tem vincula??o com nenhuma das partes envolvidas.';
 
 /**
  * Parse inline links in text. Format: {link text}[url]

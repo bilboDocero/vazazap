@@ -1,9 +1,9 @@
-# MasterWhats
+# VorcaroZap
 
 > Visualizador interativo das 66.387 mensagens de WhatsApp extraídas dos celulares apreendidos de Daniel Vorcaro (Banco Master), em 24 conversas — das trocas com Martha Graeff ao relatório da Polícia Federal sobre os contatos com o ministro Alexandre de Moraes.
 
 ## O que é
-MasterWhats é um projeto web que replica a interface do WhatsApp Web para permitir a navegação pelas conversas que vieram a público no escândalo do Banco Master. O projeto foi criado por Rafael Bressan com Claude Code. Cada contato tem um perfil que explica quem é a pessoa, o que o material revela e de onde vem a informação, com fontes.
+MasterWhats é um projeto web que replica a interface do WhatsApp Web para permitir a navegação pelas conversas que vieram a público no escândalo do Banco Master. Cada contato tem um perfil que explica quem é a pessoa, o que o material revela e de onde vem a informação, com fontes.
 
 ## O material
 O conteúdo vem dos celulares apreendidos de Vorcaro na Operação Compliance Zero e chegou ao público em dois momentos, por caminhos diferentes:
@@ -64,7 +64,7 @@ Cada .md abre com proveniência (fonte, documento com páginas e sha256, períod
 ## Documento-fonte do relatório da PF
 - Arquivo: data/source/IPJ-A-3298613-2026.pdf — 218 páginas
 - sha256: 23cfdfa410c47ab09cbb2b443965e3a3095d9bc3dc5fb266efff76d6f5192b60
-- Onde obter: https://github.com/rafaelbressan/masterzap/blob/main/data/source/IPJ-A-3298613-2026.pdf (página) ou https://raw.githubusercontent.com/rafaelbressan/masterzap/main/data/source/IPJ-A-3298613-2026.pdf (os bytes, 32 MB) — o site não serve o PDF; https://www.masterwhats.com.br/data/source/... redireciona para os bytes
+- Onde obter: https://github.com/vorcarozap/vorcarozap/blob/main/data/source/IPJ-A-3298613-2026.pdf (página) ou https://raw.githubusercontent.com/vorcarozap/vorcarozap/main/data/source/IPJ-A-3298613-2026.pdf (os bytes, 32 MB) — o site não serve o PDF; https://www.masterwhats.com.br/data/source/... redireciona para os bytes
 - Os destaques abaixo e no llms-full.txt já trazem o link e ⟨data hora · laudo p., fig.⟩
 
 ## Fontes
@@ -73,4 +73,4 @@ Cada .md abre com proveniência (fonte, documento com páginas e sha256, períod
 - Poder360 (sigilo derrubado; contratos com o Barci de Moraes), CNN Brasil (como a PF rastreou as mensagens), Metrópoles, Brasil de Fato, ND Mais, Gazeta do Povo, InfoMoney, O Tempo, Agência Brasil
 
 ## Créditos
-Projeto feito por Rafael Bressan (https://linkedin.com/in/rafaelbressan) com Claude Code.
+As informa??es aqui compiladas s?o de dom?nio p?blico, extra?das de reportagens jornal?sticas e de documentos p?blicos judiciais.

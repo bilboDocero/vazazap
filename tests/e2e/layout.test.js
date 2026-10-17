@@ -49,7 +49,7 @@ test.describe('Layout — Batch 2', () => {
     await expect(emptyState).toBeVisible();
 
     const title = page.locator('.empty-state-title');
-    await expect(title).toHaveText('MasterWhats');
+    await expect(title).toHaveText('VorcaroZap');
   });
 
   test('clicking a conversation marks it active', async ({ page }) => {

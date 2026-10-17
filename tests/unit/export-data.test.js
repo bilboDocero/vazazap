@@ -103,7 +103,7 @@ describe('the Markdown', () => {
     expect(text).toContain('](https://www.masterwhats.com.br/chat/alexandre-de-moraes#msg-');
     expect(text).toMatch(/⟨\d{2}\/\d{2}\/\d{4} \d{2}:\d{2} · laudo p\. \d+, fig\. \d+⟩/);
     expect(text).toContain('218 páginas');
-    expect(text).toContain('[no repositório](https://github.com/rafaelbressan/masterzap/blob/main/data/source/');
+    expect(text).toContain('[no repositório](https://github.com/vorcarozap/vorcarozap/blob/main/data/source/');
   });
 
   it('cites the page of the report on every message from it', () => {

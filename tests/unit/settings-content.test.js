@@ -22,7 +22,8 @@ describe('SETTINGS_CONTENT', () => {
 
   it('has credits string', () => {
     expect(typeof SETTINGS_CREDITS).toBe('string');
-    expect(SETTINGS_CREDITS).toContain('Rafael Bressan');
+    expect(SETTINGS_CREDITS).toContain('dom?nio p?blico');
+    expect(SETTINGS_CREDITS).not.toContain('Rafael Bressan');
   });
 });
 

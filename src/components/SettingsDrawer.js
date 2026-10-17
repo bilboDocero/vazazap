@@ -1,5 +1,5 @@
 /**
- * SettingsDrawer — "Sobre o MasterWhats" panel.
+ * SettingsDrawer — "Sobre o VorcaroZap" panel.
  * Replaces the sidebar when opened from the nav rail settings icon.
  * Shows project description, context, and searchable conversation highlights.
  *
@@ -42,7 +42,7 @@ export function showSettingsDrawer(container, { onClose, actions = {} } = {}) {
 
   const titleEl = document.createElement('span');
   titleEl.className = 'profile-drawer-title';
-  titleEl.textContent = 'Sobre o MasterWhats';
+  titleEl.textContent = 'Sobre o VorcaroZap';
   header.appendChild(titleEl);
 
   drawer.appendChild(header);
@@ -57,7 +57,7 @@ export function showSettingsDrawer(container, { onClose, actions = {} } = {}) {
 
   const logoImg = document.createElement('img');
   logoImg.src = '/assets/masterzap-logo.png';
-  logoImg.alt = 'MasterWhats';
+  logoImg.alt = 'VorcaroZap';
   logoImg.className = 'settings-logo-img';
   logoImg.width = 80;
   logoImg.height = 80;
@@ -65,7 +65,7 @@ export function showSettingsDrawer(container, { onClose, actions = {} } = {}) {
 
   const logoName = document.createElement('div');
   logoName.className = 'settings-logo-name';
-  logoName.textContent = 'MasterWhats';
+  logoName.textContent = 'VorcaroZap';
   logoSection.appendChild(logoName);
 
   const logoSub = document.createElement('div');

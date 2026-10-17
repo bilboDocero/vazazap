@@ -32,7 +32,7 @@ describe('one page per conversation', () => {
       const html = page(conv.id);
       expect(html, conv.id).toContain(`<link rel="canonical" href="${SITE}/chat/${conv.id}">`);
       expect(html, conv.id).toContain(`<meta property="og:url" content="${SITE}/chat/${conv.id}">`);
-      expect(html, conv.id).toMatch(/<title>Daniel Vorcaro ↔ .+ — MasterWhats<\/title>/);
+      expect(html, conv.id).toMatch(/<title>Daniel Vorcaro ↔ .+ — VorcaroZap<\/title>/);
     }
   });
 
@@ -48,7 +48,7 @@ describe('one page per conversation', () => {
     expect(html).toContain('218 páginas');
     expect(html).toMatch(/<dt>sha256 do documento<\/dt><dd><code>[0-9a-f]{64}<\/code><\/dd>/);
     // The path is the repository's; a crawler must not fetch it from the site.
-    expect(html).toContain('href="https://github.com/rafaelbressan/masterzap/blob/main/data/source/');
+    expect(html).toContain('href="https://github.com/vorcarozap/vorcarozap/blob/main/data/source/');
     expect(html).toContain('o site não serve o PDF');
     const [ld] = ldBlocks(html);
     expect(ld.isBasedOn.numberOfPages).toBe(218);

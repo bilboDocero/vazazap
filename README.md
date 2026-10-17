@@ -1,6 +1,6 @@
 ![MasterWhats — Conversas Vazadas de Daniel Vorcaro](public/assets/og-image.png)
 
-# MasterWhats
+# VorcaroZap
 
 > Visualizador interativo das 66.387 mensagens de WhatsApp extraídas dos celulares apreendidos de Daniel Vorcaro (Banco Master), em 24 conversas — de Martha Graeff a Alexandre de Moraes.
 
@@ -8,7 +8,7 @@
 
 ---
 
-Feito por **[Rafael Bressan](https://linkedin.com/in/rafaelbressan)** com **[Claude Code](https://claude.ai/code)**.
+
 
 
 ## Sobre o Projeto
@@ -18,11 +18,9 @@ As mensagens vêm dos celulares apreendidos de Daniel Vorcaro — ex-dono do Ban
 - **Março de 2026 — as conversas com Martha Graeff.** 65.772 mensagens trocadas com a então noiva vazaram para a imprensa e revelaram conexões com autoridades dos Três Poderes, apelidos que viralizaram nas redes e detalhes do maior escândalo bancário da história do Brasil.
 - **Setembro de 2026 — o relatório da PF sobre Alexandre de Moraes.** Caiu o sigilo da IPJ-A nº 3298613/2026, em que a Polícia Federal reconstrói, a partir do iPhone de Vorcaro, seus contatos com o ministro do STF e outras 22 pessoas. Não é um export de WhatsApp: as mensagens estavam em imagens dentro do laudo e foram transcritas uma a uma — veja [`data/ipj-3298613/README.md`](data/ipj-3298613/README.md).
 
-O MasterWhats transforma essas conversas em uma experiência de leitura no estilo WhatsApp Web: navegável, pesquisável e compartilhável. Cada contato tem um perfil que explica quem é a pessoa, o que o material revela e de onde vem a informação. Um novo vazamento entra como mais uma conversa.
+O VorcaroZap transforma essas conversas em uma experiência de leitura no estilo WhatsApp Web: navegável, pesquisável e compartilhável. Cada contato tem um perfil que explica quem é a pessoa, o que o material revela e de onde vem a informação. Um novo vazamento entra como mais uma conversa.
 
-### Origem do nome
 
-O nome do repositório — **masterzap** — é uma referência ao projeto original [MasterZap](https://www.reddit.com/r/brasil/s/xQeqrG27p8), criado por **Lucas Matheus** no Replit com Grok. O MasterWhats foi construído a partir dessa inspiração, reimaginando a experiência com uma nova arquitetura e funcionalidades adicionais.
 
 ## Funcionalidades
 
@@ -48,7 +46,7 @@ O nome do repositório — **masterzap** — é uma referência ao projeto origi
 ## Como Rodar Localmente
 
 ```bash
-git clone https://github.com/rafaelbressan/masterzap.git
+git clone https://github.com/vorcarozap/vorcarozap.git
 cd masterzap
 npm install
 npm run split-data    # Gera os arquivos JSON por data em public/data/
@@ -129,10 +127,9 @@ As informações compiladas neste projeto são de domínio público, extraídas 
 
 ## English Summary
 
-**MasterWhats** is an interactive viewer for 66,387 WhatsApp messages recovered from the seized phones of Daniel Vorcaro (former owner of Banco Master, arrested by Brazil's Federal Police), across 24 conversations: the leaked exchanges with Martha Graeff and the Federal Police report on his contacts with Supreme Court Justice Alexandre de Moraes, unsealed in September 2026. Built with vanilla JS and Vite, it features smart search with accent support, calendar navigation, direct message link sharing, investigative profiles, and a fully responsive WhatsApp Web-like interface optimized for mobile.
+**VorcaroZap** is an interactive viewer for 66,387 WhatsApp messages recovered from the seized phones of Daniel Vorcaro (former owner of Banco Master, arrested by Brazil's Federal Police), across 24 conversations: the leaked exchanges with Martha Graeff and the Federal Police report on his contacts with Supreme Court Justice Alexandre de Moraes, unsealed in September 2026. Built with vanilla JS and Vite, it features smart search with accent support, calendar navigation, direct message link sharing, investigative profiles, and a fully responsive WhatsApp Web-like interface optimized for mobile.
 
-The repo name "masterzap" references the original [MasterZap](https://www.reddit.com/r/brasil/s/xQeqrG27p8) project by Lucas Matheus (built on Replit with Grok), which inspired this reimagined version.
 
 **Contributions welcome** — new leaked conversations, media support, sharing improvements, and bug fixes. See the Roadmap section above. Only text messages are currently available; images, audio, and video were not part of the leaks.
 
-**[Live: www.masterwhats.com.br](https://www.masterwhats.com.br/)** | **Author: [Rafael Bressan](https://linkedin.com/in/rafaelbressan)**
+**[Live: www.masterwhats.com.br](https://www.masterwhats.com.br/)**

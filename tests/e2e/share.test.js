@@ -75,7 +75,7 @@ test.describe('Chat Interactions', () => {
       'Exportar (.md)',
       'Exportar (.json)',
       'Fechar conversa',
-      'Sobre o MasterWhats',
+      'Sobre o VorcaroZap',
     ]);
   });
 

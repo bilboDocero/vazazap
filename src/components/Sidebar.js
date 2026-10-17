@@ -276,7 +276,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
     const items = [
       { label: 'Perfil', action: onProfile, enabled: !!onProfile },
       { label: 'Exportar tudo (.zip)', action: onExportAll, enabled: !!onExportAll },
-      { label: 'Sobre o MasterWhats', action: onAbout, enabled: !!onAbout },
+      { label: 'Sobre o VorcaroZap', action: onAbout, enabled: !!onAbout },
     ];
 
     for (const item of items) {

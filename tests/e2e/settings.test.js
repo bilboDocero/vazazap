@@ -22,14 +22,14 @@ test.describe('Settings/About Drawer', () => {
     test.skip(page.viewportSize().width <= 600, 'Nav rail hidden on mobile');
     await page.locator('.nav-rail-btn[title="Sobre"]').click();
     const title = page.locator('.profile-drawer-title');
-    await expect(title).toHaveText('Sobre o MasterWhats');
+    await expect(title).toHaveText('Sobre o VorcaroZap');
   });
 
   test('about drawer shows logo and app name', async ({ page }) => {
     test.skip(page.viewportSize().width <= 600, 'Nav rail hidden on mobile');
     await page.locator('.nav-rail-btn[title="Sobre"]').click();
     const logoName = page.locator('.settings-logo-name');
-    await expect(logoName).toHaveText('MasterWhats');
+    await expect(logoName).toHaveText('VorcaroZap');
     const logoImg = page.locator('.settings-logo-img');
     await expect(logoImg).toBeVisible();
   });
@@ -73,7 +73,7 @@ test.describe('SEO & Favicons', () => {
   test('page has correct title', async ({ page }) => {
     await page.goto('/');
     const title = await page.title();
-    expect(title).toContain('MasterWhats');
+    expect(title).toContain('VorcaroZap');
     expect(title).toContain('Vorcaro');
   });
 
@@ -86,7 +86,7 @@ test.describe('SEO & Favicons', () => {
     const response = await page.goto('/site.webmanifest');
     expect(response.status()).toBe(200);
     const json = await response.json();
-    expect(json.name).toBe('MasterWhats');
+    expect(json.name).toBe('VorcaroZap');
   });
 
   test('robots.txt is served', async ({ page }) => {
@@ -108,7 +108,7 @@ test.describe('SEO & Favicons', () => {
     const response = await page.goto('/llms.txt');
     expect(response.status()).toBe(200);
     const text = await response.text();
-    expect(text).toContain('MasterWhats');
+    expect(text).toContain('VorcaroZap');
     expect(text).toContain('Daniel Vorcaro');
   });
 });

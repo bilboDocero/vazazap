@@ -598,13 +598,13 @@ async function init() {
   app.appendChild(wrapper);
 
   const elapsed = Date.now() - loadStart;
-  const isFirstVisit = typeof window !== 'undefined' && !sessionStorage.getItem('masterwhats_loaded');
+  const isFirstVisit = typeof window !== 'undefined' && !sessionStorage.getItem('vorcarozap_loaded');
   const minLoading = isFirstVisit ? 600 : 0;
   if (elapsed < minLoading) {
     await new Promise(r => setTimeout(r, minLoading - elapsed));
   }
   try {
-    sessionStorage.setItem('masterwhats_loaded', '1');
+    sessionStorage.setItem('vorcarozap_loaded', '1');
   } catch {
     // Ignore storage errors in private browsing/sandboxed contexts
   }
@@ -616,7 +616,7 @@ async function init() {
 }
 
 init().catch(err => {
-  console.error('MasterWhats init failed:', err);
+  console.error('VorcaroZap init failed:', err);
   const loading = document.getElementById('loading-screen');
   if (loading) loading.remove();
   const app = document.getElementById('app');

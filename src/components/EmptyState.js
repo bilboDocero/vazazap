@@ -38,7 +38,7 @@ export function renderEmptyState(container) {
         <path d="m274 49 7 7 15-15" stroke="#FFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <h1 class="empty-state-title">MasterWhats</h1>
+    <h1 class="empty-state-title">VorcaroZap</h1>
     <span class="empty-state-subtitle">O histórico, conversa por conversa.</span>
     <p class="empty-state-text">
       Explore as mensagens de Daniel Vorcaro em uma interface familiar.<br>

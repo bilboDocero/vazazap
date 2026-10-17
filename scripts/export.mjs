@@ -116,7 +116,7 @@ function conversationMarkdown(entry, messages, { standalone = true, month = null
 
   out.push(`${heading} Daniel Vorcaro ↔ ${contact}${month ? ` — ${monthName(month)}` : ''}`, '');
   if (standalone) {
-    out.push(`> Exportado de [MasterWhats](${SITE}/#/chat/${entry.id}) em ${generatedAt.slice(0, 10)}.${month ? ` Só ${monthName(month)} (${messages.length} mensagens); a conversa inteira está em masterwhats-${entry.id}.md.` : ''} Código e dados: ${REPO}.`, '');
+    out.push(`> Exportado de [VorcaroZap](${SITE}/#/chat/${entry.id}) em ${generatedAt.slice(0, 10)}.${month ? ` Só ${monthName(month)} (${messages.length} mensagens); a conversa inteira está em masterwhats-${entry.id}.md.` : ''} Código e dados: ${REPO}.`, '');
   }
 
   out.push(`${sub} Proveniência`, '', '| | |', '|---|---|');
@@ -198,7 +198,7 @@ function aboutMarkdown() {
 function readme(conversations) {
   const total = conversations.reduce((n, c) => n + c.total_messages, 0);
   return [
-    '# MasterWhats — export completo', '',
+    '# VorcaroZap — export completo', '',
     `Gerado em ${generatedAt.slice(0, 10)} a partir de ${SITE}. ${conversations.length} conversas, ${total} mensagens.`, '',
     '## O que tem aqui', '',
     '| Arquivo | Conteúdo |', '|---|---|',
@@ -220,8 +220,8 @@ function readme(conversations) {
 function allMarkdown(built) {
   const total = built.reduce((n, b) => n + b.entry.total_messages, 0);
   const out = [
-    '# MasterWhats — todas as conversas', '',
-    `> Exportado de [MasterWhats](${SITE}) em ${generatedAt.slice(0, 10)}. ${built.length} conversas, ${total} mensagens. Código e dados: ${REPO}.`, '',
+    '# VorcaroZap — todas as conversas', '',
+    `> Exportado de [VorcaroZap](${SITE}) em ${generatedAt.slice(0, 10)}. ${built.length} conversas, ${total} mensagens. Código e dados: ${REPO}.`, '',
     aboutMarkdown(),
     // Vorcaro's own profile quotes the Martha chat when it says "search".
     profileMarkdown('Quem é Daniel Vorcaro', VORCARO_PROFILE, 'martha-graeff').text,

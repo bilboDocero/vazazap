@@ -131,7 +131,7 @@ function appPage({ title, description, path, jsonLd, chat, hash, article, extraH
 /** A description a search result can show, from the profile when there is one. */
 function describe(entry, profile, who) {
   const first = profile?.sections?.[0]?.paragraphs?.[0]?.text;
-  const fallback = `Conversa entre Daniel Vorcaro e ${who}: ${entry.total_messages} mensagens, de ${entry.date_range.start} a ${entry.date_range.end}, no MasterWhats.`;
+  const fallback = `Conversa entre Daniel Vorcaro e ${who}: ${entry.total_messages} mensagens, de ${entry.date_range.start} a ${entry.date_range.end}, no VorcaroZap.`;
   if (!first) return fallback;
   const text = linksToText(first).replace(/\s+/g, ' ').trim();
   if (text.length <= 155) return text;
@@ -227,7 +227,7 @@ function conversationPage(entry, messages, profile, who) {
   out.push(`<article id="prerender">`);
   out.push(`<h1>Daniel Vorcaro ↔ ${escapeHtml(who)}</h1>`);
   out.push(`<p>${entry.total_messages} mensagens, de ${entry.date_range.start} a ${entry.date_range.end}. `
-    + `<a href="/#/chat/${entry.id}">Abrir no MasterWhats</a> · `
+    + `<a href="/#/chat/${entry.id}">Abrir no VorcaroZap</a> · `
     + `<a href="/export/masterwhats-${entry.id}.md">Markdown completo</a> · `
     + `<a href="/export/masterwhats-${entry.id}.json">JSON</a></p>`);
   out.push(...provenanceHtml(entry));
@@ -252,7 +252,7 @@ function conversationPage(entry, messages, profile, who) {
 
   const description = describe(entry, profile, who);
   return appPage({
-    title: `Daniel Vorcaro ↔ ${who} — MasterWhats`,
+    title: `Daniel Vorcaro ↔ ${who} — VorcaroZap`,
     description,
     path,
     jsonLd: conversationLd(entry, who, description, { path, first: entry.date_range.start, last: entry.date_range.end }),
@@ -272,7 +272,7 @@ function monthPage(entry, who, ym, msgs, prevYm, nextYm) {
     + `<a href="${parent}">A conversa</a> · `
     + (prevYm ? `<a href="${parent}/${prevYm}" rel="prev">${longMonth(prevYm)}</a> · ` : '')
     + (nextYm ? `<a href="${parent}/${nextYm}" rel="next">${longMonth(nextYm)}</a> · ` : '')
-    + `<a href="/#/chat/${entry.id}/msg/${msgs[0].id}">Abrir no MasterWhats</a> · `
+    + `<a href="/#/chat/${entry.id}/msg/${msgs[0].id}">Abrir no VorcaroZap</a> · `
     + `<a href="/export/masterwhats-${entry.id}-${ym}.md">Markdown deste mês</a> · `
     + `<a href="/export/masterwhats-${entry.id}.md">Markdown completo</a></p>`);
   out.push(...messagesHtml(msgs));
@@ -282,7 +282,7 @@ function monthPage(entry, who, ym, msgs, prevYm, nextYm) {
   const links = (prevYm ? `<link rel="prev" href="${SITE}${parent}/${prevYm}">\n` : '')
     + (nextYm ? `<link rel="next" href="${SITE}${parent}/${nextYm}">\n` : '');
   return appPage({
-    title: `Daniel Vorcaro ↔ ${who} — ${longMonth(ym)} — MasterWhats`,
+    title: `Daniel Vorcaro ↔ ${who} — ${longMonth(ym)} — VorcaroZap`,
     description,
     path,
     jsonLd: conversationLd(entry, who, description, { path, month: ym, first: msgs[0].date, last: msgs.at(-1).date, parent }),
@@ -334,7 +334,7 @@ ${JSON.stringify(jsonLd, null, 2)}
 </head>
 <body>
 <main>
-<header><a href="/">MasterWhats</a> · <a href="/quem">Pessoas citadas</a></header>
+<header><a href="/">VorcaroZap</a> · <a href="/quem">Pessoas citadas</a></header>
 ${body}
 </main>
 </body>
@@ -383,7 +383,7 @@ function personPage(person, mentions) {
     isPartOf: { '@id': `${SITE}/#dataset` },
     dateModified: today,
   };
-  return standalone({ title: `${person.name} nas conversas de Daniel Vorcaro — MasterWhats`, description, path, jsonLd, body: body.join('\n') });
+  return standalone({ title: `${person.name} nas conversas de Daniel Vorcaro — VorcaroZap`, description, path, jsonLd, body: body.join('\n') });
 }
 
 function peopleIndex(people) {
@@ -397,7 +397,7 @@ function peopleIndex(people) {
     '@context': 'https://schema.org', '@type': 'CollectionPage', '@id': `${SITE}/quem`, url: `${SITE}/quem`,
     name: 'Pessoas citadas nas conversas de Daniel Vorcaro', inLanguage: 'pt-BR', isPartOf: { '@id': `${SITE}/#dataset` }, dateModified: today,
   };
-  return standalone({ title: 'Pessoas citadas — MasterWhats', description: 'Quem aparece nas conversas de Daniel Vorcaro, com toda menção datada e apontando para a mensagem.', path: '/quem', jsonLd, body: body.join('\n') });
+  return standalone({ title: 'Pessoas citadas — VorcaroZap', description: 'Quem aparece nas conversas de Daniel Vorcaro, com toda menção datada e apontando para a mensagem.', path: '/quem', jsonLd, body: body.join('\n') });
 }
 
 // ── llms-full.txt ──────────────────────────────────────────────────────────
@@ -416,7 +416,7 @@ function llmsFull(built, people) {
   const about = SETTINGS_CONTENT.sections.find(s => s.title === 'Sobre o Projeto');
   const rest = SETTINGS_CONTENT.sections.filter(s => s !== about);
   const out = [
-    '# MasterWhats — conteúdo completo', '',
+    '# VorcaroZap — conteúdo completo', '',
     `> Tudo que o site diz, em texto. Cada citação traz ⟨data hora · laudo p., fig.⟩ e linka a mensagem na página estática (${SITE}/chat/<id>#msg-<n>, ou a página do mês na conversa com Martha Graeff); a mesma página abre o app nessa mensagem para quem tem JavaScript. O mesmo n aparece como "msg n" no Markdown de cada conversa. ${built.length} conversas, ${total} mensagens, de ${built.at(-1)?.entry.date_range.start ?? ''} a ${built[0]?.entry.date_range.end ?? ''}. Gerado em ${today}. Código e dados: ${REPO}.`, '',
     '## Sobre o projeto', '',
     ...(about?.paragraphs || []).map(p => linksToMarkdown(p.text, { resolve, hrefFor: locate }) + '\n'),
