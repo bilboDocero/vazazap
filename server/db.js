@@ -67,7 +67,7 @@ function supabaseHeaders() {
     'Authorization': `Bearer ${SUPABASE_KEY}`,
     'Content-Type': 'application/json',
     'Prefer': 'return=representation',
-    'User-Agent': 'VorcaroZap-Server/1.0',
+    'User-Agent': 'vorcarozap-Server/1.0',
   };
 }
 

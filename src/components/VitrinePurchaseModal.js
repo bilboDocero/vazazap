@@ -3,7 +3,7 @@
  * for the Vitrine product, with real Asaas payment integration (PIX QR Code & Cartão)
  * and PostgreSQL persistence.
  *
- * Flow: 1. Plano -> 2. Edição -> 3. Pagamento -> 4. Preview
+ * Sequence: 1. Plano -> 2. Edição -> 3. Pagamento -> 4. Preview
  */
 
 import {
@@ -58,7 +58,6 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
   let pixData = null;
   let isProcessingPayment = false;
   let paymentError = '';
-  let paymentApproved = false;
   let pollIntervalId = null;
 
   // Credit Card Form State
@@ -96,7 +95,6 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         const data = await res.json();
         if (data.ok && data.isPaid) {
           stopPolling();
-          paymentApproved = true;
           currentStep = 4; // Advance to Preview!
           render();
         }
@@ -113,10 +111,10 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
       <div class="status-modal-dialog">
         <header class="status-modal-header">
           <div class="status-modal-steps">
-            <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">1. Plano</span>
-            <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">2. Edição</span>
-            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">3. Pagamento</span>
-            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">4. Preview</span>
+            <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">Plano</span>
+            <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">Edição</span>
+            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">Pagamento</span>
+            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">Preview</span>
           </div>
           <button class="status-modal-close" aria-label="Fechar modal">&times;</button>
         </header>
@@ -200,7 +198,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
       `;
     }
 
-    // ── STEP 2: Edição dos Produtos da Vitrine ────────────────
+    // ── STEP 2: Edição da Vitrine (Design Original Preservado) ─
     if (currentStep === 2) {
       const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
       const activeFile = (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length)
@@ -216,84 +214,100 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
           <form class="status-publish-form">
             <div class="status-profile-section">
               <div class="status-avatar-upload-box">
-                <div class="status-avatar-preview">
-                  ${profilePicData
-                    ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" class="status-avatar-img" />`
-                    : `<div class="status-avatar-placeholder">${ICON_CAMERA}</div>`
-                  }
-                </div>
-                <label class="status-avatar-btn">
-                  <span>${profilePicData ? 'Alterar foto' : 'Foto da Loja'}</span>
+                <label class="status-avatar-upload-label">
+                  <div class="status-avatar-preview">
+                    ${profilePicData
+                      ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" class="status-avatar-img" />`
+                      : `<div class="status-avatar-placeholder">${ICON_CAMERA}</div>`
+                    }
+                  </div>
+                  <span class="status-avatar-btn-text">${profilePicData ? 'Alterar foto' : 'Enviar foto'}</span>
                   <input type="file" class="input-profile-pic" accept="image/jpeg,image/png,image/webp" style="display:none;" />
                 </label>
               </div>
 
               <div class="status-names-group">
                 <label class="status-field-label">
-                  <span>Nome da Vitrine / Loja:</span>
-                  <input type="text" class="status-text-input input-profile-name" placeholder="Ex: Relógios & Cia" value="${escapeAttr(profileName)}" maxlength="60" required />
+                  <span>Nome da vitrine ou empresa</span>
+                  <input type="text" class="input-profile-name" value="${escapeHtml(profileName)}" placeholder="Ex: Master Store ou Relógios & Cia" required />
                 </label>
+              </div>
+            </div>
 
-                <div class="status-social-pick">
-                  <div class="status-social-networks">
-                    ${Object.entries(SOCIAL_NETWORKS).map(([key, net]) => `
-                      <button type="button" class="status-network-btn ${selectedNetwork === key ? 'active' : ''}" data-net="${key}" title="${net.name}">
-                        ${net.icon}
-                      </button>
-                    `).join('')}
-                  </div>
-                  <input type="text" class="status-text-input input-user-handle" placeholder="@sua.loja" value="${escapeAttr(userHandle)}" maxlength="40" required />
+            <div class="status-social-section">
+              <label class="status-field-label">
+                <span>Rede social</span>
+                <div class="status-networks-list">
+                  ${Object.values(SOCIAL_NETWORKS).map(net => `
+                    <button type="button" class="status-network-btn ${selectedNetwork === net.id ? 'active' : ''}" data-net="${net.id}" style="--net-color: ${net.color}" aria-label="${net.name}" title="${net.name}">
+                      ${net.icon}
+                    </button>
+                  `).join('')}
                 </div>
+              </label>
+
+              <label class="status-field-label">
+                <span>Usuário / Username no ${network.name}</span>
+                <div class="status-username-wrapper">
+                  ${network.prefix ? `<span class="status-username-prefix">${network.prefix}</span>` : ''}
+                  <input type="text" class="input-user-handle" value="${escapeHtml(userHandle)}" placeholder="${network.placeholder}" required />
+                </div>
+              </label>
+
+              <div class="status-social-link-preview">
+                <span class="status-link-tag">Link automático:</span>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="status-generated-link">https://instagram.com/user</a>
               </div>
             </div>
 
-            <div class="status-link-preview-box">
-              <span class="status-link-preview-label">Link da sua loja/contato:</span>
-              <span class="status-link-preview-url"></span>
-            </div>
-
-            <div class="status-media-upload-section">
-              <div class="status-media-header">
-                <label class="status-field-label">
-                  <span>Fotos do Produto (${uploadedFiles.length} de ${fileCount} anexadas)</span>
-                  <small class="status-media-hint">Formato vertical 9:16 (JPG, PNG ou WEBP). Máximo 5 MB cada.</small>
-                </label>
+            <div class="status-media-section">
+              <div class="status-guidance-box">
+                <div class="status-guidance-badge">📐 Dimensões Ideais</div>
+                <p>Recomendamos imagens verticais na proporção <strong>9:16 (1080 × 1920 px)</strong> para preencher toda a tela da vitrine sem faixas. Vídeos não são aceitos no momento (máx. <strong>5 MB</strong> por anexo).</p>
               </div>
 
-              <div class="status-uploaded-grid">
-                ${uploadedFiles.map((f, i) => `
-                  <div class="status-uploaded-tile ${i === activeFileIndex ? 'selected' : ''}" data-id="${f.id}" title="Clique para editar a descrição deste produto">
-                    <img src="${sanitizeUrl(f.url, true)}" alt="${escapeHtml(f.name)}" />
-                    <button type="button" class="status-tile-delete-btn" data-id="${f.id}" aria-label="Remover">&times;</button>
-                    <span class="status-tile-order-badge">${i + 1}</span>
+              <label class="status-field-label">
+                <span>Produtos da Vitrine (${uploadedFiles.length} de ${fileCount} contratados)</span>
+              </label>
+
+              ${uploadError ? `<div class="status-upload-error-msg" role="alert">${escapeHtml(uploadError)}</div>` : ''}
+
+              <div class="status-files-dropzone">
+                ${uploadedFiles.map((file, idx) => `
+                  <div class="status-uploaded-tile ${idx === activeFileIndex ? 'selected' : ''}" data-id="${file.id}" role="button" tabindex="0" title="Clique para editar a legenda deste produto">
+                    <img src="${sanitizeUrl(file.url, true)}" alt="${escapeHtml(file.name)}" class="status-tile-img" />
+                    <span class="status-tile-badge">#${idx + 1}</span>
+                    <button type="button" class="status-tile-delete-btn" data-id="${file.id}" aria-label="Remover anexo" title="Remover anexo">&times;</button>
                   </div>
                 `).join('')}
 
                 ${uploadedFiles.length < fileCount ? `
-                  <label class="status-tile-add-btn">
-                    <input type="file" class="input-media-file" accept="image/jpeg,image/png,image/webp" style="display:none;" />
+                  <label class="status-upload-add-tile" title="Adicionar anexo (1 por vez, máx 5MB)">
+                    <input type="file" class="input-media-files" accept="image/jpeg,image/png,image/webp" style="display:none;" />
                     ${ICON_PLUS_SIGN}
-                    <span>Anexar foto ${uploadedFiles.length + 1}</span>
+                    <span>Adicionar</span>
                   </label>
                 ` : ''}
               </div>
 
-              ${uploadError ? `<div class="status-upload-error">${escapeHtml(uploadError)}</div>` : ''}
-
-              <div class="status-caption-box-wrapper">
-                <label class="status-field-label">
-                  <span>${activeFile ? `Descrição do produto #${activeFileIndex + 1} (${escapeHtml(activeFile.name)})` : 'Descrição da vitrine/produto'}:</span>
-                </label>
-                <textarea class="status-textarea input-caption" placeholder="Descreva os detalhes, preço ou chamada de ação do produto..." rows="2" maxlength="300">${escapeHtml(currentCaption)}</textarea>
+              <div class="status-quick-samples">
+                <button type="button" class="status-btn-samples">
+                  + Preencher com fotos de exemplo
+                </button>
               </div>
             </div>
 
+            <label class="status-field-label">
+              <span>Descrição / Legenda do produto (opcional)</span>
+              <textarea class="input-caption" rows="2" placeholder="Digite detalhes ou condições deste produto...">${escapeHtml(currentCaption)}</textarea>
+            </label>
+
             <div class="status-form-actions">
-              <button type="button" class="status-btn-primary btn-advance-to-payment">
-                Avançar para Pagamento (${pricing.formattedTotal}) &rarr;
+              <button type="button" class="status-btn-back-step btn-back-to-step1" aria-label="Voltar" title="Voltar">
+                ${ICON_BACK_ARROW}
               </button>
-              <button type="button" class="btn-back-to-step1" style="margin-top: 10px; width: 100%; border: 0; background: transparent; color: #64748B; font-size: 13px; cursor: pointer; text-decoration: underline;">
-                &larr; Voltar para escolha do plano
+              <button type="submit" class="status-btn-primary btn-advance-to-payment">
+                Avançar para Pagamento (${pricing.formattedTotal}) &rarr;
               </button>
             </div>
           </form>
@@ -301,7 +315,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
       `;
     }
 
-    // ── STEP 3: Pagamento com Fricção Mínima (Asaas v3) ────────
+    // ── STEP 3: Pagamento com Fricção Mínima (Nome e User já capturados) ─
     if (currentStep === 3) {
       return `
         <div class="status-step-payment" style="text-align: left; width: 100%;">
@@ -345,7 +359,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
           <div class="payment-input-group" style="margin-bottom: 14px;">
             <label class="payment-input-label">CPF ou CNPJ para Faturamento</label>
             <input type="text" class="payment-input-field input-customer-cpf" placeholder="000.000.000-00" value="${escapeAttr(customerCpf)}" maxlength="18" required />
-            <small style="color: #64748B; font-size: 11px; margin-top: 2px;">Exigido pelo Banco Central para registro da cobrança no Asaas.</small>
+            <small style="color: #64748B; font-size: 11px; margin-top: 2px;">Exigido pelo Banco Central para registro fiscal do Pix/cobrança.</small>
           </div>
 
           ${selectedBillingType === 'PIX' ? `
@@ -418,12 +432,16 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
       `;
     }
 
-    // ── STEP 4: Pré-visualização e Publicação da Vitrine ──────
+    // ── STEP 4: Pré-visualização da Vitrine (Design Original) ─
     if (currentStep === 4) {
       const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
-      const mediaList = uploadedFiles.length > 0 ? uploadedFiles : [];
-      const activeMedia = mediaList[previewActiveIdx] || { name: 'Foto', url: '', caption: caption };
-      const activeCaption = activeMedia.caption || caption || '';
+      const mediaList = uploadedFiles.length > 0
+        ? uploadedFiles
+        : [{ id: 'sample', name: 'Foto Exemplo', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80', caption: '' }];
+
+      const safeIdx = Math.min(previewActiveIdx, mediaList.length - 1);
+      const activeMedia = mediaList[safeIdx];
+      const activeCaption = activeMedia?.caption || caption || '';
 
       return `
         <div class="status-step-preview">
@@ -433,65 +451,62 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
             </span>
           </div>
 
-          <div class="status-preview-top-bar">
-            <button type="button" class="status-preview-back-btn btn-back-to-edit">
-              ${ICON_BACK_ARROW}
-              <span>Ajustar Edição</span>
-            </button>
-            <span class="status-preview-step-title">Pré-visualização da Vitrine (${previewActiveIdx + 1} de ${mediaList.length})</span>
-          </div>
+          <h2 class="status-modal-title">Pré-visualização da Vitrine</h2>
+          <p class="status-modal-desc">Confira exatamente como seu produto será exibido na Vitrine antes de confirmar a publicação.</p>
 
-          <div class="status-preview-phone-mockup">
-            <div class="story-progress-bar">
-              ${mediaList.map((_, idx) => `
-                <div class="story-progress-seg ${idx === previewActiveIdx ? 'active' : (idx < previewActiveIdx ? 'passed' : '')}"></div>
-              `).join('')}
-            </div>
+          <div class="status-preview-frame">
+            <div class="status-preview-screen">
+              <div class="story-progress-bar">
+                ${mediaList.map((m, idx) => `
+                  <div class="story-progress-seg ${idx === safeIdx ? 'active' : (idx < safeIdx ? 'passed' : '')}"></div>
+                `).join('')}
+              </div>
 
-            <header class="story-header">
-              <div class="story-header-user">
-                <div class="story-header-avatar">
-                  ${profilePicData
-                    ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" />`
-                    : defaultAvatarSvg('preview')
-                  }
-                </div>
-                <div>
-                  <div class="story-header-name">
-                    ${escapeHtml(profileName || 'Vitrine Comercial')}
-                    ${selectedPlan === 'vitrine_impulsionado' ? '<span class="updates-status-badge-boost">Impulsionado</span>' : ''}
+              <header class="story-header">
+                <div class="story-header-user">
+                  <div class="story-header-avatar">
+                    ${profilePicData
+                      ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" />`
+                      : `<div style="background:#00A884;width:100%;height:100%;display:grid;place-items:center;color:#fff;font-weight:700;">${(profileName || 'V').charAt(0)}</div>`
+                    }
                   </div>
-                  <div class="story-header-meta">${escapeHtml(userHandle || '@loja')} · ${escapeHtml(network.name)}</div>
+                  <div>
+                    <div class="story-header-name">
+                      ${escapeHtml(profileName || 'Vitrine Comercial')}
+                      ${selectedPlan === 'vitrine_impulsionado' ? '<span class="updates-status-badge-boost">Impulsionado</span>' : ''}
+                    </div>
+                    <div class="story-header-meta">${escapeHtml(userHandle ? (userHandle.startsWith('@') ? userHandle : `@${userHandle}`) : '@vitrine')} · ${network.name}</div>
+                  </div>
                 </div>
+              </header>
+
+              <div class="status-preview-media-box">
+                <img src="${sanitizeUrl(activeMedia.url, true)}" alt="${escapeHtml(activeMedia.name)}" class="status-preview-media-img" />
+
+                ${mediaList.length > 1 ? `
+                  <button type="button" class="status-preview-nav prev" aria-label="Mídia anterior">&#10094;</button>
+                  <button type="button" class="status-preview-nav next" aria-label="Próxima mídia">&#10095;</button>
+                ` : ''}
               </div>
-            </header>
 
-            <div class="status-preview-media-box">
-              <img src="${sanitizeUrl(activeMedia.url, true)}" alt="${escapeHtml(activeMedia.name)}" class="status-preview-media-img" />
+              <footer class="story-footer">
+                ${activeCaption ? `
+                  <div class="story-caption-box">
+                    <p class="story-caption-text">${escapeHtml(activeCaption)}</p>
+                  </div>
+                ` : ''}
 
-              ${mediaList.length > 1 ? `
-                <button type="button" class="status-preview-nav prev" aria-label="Foto anterior">&#10094;</button>
-                <button type="button" class="status-preview-nav next" aria-label="Próxima foto">&#10095;</button>
-              ` : ''}
+                <div class="story-social-btn" style="background: ${escapeAttr(network.color)};">
+                  ${network.icon}
+                  <span>Visitar vitrine no ${escapeHtml(network.name)} (${escapeHtml(userHandle || 'loja')}) ↗</span>
+                </div>
+              </footer>
             </div>
-
-            <footer class="story-footer">
-              ${activeCaption ? `
-                <div class="story-caption-box">
-                  <p class="story-caption-text">${escapeHtml(activeCaption)}</p>
-                </div>
-              ` : ''}
-
-              <div class="story-social-btn" style="background: ${escapeAttr(network.color)};">
-                ${network.icon}
-                <span>Visitar vitrine no ${escapeHtml(network.name)} (${escapeHtml(userHandle || 'loja')}) ↗</span>
-              </div>
-            </footer>
           </div>
 
-          <div class="status-preview-actions">
-            <button type="button" class="status-btn-secondary status-btn-edit-preview">
-              Editar Dados e Fotos
+          <div class="status-preview-actions-bar">
+            <button type="button" class="status-btn-edit-preview btn-back-to-edit">
+              &larr; Voltar para editar
             </button>
             <button type="button" class="status-btn-primary btn-confirm-publish">
               Confirmar e Publicar Vitrine
@@ -506,19 +521,22 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
 
   function wireEvents(pricing) {
     modalEl.querySelector('.status-modal-close')?.addEventListener('click', closeModal);
+    modalEl.addEventListener('click', (e) => {
+      if (e.target === modalEl) closeModal();
+    });
 
     // ── Events Step 1: Plano ──────────────────────────────────
     if (currentStep === 1) {
-      modalEl.querySelectorAll('input[name="plan"]').forEach(input => {
-        input.addEventListener('change', (e) => {
-          selectedPlan = e.target.value;
+      modalEl.querySelectorAll('input[name="plan"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+          selectedPlan = radio.value;
           render();
         });
       });
 
       modalEl.querySelectorAll('.status-file-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          fileCount = parseInt(btn.dataset.count, 10);
+          fileCount = Number(btn.dataset.count);
           if (uploadedFiles.length > fileCount) {
             uploadedFiles = uploadedFiles.slice(0, fileCount);
             if (activeFileIndex >= fileCount) activeFileIndex = -1;
@@ -533,19 +551,21 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
       });
     }
 
-    // ── Events Step 2: Edição ─────────────────────────────────
+    // ── Events Step 2: Edição da Vitrine ──────────────────────
     else if (currentStep === 2) {
-      const handleInput = modalEl.querySelector('.input-user-handle');
       const nameInput = modalEl.querySelector('.input-profile-name');
+      const handleInput = modalEl.querySelector('.input-user-handle');
+      const linkPreview = modalEl.querySelector('.status-generated-link');
       const captionInput = modalEl.querySelector('.input-caption');
       const profilePicInput = modalEl.querySelector('.input-profile-pic');
-      const mediaInput = modalEl.querySelector('.input-media-file');
-      const linkPreviewEl = modalEl.querySelector('.status-link-preview-url');
+      const mediaInput = modalEl.querySelector('.input-media-files');
 
       function updateLink() {
-        if (linkPreviewEl && handleInput) {
-          const raw = handleInput.value.trim();
-          linkPreviewEl.textContent = buildSocialLink(selectedNetwork, raw);
+        const username = handleInput ? handleInput.value.trim() || 'vitrine' : 'vitrine';
+        const url = buildSocialLink(selectedNetwork, username);
+        if (linkPreview) {
+          linkPreview.textContent = url;
+          linkPreview.href = url;
         }
       }
 
@@ -554,7 +574,9 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         updateLink();
       });
 
-      nameInput?.addEventListener('input', () => { profileName = nameInput.value; });
+      nameInput?.addEventListener('input', () => {
+        profileName = nameInput.value;
+      });
 
       captionInput?.addEventListener('input', () => {
         const val = captionInput.value;
@@ -591,8 +613,8 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
       modalEl.querySelectorAll('.status-network-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           selectedNetwork = btn.dataset.net;
-          profileName = nameInput.value;
-          userHandle = handleInput.value.trim();
+          if (nameInput) profileName = nameInput.value;
+          if (handleInput) userHandle = handleInput.value.trim();
           if (captionInput && activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length) {
             uploadedFiles[activeFileIndex].caption = captionInput.value;
           }
@@ -606,7 +628,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         if (!file) return;
 
         if (file.type && !file.type.startsWith('image/')) {
-          uploadError = 'Por favor envie uma imagem válida (JPG, PNG ou WEBP).';
+          uploadError = 'Vídeos não são permitidos. Envie uma imagem em JPG, PNG ou WEBP.';
           render();
           return;
         }
@@ -634,77 +656,110 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         if (!file) return;
 
         if (file.type && !file.type.startsWith('image/')) {
-          uploadError = 'Vídeos não são aceitos. Por favor envie apenas fotos (JPG, PNG ou WEBP).';
+          uploadError = 'Vídeos não são permitidos. Envie uma imagem vertical (9:16) em JPG, PNG ou WEBP.';
           render();
           return;
         }
 
         if (file.size > MAX_FILE_SIZE) {
-          uploadError = `O arquivo selecionado (${file.name}) ultrapassa o limite de 5 MB (${(file.size / 1024 / 1024).toFixed(1)} MB).`;
+          uploadError = `O arquivo "${file.name}" excede o tamanho máximo de 5 MB (${(file.size / 1024 / 1024).toFixed(1)} MB).`;
           render();
           return;
         }
 
-        if (uploadedFiles.length >= fileCount) {
-          uploadError = `Seu plano permite no máximo ${fileCount} foto${fileCount > 1 ? 's' : ''}.`;
-          render();
-          return;
-        }
-
-        uploadError = '';
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const newFile = {
-            id: `media-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-            name: file.name,
-            url: ev.target.result,
-            type: file.type || 'image/jpeg',
-            caption: '',
+        if (uploadedFiles.length < fileCount) {
+          uploadError = '';
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const newFile = {
+              id: `file-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+              name: file.name,
+              url: ev.target.result,
+              type: file.type || 'image/jpeg',
+              caption: '',
+            };
+            uploadedFiles.push(newFile);
+            activeFileIndex = uploadedFiles.length - 1;
+            caption = '';
+            if (nameInput) profileName = nameInput.value;
+            if (handleInput) userHandle = handleInput.value.trim();
+            render();
+            setTimeout(() => {
+              modalEl.querySelector('.input-caption')?.focus();
+            }, 50);
           };
+          reader.readAsDataURL(file);
+        }
+      });
 
-          uploadedFiles.push(newFile);
-          activeFileIndex = uploadedFiles.length - 1;
-          caption = '';
+      modalEl.querySelector('.status-btn-samples')?.addEventListener('click', () => {
+        const sampleImages = [
+          'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80',
+          'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
+          'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
+          'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=800&q=80',
+        ];
 
-          render();
-        };
-        reader.readAsDataURL(file);
+        while (uploadedFiles.length < fileCount) {
+          const idx = uploadedFiles.length;
+          uploadedFiles.push({
+            id: `sample-${Date.now()}-${idx}`,
+            name: `Produto Vitrine #${idx + 1}.jpg`,
+            url: sampleImages[idx % sampleImages.length],
+            type: 'image/jpeg',
+            caption: '',
+          });
+        }
+        activeFileIndex = uploadedFiles.length - 1;
+        caption = '';
+        if (nameInput) profileName = nameInput.value;
+        if (handleInput) userHandle = handleInput.value.trim();
+        uploadError = '';
+        render();
+        setTimeout(() => {
+          modalEl.querySelector('.input-caption')?.focus();
+        }, 50);
       });
 
       modalEl.querySelectorAll('.status-tile-delete-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const fileId = btn.dataset.id;
-          uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
-          activeFileIndex = uploadedFiles.length - 1;
+          const delId = btn.dataset.id;
+          uploadedFiles = uploadedFiles.filter(f => f.id !== delId);
+          if (activeFileIndex >= uploadedFiles.length) {
+            activeFileIndex = uploadedFiles.length - 1;
+          }
           caption = activeFileIndex >= 0 ? (uploadedFiles[activeFileIndex].caption || '') : '';
+          if (nameInput) profileName = nameInput.value;
+          if (handleInput) userHandle = handleInput.value.trim();
           render();
         });
       });
 
-      modalEl.querySelector('.btn-advance-to-payment')?.addEventListener('click', () => {
-        if (!profileName.trim()) {
-          uploadError = 'Por favor informe o Nome da Vitrine ou Loja.';
-          render();
-          return;
+      modalEl.querySelector('.btn-back-to-step1')?.addEventListener('click', () => {
+        currentStep = 1;
+        render();
+      });
+
+      const form = modalEl.querySelector('.status-publish-form');
+      form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        profileName = nameInput ? nameInput.value.trim() || 'Vitrine Comercial' : 'Vitrine Comercial';
+        userHandle = handleInput ? handleInput.value.trim() || 'vitrine' : 'vitrine';
+
+        if (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length && captionInput) {
+          uploadedFiles[activeFileIndex].caption = captionInput.value.trim();
         }
-        if (!userHandle.trim()) {
-          uploadError = 'Por favor informe o @usuário da loja.';
-          render();
-          return;
-        }
+        caption = captionInput ? captionInput.value.trim() : '';
+
         if (uploadedFiles.length === 0) {
           uploadError = 'Por favor anexe pelo menos 1 foto do seu produto.';
           render();
           return;
         }
+
         uploadError = '';
         currentStep = 3; // Advance to Pagamento!
-        render();
-      });
-
-      modalEl.querySelector('.btn-back-to-step1')?.addEventListener('click', () => {
-        currentStep = 1;
         render();
       });
     }
@@ -737,7 +792,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         });
       });
 
-      // Gerar Pix (Fricção mínima: nome e handle já herdados da edição!)
+      // Gerar Pix
       modalEl.querySelector('.btn-generate-pix')?.addEventListener('click', async () => {
         if (customerCpf.replace(/\D/g, '').length < 11) {
           paymentError = 'Por favor informe um CPF ou CNPJ válido.';
@@ -914,7 +969,6 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
           }
 
           asaasPaymentId = data.paymentId;
-          paymentApproved = true;
           currentStep = 4; // Advance to Preview!
           render();
         } catch (err) {

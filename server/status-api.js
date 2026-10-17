@@ -87,14 +87,14 @@ export function statusApiMiddleware(req, res, next) {
 
         // 1. Find or create customer in Asaas
         const customerId = await findOrCreateCustomer({
-          name: customerData.name || body.profile_name || 'Anunciante VorcaroZap',
+          name: customerData.name || body.profile_name || 'Anunciante vorcarozap',
           cpfCnpj: customerData.cpfCnpj,
           email: customerData.email,
           phone: customerData.phone,
         });
 
         // 2. Prepare description & external reference
-        const description = `VorcaroZap - ${type === 'vitrine' ? 'Vitrine Comercial' : 'Status/Stories'} (${planType})`;
+        const description = `vorcarozap - ${type === 'vitrine' ? 'Vitrine Comercial' : 'Status/Stories'} (${planType})`;
         const externalReference = `${type}:${recordId}`;
         const remoteIp = req.socket?.remoteAddress || '127.0.0.1';
 

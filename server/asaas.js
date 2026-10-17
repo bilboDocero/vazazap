@@ -55,7 +55,7 @@ async function asaasFetch(endpoint, options = {}) {
   const headers = {
     'access_token': config.apiKey,
     'Content-Type': 'application/json',
-    'User-Agent': 'VorcaroZap/1.0',
+    'User-Agent': 'vorcarozap/1.0',
     ...(options.headers || {}),
   };
 
@@ -113,7 +113,7 @@ export async function findOrCreateCustomer({ name, cpfCnpj, email, phone }) {
 
   // 2. Create customer with automatic fallback
   const customerPayload = {
-    name: (name || 'Anunciante VorcaroZap').trim(),
+    name: (name || 'Anunciante vorcarozap').trim(),
     cpfCnpj: cleanCpf || undefined,
     email: fallbackEmail,
     mobilePhone: fallbackPhone,
@@ -135,7 +135,7 @@ export async function createPixPayment({ customerId, value, description, externa
   // Development simulation if API key is not yet set
   if (!config.isConfigured) {
     const mockId = `pay_mock_${Date.now()}`;
-    const mockPayload = `00020101021226730014br.gov.bcb.pix2551pix.asaas.com/qr/v2/${mockId}5204000053039865802BR5915VORCAROZAP_PAG6009SAO_PAULO62070503***6304`;
+    const mockPayload = `00020101021226730014br.gov.bcb.pix2551pix.asaas.com/qr/v2/${mockId}5204000053039865802BR5915vorcarozap_PAG6009SAO_PAULO62070503***6304`;
     // 1x1 green transparent pixel placeholder
     const mockQrCodeImage = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 
@@ -164,7 +164,7 @@ export async function createPixPayment({ customerId, value, description, externa
     billingType: 'PIX',
     value: Math.round(Number(value) * 100) / 100,
     dueDate,
-    description: (description || 'Publicação de Status no VorcaroZap').slice(0, 500),
+    description: (description || 'Publicação de Status no vorcarozap').slice(0, 500),
     externalReference: (externalReference || '').slice(0, 200),
   };
 
@@ -224,7 +224,7 @@ export async function createCreditCardPayment({
     billingType: 'CREDIT_CARD',
     value: Math.round(Number(value) * 100) / 100,
     dueDate,
-    description: (description || 'Publicação de Status/Vitrine no VorcaroZap').slice(0, 500),
+    description: (description || 'Publicação de Status/Vitrine no vorcarozap').slice(0, 500),
     externalReference: (externalReference || '').slice(0, 200),
     remoteIp: remoteIp || '127.0.0.1',
     creditCard: {

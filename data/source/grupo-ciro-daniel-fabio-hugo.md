@@ -5,7 +5,7 @@
 - **Criador**: Ciro Nogueira
 - **Data de criação**: Abril de 2024
 - **Período de mensagens preservadas**: Agosto a novembro de 2025
-- **Identificador no VorcaroZap**: `ciro-daniel-fabio-hugo`
+- **Identificador no vorcarozap**: `ciro-daniel-fabio-hugo`
 
 ---
 

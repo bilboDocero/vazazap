@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Schema Supabase / PostgreSQL para VorcaroZap (com integração de pagamentos Asaas)
+-- Schema Supabase / PostgreSQL para vorcarozap (com integração de pagamentos Asaas)
 -- Execute este script no SQL Editor do Supabase (https://supabase.com/dashboard)
 -- ==============================================================================
 

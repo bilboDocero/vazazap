@@ -31,7 +31,7 @@ export function renderCommercialDetail(container, { activeSection = 'catalogo', 
         <div class="commercial-hero-tag">Produtos da Plataforma</div>
         <h2 class="commercial-hero-title">Espaços Comerciais Disponíveis</h2>
         <p class="commercial-hero-text">
-          Selecione abaixo os produtos para ativação imediata nas respectivas abas do VorcaroZap (Status, Canais, Comunidades e Vitrine).
+          Selecione abaixo os produtos para ativação imediata nas respectivas abas do vorcarozap (Status, Canais, Comunidades e Vitrine).
         </p>
       </div>
 

@@ -169,7 +169,7 @@ function inlineStylesheets(clonedDoc) {
 export const ATTRIBUTION_BAR_HEIGHT = 44;
 const ATTRIBUTION_URL = 'www.masterwhats.com.br';
 const ATTRIBUTION_NAME = 'MasterWhats';
-const ATTRIBUTION_LOGO = '/assets/masterzap-logo.png';
+const ATTRIBUTION_LOGO = '/assets/vorcarozap-logo.png';
 
 function loadImage(src) {
   return new Promise((resolve) => {

@@ -40,6 +40,6 @@ describe('showToast()', () => {
     showToast(container, 'With logo');
     const logo = container.querySelector('.search-toast-logo img');
     expect(logo).not.toBeNull();
-    expect(logo.src).toContain('masterzap-logo');
+    expect(logo.src).toContain('vorcarozap-logo');
   });
 });

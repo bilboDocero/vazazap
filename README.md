@@ -1,6 +1,6 @@
 ![MasterWhats — Conversas Vazadas de Daniel Vorcaro](public/assets/og-image.png)
 
-# VorcaroZap
+# vorcarozap
 
 > Visualizador interativo das 66.387 mensagens de WhatsApp extraídas dos celulares apreendidos de Daniel Vorcaro (Banco Master), em 24 conversas — de Martha Graeff a Alexandre de Moraes.
 
@@ -18,7 +18,7 @@ As mensagens vêm dos celulares apreendidos de Daniel Vorcaro — ex-dono do Ban
 - **Março de 2026 — as conversas com Martha Graeff.** 65.772 mensagens trocadas com a então noiva vazaram para a imprensa e revelaram conexões com autoridades dos Três Poderes, apelidos que viralizaram nas redes e detalhes do maior escândalo bancário da história do Brasil.
 - **Setembro de 2026 — o relatório da PF sobre Alexandre de Moraes.** Caiu o sigilo da IPJ-A nº 3298613/2026, em que a Polícia Federal reconstrói, a partir do iPhone de Vorcaro, seus contatos com o ministro do STF e outras 22 pessoas. Não é um export de WhatsApp: as mensagens estavam em imagens dentro do laudo e foram transcritas uma a uma — veja [`data/ipj-3298613/README.md`](data/ipj-3298613/README.md).
 
-O VorcaroZap transforma essas conversas em uma experiência de leitura no estilo WhatsApp Web: navegável, pesquisável e compartilhável. Cada contato tem um perfil que explica quem é a pessoa, o que o material revela e de onde vem a informação. Um novo vazamento entra como mais uma conversa.
+O vorcarozap transforma essas conversas em uma experiência de leitura no estilo WhatsApp Web: navegável, pesquisável e compartilhável. Cada contato tem um perfil que explica quem é a pessoa, o que o material revela e de onde vem a informação. Um novo vazamento entra como mais uma conversa.
 
 
 
@@ -30,7 +30,7 @@ O VorcaroZap transforma essas conversas em uma experiência de leitura no estilo
 - **Perfis investigativos** — biografia de Vorcaro e Martha com contexto e links para as reportagens
 - **Menu de contexto** — copie texto, responda ou compartilhe qualquer mensagem
 - **Links internos** — clique nos trechos citados pela imprensa e vá direto para a mensagem original
-- **Totalmente responsivo** — experiência completa no celular e no desktop, um diferencial em relação ao [MasterZap](https://www.reddit.com/r/brasil/s/xQeqrG27p8) original
+- **Totalmente responsivo** — experiência completa no celular e no desktop, um diferencial em relação ao [vorcarozap](https://www.reddit.com/r/brasil/s/xQeqrG27p8) original
 
 ## Tecnologia
 
@@ -47,7 +47,7 @@ O VorcaroZap transforma essas conversas em uma experiência de leitura no estilo
 
 ```bash
 git clone https://github.com/vorcarozap/vorcarozap.git
-cd masterzap
+cd vorcarozap
 npm install
 npm run split-data    # Gera os arquivos JSON por data em public/data/
 npm run export        # Gera o export limpo (Markdown, JSON, zip) em public/export/
@@ -127,7 +127,7 @@ As informações compiladas neste projeto são de domínio público, extraídas 
 
 ## English Summary
 
-**VorcaroZap** is an interactive viewer for 66,387 WhatsApp messages recovered from the seized phones of Daniel Vorcaro (former owner of Banco Master, arrested by Brazil's Federal Police), across 24 conversations: the leaked exchanges with Martha Graeff and the Federal Police report on his contacts with Supreme Court Justice Alexandre de Moraes, unsealed in September 2026. Built with vanilla JS and Vite, it features smart search with accent support, calendar navigation, direct message link sharing, investigative profiles, and a fully responsive WhatsApp Web-like interface optimized for mobile.
+**vorcarozap** is an interactive viewer for 66,387 WhatsApp messages recovered from the seized phones of Daniel Vorcaro (former owner of Banco Master, arrested by Brazil's Federal Police), across 24 conversations: the leaked exchanges with Martha Graeff and the Federal Police report on his contacts with Supreme Court Justice Alexandre de Moraes, unsealed in September 2026. Built with vanilla JS and Vite, it features smart search with accent support, calendar navigation, direct message link sharing, investigative profiles, and a fully responsive WhatsApp Web-like interface optimized for mobile.
 
 
 **Contributions welcome** — new leaked conversations, media support, sharing improvements, and bug fixes. See the Roadmap section above. Only text messages are currently available; images, audio, and video were not part of the leaks.

@@ -75,7 +75,7 @@ test.describe('Chat Interactions', () => {
       'Exportar (.md)',
       'Exportar (.json)',
       'Fechar conversa',
-      'Sobre o VorcaroZap',
+      'Sobre o vorcarozap',
     ]);
   });
 

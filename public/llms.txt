@@ -1,4 +1,4 @@
-# VorcaroZap
+# vorcarozap
 
 > Visualizador interativo das 66.387 mensagens de WhatsApp extraídas dos celulares apreendidos de Daniel Vorcaro (Banco Master), em 24 conversas — das trocas com Martha Graeff ao relatório da Polícia Federal sobre os contatos com o ministro Alexandre de Moraes.
 

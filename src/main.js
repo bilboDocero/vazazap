@@ -798,7 +798,7 @@ async function init() {
 }
 
 init().catch(err => {
-  console.error('VorcaroZap init failed:', err);
+  console.error('vorcarozap init failed:', err);
   const loading = document.getElementById('loading-screen');
   if (loading) loading.remove();
   const app = document.getElementById('app');

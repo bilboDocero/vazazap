@@ -72,13 +72,13 @@ export default async function handler(req, res) {
     const customerData = body.customer || {};
 
     const customerId = await findOrCreateCustomer({
-      name: customerData.name || body.profile_name || 'Anunciante VorcaroZap',
+      name: customerData.name || body.profile_name || 'Anunciante vorcarozap',
       cpfCnpj: customerData.cpfCnpj,
       email: customerData.email,
       phone: customerData.phone,
     });
 
-    const description = `VorcaroZap - ${type === 'vitrine' ? 'Vitrine Comercial' : 'Status/Stories'} (${planType})`;
+    const description = `vorcarozap - ${type === 'vitrine' ? 'Vitrine Comercial' : 'Status/Stories'} (${planType})`;
     const externalReference = `${type}:${recordId}`;
     const remoteIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1';
 

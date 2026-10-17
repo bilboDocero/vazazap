@@ -1,4 +1,4 @@
--- Schema for VorcaroZap Product Purchases & Status Simulation
+-- Schema for vorcarozap Product Purchases & Status Simulation
 
 CREATE TABLE IF NOT EXISTS status_purchases (
   id VARCHAR(64) PRIMARY KEY,

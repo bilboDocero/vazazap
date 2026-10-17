@@ -343,7 +343,7 @@ export function createNewCommunity({ name, description }) {
   const newCommunity = {
     id,
     name: name.trim(),
-    description: (description || '').trim() || 'Comunidade criada no VorcaroZap.',
+    description: (description || '').trim() || 'Comunidade criada no vorcarozap.',
     membersCount: '1 membro',
     avatarSvg: renderGenericCommunityAvatar(name),
     groups: [

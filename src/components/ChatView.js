@@ -10,7 +10,7 @@
  */
 import { escapeHtml, formatTime, formatDateLong, linkify } from '../lib/utils.js';
 import { ScrollLoader } from '../lib/scroll-loader.js';
-import { ICON_INFO, ICON_SEARCH, ICON_CHECKEMPTY, ICON_BELL, ICON_TIMER, ICON_DOWNLOAD, ICON_CLOSE_CIRCULAR, ICON_MASTERZAP_LOGO, ICON_MEETBALL, ICON_CHEVRON_DW, ICON_SCREENSHOT } from '../lib/icons.js';
+import { ICON_INFO, ICON_SEARCH, ICON_CHECKEMPTY, ICON_BELL, ICON_TIMER, ICON_DOWNLOAD, ICON_CLOSE_CIRCULAR, ICON_vorcarozap_LOGO, ICON_MEETBALL, ICON_CHEVRON_DW, ICON_SCREENSHOT } from '../lib/icons.js';
 
 import { defaultAvatarSvg } from '../lib/avatar.js';
 import { parseContacts, parseLocation, mapsUrl, parseLink, parseAudio, parseImage, conversationForPhone } from '../lib/media.js';
@@ -650,7 +650,7 @@ export function renderChatView(container, { conversation, dateIndex, loadMessage
       { label: 'Exportar (.md)', icon: ICON_DOWNLOAD, action: () => onExport('md'), enabled: !!onExport },
       { label: 'Exportar (.json)', icon: ICON_DOWNLOAD, action: () => onExport('json'), enabled: !!onExport },
       { label: 'Fechar conversa', icon: ICON_CLOSE_CIRCULAR, action: onCloseChat || onBack, enabled: !!(onCloseChat || onBack) },
-      { label: 'Sobre o VorcaroZap', icon: ICON_MASTERZAP_LOGO, action: onAbout, enabled: !!onAbout },
+      { label: 'Sobre o vorcarozap', icon: ICON_vorcarozap_LOGO, action: onAbout, enabled: !!onAbout },
     ];
 
     for (const item of items) {

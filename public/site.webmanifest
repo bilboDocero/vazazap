@@ -1,6 +1,6 @@
 {
-  "name": "VorcaroZap",
-  "short_name": "VorcaroZap",
+  "name": "vorcarozap",
+  "short_name": "vorcarozap",
   "description": "Visualizador interativo das 66 mil mensagens dos celulares apreendidos de Daniel Vorcaro, em 24 conversas",
   "icons": [
     {

@@ -3,7 +3,7 @@
  * of a Status (Normal or Impulsionado) with Asaas real payment integration
  * (PIX QR Code / Copia e Cola & Cartão de Crédito) and PostgreSQL persistence.
  *
- * Flow: 1. Plano -> 2. Edição -> 3. Pagamento -> 4. Preview
+ * Sequence: 1. Plano -> 2. Edição -> 3. Pagamento -> 4. Preview
  */
 
 import {
@@ -51,14 +51,13 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
   let uploadError = '';
 
   // Payment State (Asaas v3, captured in Step 3: Pagamento)
-  let selectedBillingType = 'PIX'; // 'PIX' | 'CREDIT_CARD'
+  let selectedBillingType = 'PIX';
   let customerCpf = '';
   let asaasPaymentId = null;
   let statusRecordId = `status-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-  let pixData = null; // { encodedImage, payload, expirationDate }
+  let pixData = null;
   let isProcessingPayment = false;
   let paymentError = '';
-  let paymentApproved = false;
   let pollIntervalId = null;
 
   // Credit Card Form State
@@ -96,7 +95,6 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         const data = await res.json();
         if (data.ok && data.isPaid) {
           stopPolling();
-          paymentApproved = true;
           currentStep = 4; // Advance to Preview!
           render();
         }
@@ -113,10 +111,10 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       <div class="status-modal-dialog">
         <header class="status-modal-header">
           <div class="status-modal-steps">
-            <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">1. Plano</span>
-            <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">2. Edição</span>
-            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">3. Pagamento</span>
-            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">4. Preview</span>
+            <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">Plano</span>
+            <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">Edição</span>
+            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">Pagamento</span>
+            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">Preview</span>
           </div>
           <button class="status-modal-close" aria-label="Fechar modal">&times;</button>
         </header>
@@ -146,7 +144,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
                   <span class="status-plan-name">Status Normal</span>
                   <span class="status-plan-price">R$ 4,90 <small>/arquivo</small></span>
                 </div>
-                <p class="status-plan-text">Veiculação de 24 horas no acervo, suporte a até 4 arquivos com desconto progressivo.</p>
+                <p class="status-plan-text">Veiculação de 24 horas no acervo, suporte a até 4 arquivos com desconto cumulativo.</p>
               </div>
             </label>
 
@@ -200,7 +198,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       `;
     }
 
-    // ── STEP 2: Edição do Story (Foto, Nome, @User, Mídias) ──
+    // ── STEP 2: Edição do Story (Design Original Preservado) ─
     if (currentStep === 2) {
       const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
       const activeFile = (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length)
@@ -210,90 +208,106 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
 
       return `
         <div class="status-step-upload">
-          <h2 class="status-modal-title">Configurar seu Story</h2>
-          <p class="status-modal-desc">Informe seu nome ou marca, seu @usuário e selecione até ${fileCount} foto${fileCount > 1 ? 's' : ''}.</p>
+          <h2 class="status-modal-title">Configurar seu Status</h2>
+          <p class="status-modal-desc">Suba sua foto, defina o usuário da rede social e anexe até ${fileCount} arquivo${fileCount > 1 ? 's' : ''}.</p>
 
           <form class="status-publish-form">
             <div class="status-profile-section">
               <div class="status-avatar-upload-box">
-                <div class="status-avatar-preview">
-                  ${profilePicData
-                    ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" class="status-avatar-img" />`
-                    : `<div class="status-avatar-placeholder">${ICON_CAMERA}</div>`
-                  }
-                </div>
-                <label class="status-avatar-btn">
-                  <span>${profilePicData ? 'Alterar foto' : 'Enviar foto'}</span>
+                <label class="status-avatar-upload-label">
+                  <div class="status-avatar-preview">
+                    ${profilePicData
+                      ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" class="status-avatar-img" />`
+                      : `<div class="status-avatar-placeholder">${ICON_CAMERA}</div>`
+                    }
+                  </div>
+                  <span class="status-avatar-btn-text">${profilePicData ? 'Alterar foto' : 'Enviar foto'}</span>
                   <input type="file" class="input-profile-pic" accept="image/jpeg,image/png,image/webp" style="display:none;" />
                 </label>
               </div>
 
               <div class="status-names-group">
                 <label class="status-field-label">
-                  <span>Nome da Marca / Anunciante:</span>
-                  <input type="text" class="status-text-input input-profile-name" placeholder="Ex: Loja do Vorcaro" value="${escapeAttr(profileName)}" maxlength="60" required />
+                  <span>Nome de exibição</span>
+                  <input type="text" class="input-profile-name" value="${escapeHtml(profileName)}" placeholder="Ex: Juliana Silva ou Loja do Vorcaro" required />
                 </label>
+              </div>
+            </div>
 
-                <div class="status-social-pick">
-                  <div class="status-social-networks">
-                    ${Object.entries(SOCIAL_NETWORKS).map(([key, net]) => `
-                      <button type="button" class="status-network-btn ${selectedNetwork === key ? 'active' : ''}" data-net="${key}" title="${net.name}">
-                        ${net.icon}
-                      </button>
-                    `).join('')}
-                  </div>
-                  <input type="text" class="status-text-input input-user-handle" placeholder="@seu.perfil" value="${escapeAttr(userHandle)}" maxlength="40" required />
+            <div class="status-social-section">
+              <label class="status-field-label">
+                <span>Rede social</span>
+                <div class="status-networks-list">
+                  ${Object.values(SOCIAL_NETWORKS).map(net => `
+                    <button type="button" class="status-network-btn ${selectedNetwork === net.id ? 'active' : ''}" data-net="${net.id}" style="--net-color: ${net.color}" aria-label="${net.name}" title="${net.name}">
+                      ${net.icon}
+                    </button>
+                  `).join('')}
                 </div>
+              </label>
+
+              <label class="status-field-label">
+                <span>Usuário / Username no ${network.name}</span>
+                <div class="status-username-wrapper">
+                  ${network.prefix ? `<span class="status-username-prefix">${network.prefix}</span>` : ''}
+                  <input type="text" class="input-user-handle" value="${escapeHtml(userHandle)}" placeholder="${network.placeholder}" required />
+                </div>
+              </label>
+
+              <div class="status-social-link-preview">
+                <span class="status-link-tag">Link automático:</span>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="status-generated-link">https://instagram.com/user</a>
               </div>
             </div>
 
-            <div class="status-link-preview-box">
-              <span class="status-link-preview-label">Link de destino do Story:</span>
-              <span class="status-link-preview-url"></span>
-            </div>
-
-            <div class="status-media-upload-section">
-              <div class="status-media-header">
-                <label class="status-field-label">
-                  <span>Fotos do Story (${uploadedFiles.length} de ${fileCount} anexadas)</span>
-                  <small class="status-media-hint">Formato 9:16 vertical (JPG, PNG ou WEBP). Vídeos não são permitidos.</small>
-                </label>
+            <div class="status-media-section">
+              <div class="status-guidance-box">
+                <div class="status-guidance-badge">Dimensões Ideais</div>
+                <p>Recomendamos imagens verticais na proporção <strong>9:16 (1080 × 1920 px)</strong> para preencher toda a tela do status sem faixas. <br/>Vídeos não são aceitos no momento (máx. <strong>5 MB</strong> por anexo).</p>
               </div>
 
-              <div class="status-uploaded-grid">
-                ${uploadedFiles.map((f, i) => `
-                  <div class="status-uploaded-tile ${i === activeFileIndex ? 'selected' : ''}" data-id="${f.id}" title="Clique para editar a legenda desta imagem">
-                    <img src="${sanitizeUrl(f.url, true)}" alt="${escapeHtml(f.name)}" />
-                    <button type="button" class="status-tile-delete-btn" data-id="${f.id}" aria-label="Remover">&times;</button>
-                    <span class="status-tile-order-badge">${i + 1}</span>
+              <label class="status-field-label">
+                <span>Anexos do Story (${uploadedFiles.length} de ${fileCount} contratados)</span>
+              </label>
+
+              ${uploadError ? `<div class="status-upload-error-msg" role="alert">${escapeHtml(uploadError)}</div>` : ''}
+
+              <div class="status-files-dropzone">
+                ${uploadedFiles.map((file, idx) => `
+                  <div class="status-uploaded-tile ${idx === activeFileIndex ? 'selected' : ''}" data-id="${file.id}" role="button" tabindex="0" title="Clique para editar a legenda desta imagem">
+                    <img src="${sanitizeUrl(file.url, true)}" alt="${escapeHtml(file.name)}" class="status-tile-img" />
+                    <span class="status-tile-badge">#${idx + 1}</span>
+                    <button type="button" class="status-tile-delete-btn" data-id="${file.id}" aria-label="Remover anexo" title="Remover anexo">&times;</button>
                   </div>
                 `).join('')}
 
                 ${uploadedFiles.length < fileCount ? `
-                  <label class="status-tile-add-btn">
-                    <input type="file" class="input-media-file" accept="image/jpeg,image/png,image/webp" style="display:none;" />
+                  <label class="status-upload-add-tile" title="Adicionar anexo (1 por vez, máx 5MB)">
+                    <input type="file" class="input-media-files" accept="image/jpeg,image/png,image/webp" style="display:none;" />
                     ${ICON_PLUS_SIGN}
-                    <span>Anexar foto ${uploadedFiles.length + 1}</span>
+                    <span>Adicionar</span>
                   </label>
                 ` : ''}
               </div>
 
-              ${uploadError ? `<div class="status-upload-error">${escapeHtml(uploadError)}</div>` : ''}
-
-              <div class="status-caption-box-wrapper">
-                <label class="status-field-label">
-                  <span>${activeFile ? `Legenda do arquivo #${activeFileIndex + 1} (${escapeHtml(activeFile.name)})` : 'Legenda do Story (opcional)'}:</span>
-                </label>
-                <textarea class="status-textarea input-caption" placeholder="Escreva a legenda que aparecerá no rodapé do Story..." rows="2" maxlength="300">${escapeHtml(currentCaption)}</textarea>
+              <div class="status-quick-samples">
+                <button type="button" class="status-btn-samples">
+                  + Preencher com fotos de exemplo
+                </button>
               </div>
             </div>
 
+            <label class="status-field-label">
+              <span>Legenda do status (opcional)</span>
+              <textarea class="input-caption" rows="2" placeholder="Digite uma legenda para este status...">${escapeHtml(currentCaption)}</textarea>
+            </label>
+
             <div class="status-form-actions">
-              <button type="button" class="status-btn-primary btn-advance-to-payment">
-                Avançar para Pagamento (${pricing.formattedTotal}) &rarr;
+              <button type="button" class="status-btn-back-step btn-back-to-step1" aria-label="Voltar" title="Voltar">
+                ${ICON_BACK_ARROW}
               </button>
-              <button type="button" class="btn-back-to-step1" style="margin-top: 10px; width: 100%; border: 0; background: transparent; color: #64748B; font-size: 13px; cursor: pointer; text-decoration: underline;">
-                &larr; Voltar para escolha do plano
+              <button type="submit" class="status-btn-primary btn-advance-to-payment">
+                Avançar para Pagamento (${pricing.formattedTotal}) &rarr;
               </button>
             </div>
           </form>
@@ -301,7 +315,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       `;
     }
 
-    // ── STEP 3: Pagamento com Fricção Mínima (Nome já herdado) ─
+    // ── STEP 3: Pagamento com Fricção Mínima (Nome e User já capturados) ─
     if (currentStep === 3) {
       return `
         <div class="status-step-payment" style="text-align: left; width: 100%;">
@@ -345,7 +359,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           <div class="payment-input-group" style="margin-bottom: 14px;">
             <label class="payment-input-label">CPF ou CNPJ para Faturamento</label>
             <input type="text" class="payment-input-field input-customer-cpf" placeholder="000.000.000-00" value="${escapeAttr(customerCpf)}" maxlength="18" required />
-            <small style="color: #64748B; font-size: 11px; margin-top: 2px;">Exigido pelo Banco Central para registro do Pix/cobrança no Asaas.</small>
+            <small style="color: #64748B; font-size: 11px; margin-top: 2px;">Exigido pelo Banco Central para registro fiscal do Pix/cobrança.</small>
           </div>
 
           ${selectedBillingType === 'PIX' ? `
@@ -418,12 +432,16 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       `;
     }
 
-    // ── STEP 4: Pré-visualização e Publicação ─────────────────
+    // ── STEP 4: Pré-visualização do Status (Design Original) ─
     if (currentStep === 4) {
       const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
-      const mediaList = uploadedFiles.length > 0 ? uploadedFiles : [];
-      const activeMedia = mediaList[previewActiveIdx] || { name: 'Foto', url: '', caption: caption };
-      const activeCaption = activeMedia.caption || caption || '';
+      const mediaList = uploadedFiles.length > 0
+        ? uploadedFiles
+        : [{ id: 'sample', name: 'Foto Exemplo', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80', caption: '' }];
+
+      const safeIdx = Math.min(previewActiveIdx, mediaList.length - 1);
+      const activeMedia = mediaList[safeIdx];
+      const activeCaption = activeMedia?.caption || caption || '';
 
       return `
         <div class="status-step-preview">
@@ -433,68 +451,65 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             </span>
           </div>
 
-          <div class="status-preview-top-bar">
-            <button type="button" class="status-preview-back-btn btn-back-to-edit">
-              ${ICON_BACK_ARROW}
-              <span>Ajustar Edição</span>
-            </button>
-            <span class="status-preview-step-title">Pré-visualização do Story (${previewActiveIdx + 1} de ${mediaList.length})</span>
-          </div>
+          <h2 class="status-modal-title">Pré-visualização do Status</h2>
+          <p class="status-modal-desc">Confira exatamente como seu story será exibido antes de confirmar a publicação.</p>
 
-          <div class="status-preview-phone-mockup">
-            <div class="story-progress-bar">
-              ${mediaList.map((_, idx) => `
-                <div class="story-progress-seg ${idx === previewActiveIdx ? 'active' : (idx < previewActiveIdx ? 'passed' : '')}"></div>
-              `).join('')}
-            </div>
+          <div class="status-preview-frame">
+            <div class="status-preview-screen">
+              <div class="story-progress-bar">
+                ${mediaList.map((m, idx) => `
+                  <div class="story-progress-seg ${idx === safeIdx ? 'active' : (idx < safeIdx ? 'passed' : '')}"></div>
+                `).join('')}
+              </div>
 
-            <header class="story-header">
-              <div class="story-header-user">
-                <div class="story-header-avatar">
-                  ${profilePicData
-                    ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" />`
-                    : defaultAvatarSvg('preview')
-                  }
-                </div>
-                <div>
-                  <div class="story-header-name">
-                    ${escapeHtml(profileName || 'Anunciante')}
-                    ${selectedPlan === 'status_impulsionado' ? '<span class="updates-status-badge-boost">Impulsionado</span>' : ''}
+              <header class="story-header">
+                <div class="story-header-user">
+                  <div class="story-header-avatar">
+                    ${profilePicData
+                      ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" />`
+                      : `<div style="background:#00A884;width:100%;height:100%;display:grid;place-items:center;color:#fff;font-weight:700;">${(profileName || 'U').charAt(0)}</div>`
+                    }
                   </div>
-                  <div class="story-header-meta">${escapeHtml(userHandle || '@user')} · ${escapeHtml(network.name)}</div>
+                  <div>
+                    <div class="story-header-name">
+                      ${escapeHtml(profileName || 'Anunciante Parceiro')}
+                      ${selectedPlan === 'status_impulsionado' ? '<span class="updates-status-badge-boost">Impulsionado</span>' : ''}
+                    </div>
+                    <div class="story-header-meta">${escapeHtml(userHandle ? (userHandle.startsWith('@') ? userHandle : `@${userHandle}`) : '@usuario')} · ${network.name}</div>
+                  </div>
                 </div>
+              </header>
+
+              <div class="status-preview-media-box">
+                <img src="${sanitizeUrl(activeMedia.url, true)}" alt="${escapeHtml(activeMedia.name)}" class="status-preview-media-img" />
+
+                ${mediaList.length > 1 ? `
+                  <button type="button" class="status-preview-nav prev" aria-label="Mídia anterior">&#10094;</button>
+                  <button type="button" class="status-preview-nav next" aria-label="Próxima mídia">&#10095;</button>
+                ` : ''}
               </div>
-            </header>
 
-            <div class="status-preview-media-box">
-              <img src="${sanitizeUrl(activeMedia.url, true)}" alt="${escapeHtml(activeMedia.name)}" class="status-preview-media-img" />
+              <footer class="story-footer">
+                ${activeCaption ? `
+                  <div class="story-caption-box">
+                    <p class="story-caption-text">${escapeHtml(activeCaption)}</p>
+                  </div>
+                ` : ''}
 
-              ${mediaList.length > 1 ? `
-                <button type="button" class="status-preview-nav prev" aria-label="Mídia anterior">&#10094;</button>
-                <button type="button" class="status-preview-nav next" aria-label="Próxima mídia">&#10095;</button>
-              ` : ''}
+                <div class="story-social-btn" style="background: ${escapeAttr(network.color)};">
+                  ${network.icon}
+                  <span>Visitar perfil no ${escapeHtml(network.name)} (${escapeHtml(userHandle || 'user')}) ↗</span>
+                </div>
+              </footer>
             </div>
-
-            <footer class="story-footer">
-              ${activeCaption ? `
-                <div class="story-caption-box">
-                  <p class="story-caption-text">${escapeHtml(activeCaption)}</p>
-                </div>
-              ` : ''}
-
-              <div class="story-social-btn" style="background: ${escapeAttr(network.color)};">
-                ${network.icon}
-                <span>Visitar perfil no ${escapeHtml(network.name)} (${escapeHtml(userHandle || 'user')}) ↗</span>
-              </div>
-            </footer>
           </div>
 
-          <div class="status-preview-actions">
-            <button type="button" class="status-btn-secondary status-btn-edit-preview">
-              Editar Dados e Fotos
+          <div class="status-preview-actions-bar">
+            <button type="button" class="status-btn-edit-preview btn-back-to-edit">
+              &larr; Voltar para editar
             </button>
             <button type="button" class="status-btn-primary btn-confirm-publish">
-              Confirmar e Publicar Agora
+              Confirmar e Publicar Status
             </button>
           </div>
         </div>
@@ -506,19 +521,22 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
 
   function wireEvents(pricing) {
     modalEl.querySelector('.status-modal-close')?.addEventListener('click', closeModal);
+    modalEl.addEventListener('click', (e) => {
+      if (e.target === modalEl) closeModal();
+    });
 
     // ── Events Step 1: Plano ──────────────────────────────────
     if (currentStep === 1) {
-      modalEl.querySelectorAll('input[name="plan"]').forEach(input => {
-        input.addEventListener('change', (e) => {
-          selectedPlan = e.target.value;
+      modalEl.querySelectorAll('input[name="plan"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+          selectedPlan = radio.value;
           render();
         });
       });
 
       modalEl.querySelectorAll('.status-file-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          fileCount = parseInt(btn.dataset.count, 10);
+          fileCount = Number(btn.dataset.count);
           if (uploadedFiles.length > fileCount) {
             uploadedFiles = uploadedFiles.slice(0, fileCount);
             if (activeFileIndex >= fileCount) activeFileIndex = -1;
@@ -533,19 +551,21 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       });
     }
 
-    // ── Events Step 2: Edição ─────────────────────────────────
+    // ── Events Step 2: Edição (Design Original) ───────────────
     else if (currentStep === 2) {
-      const handleInput = modalEl.querySelector('.input-user-handle');
       const nameInput = modalEl.querySelector('.input-profile-name');
+      const handleInput = modalEl.querySelector('.input-user-handle');
+      const linkPreview = modalEl.querySelector('.status-generated-link');
       const captionInput = modalEl.querySelector('.input-caption');
       const profilePicInput = modalEl.querySelector('.input-profile-pic');
-      const mediaInput = modalEl.querySelector('.input-media-file');
-      const linkPreviewEl = modalEl.querySelector('.status-link-preview-url');
+      const mediaInput = modalEl.querySelector('.input-media-files');
 
       function updateLink() {
-        if (linkPreviewEl && handleInput) {
-          const raw = handleInput.value.trim();
-          linkPreviewEl.textContent = buildSocialLink(selectedNetwork, raw);
+        const username = handleInput ? handleInput.value.trim() || 'usuario' : 'usuario';
+        const url = buildSocialLink(selectedNetwork, username);
+        if (linkPreview) {
+          linkPreview.textContent = url;
+          linkPreview.href = url;
         }
       }
 
@@ -554,7 +574,9 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         updateLink();
       });
 
-      nameInput?.addEventListener('input', () => { profileName = nameInput.value; });
+      nameInput?.addEventListener('input', () => {
+        profileName = nameInput.value;
+      });
 
       captionInput?.addEventListener('input', () => {
         const val = captionInput.value;
@@ -566,6 +588,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
 
       updateLink();
 
+      // Click on uploaded tile to switch active attachment
       modalEl.querySelectorAll('.status-uploaded-tile').forEach((tile) => {
         tile.addEventListener('click', (e) => {
           if (e.target.closest('.status-tile-delete-btn')) return;
@@ -588,11 +611,12 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         });
       });
 
+      // Social network switch
       modalEl.querySelectorAll('.status-network-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           selectedNetwork = btn.dataset.net;
-          profileName = nameInput.value;
-          userHandle = handleInput.value.trim();
+          if (nameInput) profileName = nameInput.value;
+          if (handleInput) userHandle = handleInput.value.trim();
           if (captionInput && activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length) {
             uploadedFiles[activeFileIndex].caption = captionInput.value;
           }
@@ -601,18 +625,19 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         });
       });
 
+      // Profile pic upload
       profilePicInput?.addEventListener('change', (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
 
         if (file.type && !file.type.startsWith('image/')) {
-          uploadError = 'Vídeos não são aceitos. Por favor envie uma imagem (JPG, PNG ou WEBP).';
+          uploadError = 'Vídeos não são permitidos. Envie uma imagem em JPG, PNG ou WEBP.';
           render();
           return;
         }
 
         if (file.size > MAX_FILE_SIZE) {
-          uploadError = `A foto de perfil excede o tamanho máximo de 5 MB (${(file.size / 1024 / 1024).toFixed(1)} MB).`;
+          uploadError = `A foto excede o tamanho máximo de 5 MB (${(file.size / 1024 / 1024).toFixed(1)} MB).`;
           render();
           return;
         }
@@ -629,82 +654,120 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         reader.readAsDataURL(file);
       });
 
+      // Media attachment upload
       mediaInput?.addEventListener('change', (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
 
         if (file.type && !file.type.startsWith('image/')) {
-          uploadError = 'Vídeos não são aceitos nesta plataforma. Por favor envie apenas fotos (JPG, PNG ou WEBP).';
+          uploadError = 'Vídeos não são permitidos. Envie uma imagem vertical (9:16) em JPG, PNG ou WEBP.';
           render();
           return;
         }
 
         if (file.size > MAX_FILE_SIZE) {
-          uploadError = `O arquivo selecionado (${file.name}) ultrapassa o limite de 5 MB (${(file.size / 1024 / 1024).toFixed(1)} MB).`;
+          uploadError = `O arquivo "${file.name}" excede o tamanho máximo de 5 MB (${(file.size / 1024 / 1024).toFixed(1)} MB).`;
           render();
           return;
         }
 
-        if (uploadedFiles.length >= fileCount) {
-          uploadError = `Seu plano permite no máximo ${fileCount} arquivo${fileCount > 1 ? 's' : ''}.`;
-          render();
-          return;
-        }
-
-        uploadError = '';
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const newFile = {
-            id: `media-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-            name: file.name,
-            url: ev.target.result,
-            type: file.type || 'image/jpeg',
-            caption: '',
+        if (uploadedFiles.length < fileCount) {
+          uploadError = '';
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const newFile = {
+              id: `file-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+              name: file.name,
+              url: ev.target.result,
+              type: file.type || 'image/jpeg',
+              caption: '',
+            };
+            uploadedFiles.push(newFile);
+            activeFileIndex = uploadedFiles.length - 1;
+            caption = '';
+            if (nameInput) profileName = nameInput.value;
+            if (handleInput) userHandle = handleInput.value.trim();
+            render();
+            setTimeout(() => {
+              modalEl.querySelector('.input-caption')?.focus();
+            }, 50);
           };
-
-          uploadedFiles.push(newFile);
-          activeFileIndex = uploadedFiles.length - 1;
-          caption = '';
-
-          render();
-        };
-        reader.readAsDataURL(file);
+          reader.readAsDataURL(file);
+        }
       });
 
+      // Quick sample button
+      modalEl.querySelector('.status-btn-samples')?.addEventListener('click', () => {
+        const sampleImages = [
+          'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80',
+          'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800&q=80',
+          'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80',
+          'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80',
+        ];
+
+        while (uploadedFiles.length < fileCount) {
+          const idx = uploadedFiles.length;
+          uploadedFiles.push({
+            id: `sample-${Date.now()}-${idx}`,
+            name: `Foto 9:16 #${idx + 1}.jpg`,
+            url: sampleImages[idx % sampleImages.length],
+            type: 'image/jpeg',
+            caption: '',
+          });
+        }
+        activeFileIndex = uploadedFiles.length - 1;
+        caption = '';
+        if (nameInput) profileName = nameInput.value;
+        if (handleInput) userHandle = handleInput.value.trim();
+        uploadError = '';
+        render();
+        setTimeout(() => {
+          modalEl.querySelector('.input-caption')?.focus();
+        }, 50);
+      });
+
+      // Delete uploaded file
       modalEl.querySelectorAll('.status-tile-delete-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          const fileId = btn.dataset.id;
-          uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
-          activeFileIndex = uploadedFiles.length - 1;
+          const delId = btn.dataset.id;
+          uploadedFiles = uploadedFiles.filter(f => f.id !== delId);
+          if (activeFileIndex >= uploadedFiles.length) {
+            activeFileIndex = uploadedFiles.length - 1;
+          }
           caption = activeFileIndex >= 0 ? (uploadedFiles[activeFileIndex].caption || '') : '';
+          if (nameInput) profileName = nameInput.value;
+          if (handleInput) userHandle = handleInput.value.trim();
           render();
         });
       });
 
-      modalEl.querySelector('.btn-advance-to-payment')?.addEventListener('click', () => {
-        if (!profileName.trim()) {
-          uploadError = 'Por favor informe o Nome da Marca ou Anunciante.';
-          render();
-          return;
-        }
-        if (!userHandle.trim()) {
-          uploadError = 'Por favor informe seu @usuário da rede social.';
-          render();
-          return;
-        }
-        if (uploadedFiles.length === 0) {
-          uploadError = 'Por favor anexe pelo menos 1 foto para o seu Story.';
-          render();
-          return;
-        }
-        uploadError = '';
-        currentStep = 3; // Advance to Pagamento!
+      // Back to Step 1
+      modalEl.querySelector('.btn-back-to-step1')?.addEventListener('click', () => {
+        currentStep = 1;
         render();
       });
 
-      modalEl.querySelector('.btn-back-to-step1')?.addEventListener('click', () => {
-        currentStep = 1;
+      // Advance to Step 3 (Pagamento)
+      const form = modalEl.querySelector('.status-publish-form');
+      form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        profileName = nameInput ? nameInput.value.trim() || 'Anunciante' : 'Anunciante';
+        userHandle = handleInput ? handleInput.value.trim() || 'usuario' : 'usuario';
+
+        if (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length && captionInput) {
+          uploadedFiles[activeFileIndex].caption = captionInput.value.trim();
+        }
+        caption = captionInput ? captionInput.value.trim() : '';
+
+        if (uploadedFiles.length === 0) {
+          uploadError = 'Por favor anexe pelo menos 1 foto para o seu status.';
+          render();
+          return;
+        }
+
+        uploadError = '';
+        currentStep = 3; // Advance to Pagamento!
         render();
       });
     }
@@ -737,7 +800,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         });
       });
 
-      // Gerar Pix (Fricção mínima: nome e handle já herdados da edição!)
+      // Gerar Pix (Fricção mínima)
       modalEl.querySelector('.btn-generate-pix')?.addEventListener('click', async () => {
         if (customerCpf.replace(/\D/g, '').length < 11) {
           paymentError = 'Por favor informe um CPF ou CNPJ válido.';
@@ -782,7 +845,6 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           pixData = data.pix;
           render();
 
-          // Inicia polling de verificação automática
           startPaymentPolling(data.paymentId, statusRecordId);
         } catch (err) {
           isProcessingPayment = false;
@@ -840,7 +902,6 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
 
       cardNumResInput?.addEventListener('input', e => { cardAddressNumber = e.target.value; });
 
-      // Pagar Cartão
       modalEl.querySelector('.btn-pay-card')?.addEventListener('click', async () => {
         if (customerCpf.replace(/\D/g, '').length < 11) {
           paymentError = 'Informe um CPF válido para o titular do cartão.';
@@ -917,7 +978,6 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           }
 
           asaasPaymentId = data.paymentId;
-          paymentApproved = true;
           currentStep = 4; // Advance to Preview!
           render();
         } catch (err) {
@@ -957,15 +1017,10 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         render();
       });
 
-      modalEl.querySelector('.status-btn-edit-preview')?.addEventListener('click', () => {
-        currentStep = 2; // Return to Edição
-        render();
-      });
-
       modalEl.querySelector('.btn-confirm-publish')?.addEventListener('click', async (e) => {
         const btn = e.currentTarget;
         btn.disabled = true;
-        btn.textContent = 'Publicando seu Story...';
+        btn.textContent = 'Publicando seu Status...';
 
         const finalHandle = userHandle.startsWith('@') ? userHandle : `@${userHandle}`;
         const finalLink = buildSocialLink(selectedNetwork, userHandle);
