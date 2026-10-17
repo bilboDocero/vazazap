@@ -13,40 +13,34 @@ export const ICON_PLUS_CIRCLE = `<svg viewBox="0 0 24 24" width="24" height="24"
 
 export const ICON_LOCK = `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
 
-export function renderFlutterAvatar() {
+export function renderJournalismAvatar() {
   return `
     <svg viewBox="0 0 48 48" width="48" height="48" fill="none" class="community-avatar-svg">
-      <rect width="48" height="48" rx="12" fill="#0D1117"/>
-      <path d="M28.5 7L14 21.5l4.5 4.5L37 11.5 28.5 7z" fill="#54C5F8"/>
-      <path d="M28.5 22.8L18.2 33.1l4.5 4.5 10.3-10.3-4.5-4.5z" fill="#29B6F6"/>
-      <path d="M22.7 37.6L27.2 42.1 37 32.3l-4.5-4.5-9.8 9.8z" fill="#01579B"/>
-      <path d="M22.7 37.6l4.5-4.5 4.5 4.5-4.5 4.5-4.5-4.5z" fill="#00B0FF" opacity="0.8"/>
-      <text x="24" y="44.5" font-size="3.6" font-family="system-ui, -apple-system, sans-serif" font-weight="700" fill="#54C5F8" text-anchor="middle" letter-spacing="0.2">FLUTTER EXPERIENCE</text>
+      <rect width="48" height="48" rx="12" fill="#0F172A"/>
+      <rect x="9" y="10" width="30" height="28" rx="4" fill="#1E293B" stroke="#DC2626" stroke-width="2"/>
+      <rect x="13" y="15" width="9" height="9" rx="2" fill="#EF4444"/>
+      <line x1="25" y1="16" x2="35" y2="16" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round"/>
+      <line x1="25" y1="21" x2="35" y2="21" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="13" y1="28" x2="35" y2="28" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="13" y1="32" x2="28" y2="32" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="37" cy="11" r="3.5" fill="#DC2626"/>
+      <circle cx="37" cy="11" r="1.5" fill="#FFFFFF"/>
     </svg>
   `;
 }
 
-export function renderRocketseatAvatar() {
+export function renderGossipAvatar() {
   return `
     <svg viewBox="0 0 48 48" width="48" height="48" fill="none" class="community-avatar-svg">
-      <rect width="48" height="48" rx="12" fill="#FFFFFF" stroke="#E2D9F3" stroke-width="1.5"/>
-      <path d="M15 17l-5 6 5 6" stroke="#8257E5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M33 17l5 6-5 6" stroke="#8257E5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M27 15l-6 17" stroke="#8257E5" stroke-width="3" stroke-linecap="round"/>
-    </svg>
-  `;
-}
-
-export function renderTesteAvatar() {
-  return `
-    <svg viewBox="0 0 48 48" width="48" height="48" fill="none" class="community-avatar-svg">
-      <rect width="48" height="48" rx="12" fill="#DCEBFF"/>
-      <g transform="translate(12, 12)" fill="#1E88E5">
-        <circle cx="12" cy="7" r="2.8"/>
-        <circle cx="4.5" cy="9" r="2.2"/>
-        <circle cx="19.5" cy="9" r="2.2"/>
-        <path d="M6.5 19v-2.2c0-2.5 2.4-4.3 5.5-4.3s5.5 1.8 5.5 4.3V19h-11ZM1 18v-2c0-2 1.6-3.4 3.8-3.4.8 0 1.5.2 2.1.5A6 6 0 0 0 4.5 18H1Zm18.5 0a6 6 0 0 0-2.4-4.9c.6-.3 1.3-.5 2.1-.5 2.2 0 3.8 1.4 3.8 3.4v2h-3.5Z"/>
-      </g>
+      <defs>
+        <linearGradient id="gossipGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#EC4899"/>
+          <stop offset="1" stop-color="#8B5CF6"/>
+        </linearGradient>
+      </defs>
+      <rect width="48" height="48" rx="12" fill="url(#gossipGrad)"/>
+      <path d="M24 8c1 4-2 7-4 10-2.5 3.5-3 6.5-1 10.5 1.5 3 4.5 5.5 8 5.5s7-3 7-8c0-5-3-9-6-12-1 2-2 4-4 4.5z" fill="#FDF2F8"/>
+      <path d="M24 23c-1 2-2 3.5-.5 5.5 1 1.5 2.5 2.5 4.5 2.5s3.5-1.5 3.5-4c0-2-1.5-3.5-3.5-5-.5 1-1.5 1.5-2.5 1.5z" fill="#EC4899"/>
     </svg>
   `;
 }
@@ -98,102 +92,102 @@ export function renderSubgroupAvatar(type) {
 export function getBuiltinCommunities() {
   return [
     {
-      id: 'adf-inscricoes',
-      name: '🔴 ADF - INSCRIÇÕES ABERTAS',
-      description: 'Comunidade oficial da formação ADF e Flutter Experience. Acompanhe avisos, novidades, mentorias e eventos exclusivos.',
-      membersCount: '1.428 membros',
-      avatarSvg: renderFlutterAvatar(),
+      id: 'plantao-caso-vorcaro',
+      name: '🔴 Plantão Brasília · Caso Vorcaro',
+      description: 'Cobertura jornalística e factual em tempo real sobre a Operação Compliance Zero, relatórios periciais da Polícia Federal (IPJ-A 3298613/2026), despachos do STF e desdobramentos do Banco Master.',
+      membersCount: '24.810 membros',
+      avatarSvg: renderJournalismAvatar(),
       groups: [
         {
-          id: 'adf-avisos',
+          id: 'plantao-avisos',
           name: 'Avisos',
           isAnnouncement: true,
           avatarType: 'pink',
-          snippet: '~R5 Academy: 🚨 🚨 ÚLTIM...',
+          snippet: '~Plantão Notícias: 🚨 🚨 URGENTE: PF...',
           date: 'domingo',
           isUnread: true,
           unreadCount: 4,
           isMuted: true,
           messages: [
             {
-              id: 'adf-m1',
-              sender: '~R5 Academy',
-              senderColor: '#1FAF38',
-              text: '🚨 🚨 ÚLTIMAS VAGAS PARA O ADF!\n\nAs inscrições para a nova turma do Flutter Experience estão abertas por tempo limitado. Não perca a oportunidade de dominar Flutter do zero ao avançado!\n\nGaranta sua vaga hoje com condições especiais.',
+              id: 'p-m1',
+              sender: '~Plantão Notícias',
+              senderColor: '#E53935',
+              text: '🚨 🚨 URGENTE: POLÍCIA FEDERAL FINALIZA RELATÓRIO DO INQUÉRITO DO BANCO MASTER!\n\nDocumento IPJ-A nº 3298613/2026, com 218 páginas, detalha perícia telemática realizada no aparelho celular apreendido de Daniel Vorcaro.',
               time: '18:42',
               date: 'Domingo',
             },
             {
-              id: 'adf-m2',
-              sender: '~R5 Academy',
-              senderColor: '#1FAF38',
-              text: 'Lembrando que o acesso à plataforma e ao grupo exclusivo de networking será liberado imediatamente após a confirmação da inscrição.',
+              id: 'p-m2',
+              sender: '~Plantão Notícias',
+              senderColor: '#E53935',
+              text: '📄 Perícia recuperou 52 notas do aplicativo do iPhone enviadas em visualização única, abordando pedidos de intervenção e contatos de cúpula.',
               time: '18:45',
               date: 'Domingo',
             },
             {
-              id: 'adf-m3',
-              sender: '~R5 Academy',
-              senderColor: '#1FAF38',
-              text: 'Plantão de dúvidas aberto com nossos mentores até às 23:59.',
+              id: 'p-m3',
+              sender: '~Plantão Notícias',
+              senderColor: '#E53935',
+              text: '⚖️ Ministro André Mendonça formaliza despacho de levantamento do sigilo da ação para deliberação pública no plenário do STF.',
               time: '19:10',
               date: 'Domingo',
             },
             {
-              id: 'adf-m4',
-              sender: '~R5 Academy',
-              senderColor: '#1FAF38',
-              text: '🚨 🚨 ÚLTIMAS 5 HORAS! Acesse o link oficial para garantir seu bônus de aceleração de carreira.',
+              id: 'p-m4',
+              sender: '~Plantão Notícias',
+              senderColor: '#E53935',
+              text: '🚨 🚨 ATUALIZAÇÃO: Relatório contabiliza R$ 208 milhões em contratos e tratativas institucionais para evento internacional em Londres.',
               time: '19:30',
               date: 'Domingo',
             },
           ],
         },
         {
-          id: 'adf-geral',
-          name: 'ADF · Discussão & Alunos',
+          id: 'plantao-compliance-zero',
+          name: 'Operação Compliance Zero',
           isAnnouncement: false,
           avatarType: 'default',
-          snippet: 'Pedro: Alguém conseguiu rodar o build no iOS?',
+          snippet: 'Repórter Investigativo: Apuração sobre carteiras de crédito...',
           date: 'ontem',
           isUnread: false,
           unreadCount: 0,
           isMuted: false,
           messages: [
             {
-              id: 'adf-g1',
-              sender: 'Pedro',
-              senderColor: '#007BFC',
-              text: 'Alguém conseguiu rodar o build no iOS com a versão mais recente do Flutter?',
-              time: '14:22',
+              id: 'p-cz1',
+              sender: 'Repórter Investigativo',
+              senderColor: '#0063CB',
+              text: 'A investigação apura a estrutura de aquisição do antigo Banco Máxima e movimentações financeiras com agentes reguladores.',
+              time: '14:20',
               date: 'Ontem',
             },
             {
-              id: 'adf-g2',
-              sender: 'Ana Tech',
-              senderColor: '#E53935',
-              text: 'Sim! Precisa rodar pod repo update antes no diretório ios.',
-              time: '14:25',
+              id: 'p-cz2',
+              sender: 'Redação Brasília',
+              senderColor: '#1FAF38',
+              text: 'Defesas técnicas protocolaram pedidos preliminares questionando as extrações de dados do aparelho apreendido.',
+              time: '14:28',
               date: 'Ontem',
             },
           ],
         },
         {
-          id: 'adf-vagas',
-          name: 'ADF · Vagas & Oportunidades',
+          id: 'plantao-bastidores-brasilia',
+          name: 'Bastidores de Brasília',
           isAnnouncement: false,
           avatarType: 'default',
-          snippet: 'Mariana: Nova vaga de Flutter Sênior remota aberta!',
+          snippet: 'Giro Político: Repercussão no Congresso e Tribunais...',
           date: 'sexta-feira',
           isUnread: false,
           unreadCount: 0,
           isMuted: true,
           messages: [
             {
-              id: 'adf-v1',
-              sender: 'Mariana',
+              id: 'p-bb1',
+              sender: 'Giro Político',
               senderColor: '#8257E5',
-              text: 'Nova vaga de Flutter Sênior remota aberta na fintech parceira. Envie CV com portfólio no privado!',
+              text: 'Lideranças no Congresso acompanham os desdobramentos dos relatórios periciais divulgados pela imprensa.',
               time: '11:15',
               date: 'Sexta-feira',
             },
@@ -202,87 +196,95 @@ export function getBuiltinCommunities() {
       ],
     },
     {
-      id: 'rocketseat-69',
-      name: 'Novidades Rocketseat #69',
-      description: 'Comunidade oficial da Rocketseat para a edição #69. Avisos sobre maratonas de código, cursos, mentorias e novidades de tecnologia.',
-      membersCount: '3.890 membros',
-      avatarSvg: renderRocketseatAvatar(),
+      id: 'fofocas-caso-vorcaro',
+      name: '🔥 Choquei no Acervo · Babados do Vorcaro',
+      description: 'Os bastidores mais comentados das 65 mil mensagens vazadas do casal Vorcaro e Martha Graeff: apelidos íntimos ("peleleca" e "colação"), memes do Cebolinha, jantares em Miami e encontros com celebridades!',
+      membersCount: '58.420 membros',
+      avatarSvg: renderGossipAvatar(),
       groups: [
         {
-          id: 'rocketseat-avisos',
+          id: 'fofocas-avisos',
           name: 'Avisos',
           isAnnouncement: true,
           avatarType: 'teal',
-          snippet: '+55 47 8835-8251 promoveu ...',
+          snippet: '~Gossip VIP: 💣 BABADO: Vazam 65 mil msgs...',
           date: '06/07/2026',
           isUnread: false,
           unreadCount: 0,
           isMuted: true,
           messages: [
             {
-              id: 'rs-m1',
+              id: 'f-m1',
               system: true,
-              text: '+55 47 8835-8251 promoveu você a administrador desta comunidade.',
+              text: 'Você entrou na comunidade oficial de fofocas e bastidores do caso Vorcaro.',
+              time: '10:00',
+              date: '06/07/2026',
+            },
+            {
+              id: 'f-m2',
+              sender: 'Gossip VIP',
+              senderColor: '#E1306C',
+              text: '💣 BABADO EXCLUSIVO: Vaza o acervo de 65.772 mensagens íntimas de Daniel Vorcaro com a então noiva Martha Graeff!\n\nA internet não fala em outra coisa: os apelidos "peleleca" e "colação" tomaram conta do X (antigo Twitter) com milhares de memes!',
               time: '10:05',
               date: '06/07/2026',
             },
             {
-              id: 'rs-m2',
-              sender: 'Rocketseat Admin',
-              senderColor: '#8257E5',
-              text: 'Bem-vindos à comunidade Novidades Rocketseat #69!\nAqui compartilharemos todos os anúncios e links das próximas transmissões.',
+              id: 'f-m3',
+              sender: 'Gossip VIP',
+              senderColor: '#E1306C',
+              text: '🛥️ Proposta de US$ 100 milhões por um barco em Miami, jantares privados em São Paulo com Luciano Huck e encontros com Anitta e celebridades na mansão!',
               time: '10:15',
               date: '06/07/2026',
             },
           ],
         },
         {
-          id: 'rocketseat-devs',
-          name: 'Rocketseat · Devs #69',
+          id: 'fofocas-memes',
+          name: 'Peleleca, Colação & Memes',
           isAnnouncement: false,
           avatarType: 'default',
-          snippet: 'Lucas: Qual stack vocês estão usando no projeto?',
+          snippet: 'Admin Choquei: O diálogo do "PALAAAAAAA AGOLAAAA"...',
           date: '05/07/2026',
           isUnread: false,
           unreadCount: 0,
           isMuted: true,
           messages: [
             {
-              id: 'rs-d1',
-              sender: 'Lucas',
-              senderColor: '#0063CB',
-              text: 'Qual stack vocês estão usando no projeto do evento? React com Vite ou Next.js?',
+              id: 'f-mm1',
+              sender: 'Admin Choquei',
+              senderColor: '#E1306C',
+              text: 'O diálogo imitando o Cebolinha — "PALAAAAAAA AGOLAAAA" — já virou figurinha no WhatsApp de 10 em cada 10 brasileiros kkkkk',
               time: '17:40',
+              date: '05/07/2026',
+            },
+            {
+              id: 'f-mm2',
+              sender: 'Membro Fofoqueiro',
+              senderColor: '#0063CB',
+              text: 'A palavra "surreal" aparece 91 vezes nas conversas! É realmente uma vida de filme de cinema.',
+              time: '17:45',
               date: '05/07/2026',
             },
           ],
         },
-      ],
-    },
-    {
-      id: 'teste-community',
-      name: 'Teste',
-      description: 'Comunidade de testes para validação de grupos e anúncios.',
-      membersCount: '12 membros',
-      avatarSvg: renderTesteAvatar(),
-      groups: [
         {
-          id: 'teste-avisos',
-          name: 'Avisos',
-          isAnnouncement: true,
+          id: 'fofocas-famosos',
+          name: 'VIPs, Famosos & Camarotes',
+          isAnnouncement: false,
           avatarType: 'default',
-          snippet: 'Você criou a comunidade "Teste"',
-          date: 'ontem',
+          snippet: 'Radar Famosos: Bastidores dos encontros com famosos...',
+          date: '04/07/2026',
           isUnread: false,
           unreadCount: 0,
-          isMuted: false,
+          isMuted: true,
           messages: [
             {
-              id: 't-m1',
-              system: true,
-              text: 'Você criou a comunidade "Teste"',
-              time: '15:20',
-              date: 'Ontem',
+              id: 'f-vf1',
+              sender: 'Radar Famosos',
+              senderColor: '#8257E5',
+              text: 'Vorcaro mantinha trânsito livre nos principais camarotes de Carnaval e eventos de gala entre Paris, Londres, Mônaco e Miami.',
+              time: '19:10',
+              date: '04/07/2026',
             },
           ],
         },

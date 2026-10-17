@@ -184,15 +184,8 @@ export function renderCommunitiesPanel({ communities, selectedId, onSelect, onCr
         const groupsContainer = document.createElement('div');
         groupsContainer.className = 'community-groups';
 
-        // For ADF and Rocketseat, initially show only the first group (Avisos),
-        // or show all if expanded. For Teste, show 0 groups if not expanded.
-        const isTeste = community.id === 'teste-community';
-        let visibleGroups;
-        if (isTeste) {
-          visibleGroups = isExpanded ? groups : [];
-        } else {
-          visibleGroups = isExpanded ? groups : groups.slice(0, 1);
-        }
+        // Show the first group (Avisos), or show all if expanded
+        const visibleGroups = isExpanded ? groups : groups.slice(0, 1);
 
         visibleGroups.forEach((group) => {
           const groupItem = document.createElement('div');
@@ -246,26 +239,24 @@ export function renderCommunitiesPanel({ communities, selectedId, onSelect, onCr
 
         card.appendChild(groupsContainer);
 
-        // "Ver todos" button if community has multiple groups or if it's ADF / Rocketseat
-        if (!isTeste || groups.length > 0) {
-          if (!isTeste) {
-            const toggleBtn = document.createElement('button');
-            toggleBtn.className = 'community-toggle-groups';
-            toggleBtn.type = 'button';
-            toggleBtn.textContent = isExpanded ? 'Mostrar menos' : 'Ver todos';
-            toggleBtn.setAttribute('aria-expanded', String(isExpanded));
-            toggleBtn.addEventListener('click', (e) => {
-              e.stopPropagation();
-              if (expandedCommunities.has(community.id)) {
-                expandedCommunities.delete(community.id);
-              } else {
-                expandedCommunities.add(community.id);
-              }
-              renderList();
-              onSelect(community.id);
-            });
-            card.appendChild(toggleBtn);
-          }
+        // "Ver todos" button if community has multiple groups
+        if (groups.length > 1) {
+          const toggleBtn = document.createElement('button');
+          toggleBtn.className = 'community-toggle-groups';
+          toggleBtn.type = 'button';
+          toggleBtn.textContent = isExpanded ? 'Mostrar menos' : 'Ver todos';
+          toggleBtn.setAttribute('aria-expanded', String(isExpanded));
+          toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (expandedCommunities.has(community.id)) {
+              expandedCommunities.delete(community.id);
+            } else {
+              expandedCommunities.add(community.id);
+            }
+            renderList();
+            onSelect(community.id);
+          });
+          card.appendChild(toggleBtn);
         }
       }
 
