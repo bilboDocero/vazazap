@@ -108,10 +108,25 @@ function formatCurrency(val) {
 
 const LOCAL_STORAGE_KEY = 'vorcarozap:published_status';
 
+/**
+ * Sorts statuses so impulsionados always stay at the top,
+ * and normal statuses are positioned below, ordered by published_at DESC.
+ */
+export function sortStatuses(list) {
+  if (!Array.isArray(list)) return [];
+  return [...list].sort((a, b) => {
+    const aBoost = a.plan_type === 'status_impulsionado' ? 0 : 1;
+    const bBoost = b.plan_type === 'status_impulsionado' ? 0 : 1;
+    if (aBoost !== bBoost) return aBoost - bBoost;
+    return new Date(b.published_at || b.created_at || 0) - new Date(a.published_at || a.created_at || 0);
+  });
+}
+
 export function loadCachedStatuses() {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const parsed = raw ? JSON.parse(raw) : [];
+    return sortStatuses(parsed);
   } catch {
     return [];
   }
@@ -119,7 +134,7 @@ export function loadCachedStatuses() {
 
 export function saveCachedStatuses(list) {
   try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sortStatuses(list)));
   } catch {
     // Ignore storage issues
   }
@@ -133,8 +148,9 @@ export async function fetchPublishedStatuses() {
       if (res.ok) {
         const data = await res.json();
         if (data.ok && Array.isArray(data.purchases)) {
-          saveCachedStatuses(data.purchases);
-          return data.purchases;
+          const sorted = sortStatuses(data.purchases);
+          saveCachedStatuses(sorted);
+          return sorted;
         }
       }
     } catch {
@@ -165,9 +181,9 @@ export async function createStatusPurchase(payload) {
     created_at: new Date().toISOString(),
   };
 
-  // Add to local list immediately
-  localList.unshift(createdRecord);
-  saveCachedStatuses(localList);
+  // Add to local list and sort so impulsionados always stay at the top
+  const sortedList = sortStatuses([createdRecord, ...localList.filter(item => item.id !== createdRecord.id)]);
+  saveCachedStatuses(sortedList);
 
   const isBrowser = typeof window !== 'undefined' && window.location?.origin && !window.location.origin.startsWith('about:');
   if (isBrowser) {
@@ -180,7 +196,7 @@ export async function createStatusPurchase(payload) {
       if (res.ok) {
         const data = await res.json();
         if (data.ok && data.purchase) {
-          const updated = localList.map(item => item.id === createdRecord.id ? data.purchase : item);
+          const updated = sortedList.map(item => item.id === createdRecord.id ? data.purchase : item);
           saveCachedStatuses(updated);
           if (typeof window.dispatchEvent === 'function') {
             window.dispatchEvent(new CustomEvent('status:published', { detail: data.purchase }));

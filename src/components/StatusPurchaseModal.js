@@ -61,10 +61,10 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       <div class="status-modal-dialog">
         <header class="status-modal-header">
           <div class="status-modal-steps">
-            <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">1. Plano</span>
-            <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">2. Pagamento</span>
-            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">3. Edição</span>
-            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">4. Preview</span>
+            <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">Plano</span>
+            <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">Pagamento</span>
+            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">Edição</span>
+            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">Preview</span>
           </div>
           <button class="status-modal-close" aria-label="Fechar modal">&times;</button>
         </header>
@@ -200,14 +200,14 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           <form class="status-publish-form">
             <div class="status-profile-section">
               <div class="status-avatar-upload-box">
-                <div class="status-avatar-preview">
-                  ${profilePicData
-                    ? `<img src="${profilePicData}" alt="Avatar" class="status-avatar-img" />`
-                    : `<div class="status-avatar-placeholder">${ICON_CAMERA}</div>`
-                  }
-                </div>
-                <label class="status-avatar-btn">
-                  <span>${profilePicData ? 'Alterar foto' : 'Enviar foto'}</span>
+                <label class="status-avatar-upload-label" title="Clique para enviar ou alterar foto de perfil">
+                  <div class="status-avatar-preview">
+                    ${profilePicData
+                      ? `<img src="${profilePicData}" alt="Avatar" class="status-avatar-img" />`
+                      : `<div class="status-avatar-placeholder">${ICON_CAMERA}</div>`
+                    }
+                  </div>
+                  <span class="status-avatar-btn-text">${profilePicData ? 'Alterar foto' : 'Enviar foto'}</span>
                   <input type="file" class="input-profile-pic" accept="image/jpeg,image/png,image/webp" style="display:none;" />
                 </label>
               </div>
@@ -248,7 +248,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
 
             <div class="status-media-section">
               <div class="status-guidance-box">
-                <div class="status-guidance-badge">📐 Dimensões Ideais</div>
+                <div class="status-guidance-badge">Dimensões Ideais</div>
                 <p>Recomendamos imagens verticais na proporção <strong>9:16 (1080 × 1920 px)</strong> para preencher toda a tela do status sem faixas. Vídeos não são aceitos no momento (máx. <strong>5 MB</strong> por anexo).</p>
               </div>
 

@@ -1144,8 +1144,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
   flex-shrink: 0;
+}
+
+.status-avatar-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
 }
 
 .status-avatar-preview {
@@ -1157,6 +1164,13 @@
   display: grid;
   place-items: center;
   border: 2px solid #00A884;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease;
+}
+
+.status-avatar-upload-label:hover .status-avatar-preview {
+  transform: scale(1.05);
+  border-color: #008f6f;
 }
 
 .status-avatar-img {
@@ -1169,6 +1183,7 @@
   color: #667781;
 }
 
+.status-avatar-btn-text,
 .status-avatar-btn {
   font-size: 11.5px;
   font-weight: 600;
@@ -1176,6 +1191,7 @@
   cursor: pointer;
 }
 
+.status-avatar-upload-label:hover .status-avatar-btn-text,
 .status-avatar-btn:hover {
   text-decoration: underline;
 }

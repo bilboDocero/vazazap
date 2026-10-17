@@ -116,9 +116,7 @@ export function renderUpdatesPanel({ kind, entries, onSelect }) {
     } else if (self) {
       subtitle.textContent = 'Daniel Vorcaro · sem atualizações';
     } else if (isPurchased) {
-      const network = (entry.social_network || 'social').toUpperCase();
-      const filesCount = entry.media_files?.length || entry.file_count || 1;
-      subtitle.textContent = `${entry.user_handle || '@user'} · ${network} (${filesCount} mídias)`;
+      subtitle.textContent = entry.user_handle || '@user';
     } else {
       subtitle.textContent = 'Nenhum status publicado';
     }
@@ -219,14 +217,14 @@ export function renderUpdatesPanel({ kind, entries, onSelect }) {
   return panel;
 }
 
-export function renderUpdatesDetail(container, { kind, entry, onBack, onConversation }) {
+export function renderUpdatesDetail(container, { kind, entry, onBack, onConversation, onSelectStatus }) {
   const channels = kind === 'channels';
 
   // Check if entry is a purchased/published status with media files
   const isPurchasedStatus = entry && (entry.media_files || entry.social_network);
 
   if (isPurchasedStatus) {
-    return renderStoryViewer(container, { entry, onBack });
+    return renderStoryViewer(container, { entry, onBack, onSelectStatus });
   }
 
   const el = document.createElement('section');
@@ -277,10 +275,20 @@ export function renderUpdatesDetail(container, { kind, entry, onBack, onConversa
   return el;
 }
 
-function renderStoryViewer(container, { entry, onBack }) {
+function renderStoryViewer(container, { entry, onBack, onSelectStatus }) {
+  const publishedList = loadCachedStatuses();
+  const currentClientIdx = publishedList.findIndex(item => item.id === entry.id);
+
+  const nextClient = (currentClientIdx !== -1 && currentClientIdx < publishedList.length - 1)
+    ? publishedList[currentClientIdx + 1]
+    : null;
+  const prevClient = (currentClientIdx > 0)
+    ? publishedList[currentClientIdx - 1]
+    : null;
+
   const mediaList = entry.media_files && entry.media_files.length > 0
     ? entry.media_files
-    : [{ id: 'm1', name: 'Story', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80' }];
+    : [{ id: 'm1', name: 'Story', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80', caption: entry.caption || '' }];
 
   let activeIdx = 0;
   let timerId = null;
@@ -297,6 +305,36 @@ function renderStoryViewer(container, { entry, onBack }) {
     onBack();
   }
 
+  function goToNext() {
+    if (activeIdx < mediaList.length - 1) {
+      activeIdx++;
+      drawStory();
+    } else if (nextClient) {
+      clearTimeout(timerId);
+      if (onSelectStatus) {
+        onSelectStatus(nextClient.id);
+      } else {
+        window.location.hash = `#/status/${nextClient.id}`;
+      }
+    } else {
+      exitViewer();
+    }
+  }
+
+  function goToPrev() {
+    if (activeIdx > 0) {
+      activeIdx--;
+      drawStory();
+    } else if (prevClient) {
+      clearTimeout(timerId);
+      if (onSelectStatus) {
+        onSelectStatus(prevClient.id);
+      } else {
+        window.location.hash = `#/status/${prevClient.id}`;
+      }
+    }
+  }
+
   function startTimer(duration = SLIDE_DURATION) {
     clearTimeout(timerId);
     remainingTime = duration;
@@ -305,12 +343,7 @@ function renderStoryViewer(container, { entry, onBack }) {
     playerEl.classList.remove('is-paused');
 
     timerId = setTimeout(() => {
-      if (activeIdx < mediaList.length - 1) {
-        activeIdx++;
-        drawStory();
-      } else {
-        exitViewer();
-      }
+      goToNext();
     }, duration);
   }
 
@@ -332,6 +365,10 @@ function renderStoryViewer(container, { entry, onBack }) {
     startTimer(SLIDE_DURATION);
     const currentMedia = mediaList[activeIdx] || mediaList[0];
     const net = SOCIAL_NETWORKS[entry.social_network] || SOCIAL_NETWORKS.instagram;
+    const slideCaption = currentMedia.caption || entry.caption || '';
+
+    const hasPrev = activeIdx > 0 || prevClient !== null;
+    const hasNext = activeIdx < mediaList.length - 1 || nextClient !== null;
 
     playerEl.innerHTML = `
       <div class="story-progress-bar">
@@ -362,16 +399,14 @@ function renderStoryViewer(container, { entry, onBack }) {
       <div class="story-media-box">
         <img src="${currentMedia.url}" alt="${escapeHtml(currentMedia.name)}" class="story-media-image" />
 
-        ${mediaList.length > 1 ? `
-          <button type="button" class="story-nav-btn prev" aria-label="Mídia anterior" ${activeIdx === 0 ? 'style="display:none;"' : ''}>&#10094;</button>
-          <button type="button" class="story-nav-btn next" aria-label="Próxima mídia" ${activeIdx === mediaList.length - 1 ? 'style="display:none;"' : ''}>&#10095;</button>
-        ` : ''}
+        <button type="button" class="story-nav-btn prev" aria-label="Mídia anterior" ${hasPrev ? '' : 'style="display:none;"'}>&#10094;</button>
+        <button type="button" class="story-nav-btn next" aria-label="Próxima mídia" ${hasNext ? '' : 'style="display:none;"'}>&#10095;</button>
       </div>
 
       <footer class="story-footer">
-        ${entry.caption ? `
+        ${slideCaption ? `
           <div class="story-caption-box">
-            <p class="story-caption-text">${escapeHtml(entry.caption)}</p>
+            <p class="story-caption-text">${escapeHtml(slideCaption)}</p>
           </div>
         ` : ''}
 
@@ -396,20 +431,12 @@ function renderStoryViewer(container, { entry, onBack }) {
 
     playerEl.querySelector('.story-nav-btn.prev')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (activeIdx > 0) {
-        activeIdx--;
-        drawStory();
-      }
+      goToPrev();
     });
 
     playerEl.querySelector('.story-nav-btn.next')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (activeIdx < mediaList.length - 1) {
-        activeIdx++;
-        drawStory();
-      } else {
-        exitViewer();
-      }
+      goToNext();
     });
 
     playerEl.querySelector('.story-publish-more-btn')?.addEventListener('click', () => {

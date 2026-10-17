@@ -5,6 +5,7 @@ import {
   loadCachedStatuses,
   saveCachedStatuses,
   createStatusPurchase,
+  sortStatuses,
 } from '../../src/lib/status-db.js';
 
 describe('Status Purchase & Pricing Calculator', () => {
@@ -147,6 +148,21 @@ describe('Status Purchase & Pricing Calculator', () => {
 
       expect(created.media_files[0].caption).toBe('Legenda da primeira foto');
       expect(created.media_files[1].caption).toBe('Legenda diferente da segunda foto');
+    });
+
+    it('orders status_impulsionado always at the top and status_normal below', () => {
+      const normal1 = { id: 'n1', plan_type: 'status_normal', published_at: '2026-10-17T10:00:00Z' };
+      const normal2 = { id: 'n2', plan_type: 'status_normal', published_at: '2026-10-17T12:00:00Z' };
+      const boost1 = { id: 'b1', plan_type: 'status_impulsionado', published_at: '2026-10-17T09:00:00Z' };
+      const boost2 = { id: 'b2', plan_type: 'status_impulsionado', published_at: '2026-10-17T11:00:00Z' };
+
+      const sorted = sortStatuses([normal1, boost1, normal2, boost2]);
+
+      expect(sorted.map(s => s.id)).toEqual(['b2', 'b1', 'n2', 'n1']);
+      expect(sorted[0].plan_type).toBe('status_impulsionado');
+      expect(sorted[1].plan_type).toBe('status_impulsionado');
+      expect(sorted[2].plan_type).toBe('status_normal');
+      expect(sorted[3].plan_type).toBe('status_normal');
     });
   });
 });

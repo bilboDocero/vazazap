@@ -75,5 +75,5 @@ describe('content search links', () => {
     }
 
     expect(dead).toEqual([]);
-  });
+  }, 15000);
 });

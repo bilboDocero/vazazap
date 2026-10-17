@@ -41,7 +41,12 @@ export function statusApiMiddleware(req, res, next) {
 
   // GET /api/status/purchases
   if (req.method === 'GET' && pathname === '/api/status/purchases') {
-    pool.query('SELECT * FROM status_purchases ORDER BY published_at DESC')
+    pool.query(`
+      SELECT * FROM status_purchases
+      ORDER BY
+        CASE WHEN plan_type = 'status_impulsionado' THEN 0 ELSE 1 END ASC,
+        published_at DESC
+    `)
       .then(result => {
         sendJson(res, 200, { ok: true, purchases: result.rows });
       })
