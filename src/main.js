@@ -495,7 +495,6 @@ async function init() {
     },
     onCalls: () => router.navigate('calls'),
     onStatus: () => router.navigate('status'),
-    onChannels: () => router.navigate('channels'),
     onCommunities: () => router.navigate('communities'),
     onVitrine: () => router.navigate('vitrine'),
     onAnunciar: () => router.navigate('anunciar'),
@@ -520,7 +519,6 @@ async function init() {
     onCalls: () => router.navigate('calls'),
     onChats: () => router.navigate('home'),
     onStatus: () => router.navigate('status'),
-    onChannels: () => router.navigate('channels'),
     onCommunities: () => router.navigate('communities'),
     onVitrine: () => router.navigate('vitrine'),
     onAnunciar: () => router.navigate('anunciar'),
@@ -557,32 +555,55 @@ async function init() {
 
   const updatesCatalog = createUpdatesCatalog(store.getConversations());
   let activeUpdates = null;
-  for (const kind of ['channels', 'status']) {
-    router.on(kind, id => {
-      closeAll();
-      currentConversationId = null;
-      setActiveConversation(sidebar, null);
-      const entries = updatesCatalog[kind];
-      let entry = entries.find(item => item.id === id) || null;
-      if (!entry && kind === 'status' && id) {
-        const cached = loadCachedStatuses();
-        entry = cached.find(item => item.id === id) || null;
-      }
-      if (!activeUpdates?.panel.isConnected || activeUpdates.kind !== kind) {
-        const panel = renderUpdatesPanel({ kind, entries, onSelect: selected => router.navigate(kind, selected) });
-        sidebar.showSection(kind, panel);
-        activeUpdates = { kind, panel };
-      }
-      activeUpdates.panel.setActive(entry?.id);
-      navRail.setActive(kind);
-      container.classList.toggle('chat-open', !!entry);
-      renderUpdatesDetail(mainArea, {
-        kind, entry,
-        onBack: () => router.navigate(kind),
-        onConversation: conversationId => router.navigate('chat', conversationId),
+  // Route 'channels' redirects to unified 'status' (Atualizações)
+  router.on('channels', id => {
+    router.navigate('status', id);
+  });
+
+  router.on('status', id => {
+    closeAll();
+    currentConversationId = null;
+    setActiveConversation(sidebar, null);
+
+    const statusEntries = updatesCatalog.status;
+    const channelEntries = updatesCatalog.channels;
+
+    let entry = statusEntries.find(item => item.id === id) || null;
+    if (!entry && id) {
+      const cached = loadCachedStatuses();
+      entry = cached.find(item => item.id === id) || null;
+    }
+
+    let isChannelEntry = false;
+    if (!entry && id) {
+      entry = channelEntries.find(item => item.id === id) || null;
+      if (entry) isChannelEntry = true;
+    }
+
+    if (!activeUpdates?.panel.isConnected) {
+      const panel = renderUpdatesPanel({
+        statusEntries,
+        channelEntries,
+        catalog: updatesCatalog,
+        onSelectStatus: selectedId => router.navigate('status', selectedId),
+        onSelectChannel: selectedId => router.navigate('status', selectedId),
       });
+      sidebar.showSection('status', panel);
+      activeUpdates = { kind: 'status', panel };
+    }
+
+    activeUpdates.panel.setActive(entry?.id);
+    navRail.setActive('status');
+    container.classList.toggle('chat-open', !!entry);
+
+    renderUpdatesDetail(mainArea, {
+      kind: isChannelEntry ? 'channels' : 'status',
+      entry,
+      onBack: () => router.navigate('status'),
+      onConversation: conversationId => router.navigate('chat', conversationId),
+      onSelectStatus: selectedId => router.navigate('status', selectedId),
     });
-  }
+  });
 
   // The calls screen takes the list's place; the log is one file, fetched
   // the first time it is asked for.

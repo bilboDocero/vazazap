@@ -239,10 +239,10 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   bottomNav.className = 'sidebar-bottom-nav';
   bottomNav.setAttribute('aria-label', 'Seções');
   for (const [key, label, icon, action] of [
-    ['chats', 'Conversas', ICON_CHAT, onChats],
-    ['status', 'Status', ICON_STATUS, onStatus],
-    ['channels', 'Canais', ICON_CHANNELS, onChannels],
+    ['status', 'Atualizações', ICON_STATUS, onStatus],
+    ['calls', 'Ligações', ICON_CALLS, onCalls],
     ['communities', 'Comunidades', ICON_COMMUNITIES, onCommunities],
+    ['chats', 'Conversas', ICON_CHAT, onChats],
     ['vitrine', 'Vitrine', ICON_STORE, onVitrine],
     ['anunciar', 'Anunciar', ICON_ADVERTISE, onAnunciar],
   ]) {
@@ -251,7 +251,10 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
     tab.dataset.tab = key;
     tab.setAttribute('aria-label', label);
     tab.title = label;
-    tab.innerHTML = `<span class="sidebar-bottom-tab-icon">${icon}</span>`;
+    tab.innerHTML = `
+      <span class="sidebar-bottom-tab-icon">${icon}</span>
+      <span class="sidebar-bottom-tab-label">${label}</span>
+    `;
     tab.addEventListener('click', () => action?.());
     bottomNav.appendChild(tab);
   }

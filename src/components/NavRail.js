@@ -36,8 +36,7 @@ export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCall
   main.className = 'nav-rail-main';
   const chats = button(ICON_CHAT, 'Conversas', onChat);
   const calls = button(ICON_CALLS, 'Chamadas', onCalls);
-  const status = button(ICON_STATUS, 'Status', onStatus);
-  const channels = button(ICON_CHANNELS, 'Canais', onChannels);
+  const status = button(ICON_STATUS, 'Atualizações', onStatus);
   const communities = button(ICON_COMMUNITIES, 'Comunidades', onCommunities);
   const vitrine = button(ICON_STORE, 'Vitrine', onVitrine);
   const vitrineDot = document.createElement('span');
@@ -60,7 +59,6 @@ export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCall
 
   main.append(chats, calls,
     status,
-    channels,
     communities,
     separator(),
     vitrine,
@@ -97,17 +95,17 @@ export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCall
     else chats.removeAttribute('aria-description');
   };
   rail.setActive = (which) => {
+    const targetKey = which === 'channels' ? 'status' : which;
     for (const [btn, key] of [
       [chats, 'chats'],
       [calls, 'calls'],
       [status, 'status'],
-      [channels, 'channels'],
       [communities, 'communities'],
       [vitrine, 'vitrine'],
       [anunciar, 'anunciar'],
     ]) {
-      btn.classList.toggle('active', which === key);
-      if (which === key) btn.setAttribute('aria-current', 'page');
+      btn.classList.toggle('active', targetKey === key);
+      if (targetKey === key) btn.setAttribute('aria-current', 'page');
       else btn.removeAttribute('aria-current');
     }
   };

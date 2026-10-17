@@ -12,261 +12,417 @@ import { escapeHtml, sanitizeUrl, escapeAttr } from '../lib/utils.js';
 
 const ICON_PLUS = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/></svg>';
 const ICON_BACK = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 5-7 7 7 7"/></svg>';
-const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const ICON_CAMERA_ACTION = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0-2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/><path d="M9 3L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9zm11 16H4V7h3.83l1.83-2h4.68l1.83 2H20v12z"/></svg>';
+const ICON_PENCIL_ACTION = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
+const ICON_CAM_SNIPPET = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="display:inline-block; vertical-align:-1px; margin-right:3px;"><path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0-2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/><path d="M9 3L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9zm11 16H4V7h3.83l1.83-2h4.68l1.83 2H20v12z"/></svg>';
+
+const normalize = value => (value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
 function avatar(entry, status = false, hasStory = false, isImpulsionado = false) {
   const el = document.createElement('span');
   const storyClasses = hasStory ? ` has-story${isImpulsionado ? ' is-impulsionado' : ''}` : '';
   el.className = `updates-avatar${status ? ' updates-avatar--status' : ''}${storyClasses}`;
-  const pic = entry.avatar || entry.profile_pic;
+  const pic = entry?.avatar || entry?.profile_pic;
   if (pic) {
     const img = document.createElement('img');
     img.src = pic;
     img.alt = '';
     el.appendChild(img);
   } else {
-    el.innerHTML = defaultAvatarSvg(entry.id);
+    el.innerHTML = defaultAvatarSvg(entry?.id || 'default');
   }
   return el;
 }
 
-export function renderUpdatesPanel({ kind, entries, onSelect }) {
-  const channels = kind === 'channels';
+export function renderUpdatesPanel(options = {}) {
+  const {
+    kind = 'status',
+    entries = [],
+    statusEntries = (kind === 'status' ? entries : []) || [],
+    channelEntries = (kind === 'channels' ? entries : []) || [],
+    catalog,
+    onSelect,
+    onSelectStatus = onSelect,
+    onSelectChannel = onSelect,
+  } = options;
+
+  const resolvedStatusEntries = catalog?.status || statusEntries || [];
+  const resolvedChannelEntries = catalog?.channels || channelEntries || [];
+
   const panel = document.createElement('section');
-  panel.className = `updates-panel updates-panel--${kind}`;
-  panel.setAttribute('aria-label', channels ? 'Canais do Vorcaro' : 'Status do Vorcaro');
+  panel.className = 'updates-panel updates-panel--status';
+  panel.setAttribute('aria-label', 'Atualizações: Status e Canais');
+
   panel.innerHTML = `
     <header class="updates-header">
-      <h1>${channels ? 'Canais' : 'Status'}</h1>
-      <button class="updates-add" aria-label="${channels ? 'Criar canal' : 'Contratar status'}" title="${channels ? 'Publicação disponível futuramente' : 'Contratar e publicar novo status'}">${ICON_PLUS}</button>
+      <div class="updates-header-left">
+        <h1>Atualizações</h1>
+      </div>
+      <div class="updates-header-actions">
+        <button type="button" class="updates-add" aria-label="Adicionar status" title="Contratar e publicar novo status">${ICON_PLUS}</button>
+      </div>
     </header>
-    ${channels ? `<label class="updates-search">${ICON_SEARCH}<input type="search" placeholder="Pesquisar" aria-label="Pesquisar canais" autocomplete="off"/></label>` : ''}
-    <div class="updates-list"></div>
-    <p class="updates-note">Simulação visual · imagens em tempo real</p>
+
+    <label class="updates-search">
+      ${ICON_SEARCH}
+      <input type="search" placeholder="Pesquisar" aria-label="Pesquisar atualizações" autocomplete="off"/>
+    </label>
+
+    <div class="updates-content-scroll">
+      <!-- ── SECTION: STATUS ─────────────────────────── -->
+      <section class="updates-status-section">
+        <div class="updates-section-header">
+          <h2 class="updates-section-title">Status</h2>
+          <div class="updates-status-actions">
+            <button type="button" class="updates-status-icon-btn btn-status-camera" aria-label="Adicionar status com foto" title="Adicionar status com foto">${ICON_CAMERA_ACTION}</button>
+            <button type="button" class="updates-status-icon-btn btn-status-pencil" aria-label="Escrever status" title="Escrever status">${ICON_PENCIL_ACTION}</button>
+          </div>
+        </div>
+
+        <div class="updates-status-carousel" role="region" aria-label="Atualizações de status em carrossel horizontal">
+          <!-- Horizontal cards rendered dynamically by drawStatusCards() -->
+        </div>
+      </section>
+
+      <!-- ── SECTION: CANAIS ─────────────────────────── -->
+      <section class="updates-channels-section">
+        <div class="updates-section-header">
+          <h2 class="updates-section-title">Canais</h2>
+          <button type="button" class="updates-discover-pill">Descobrir</button>
+        </div>
+
+        <div class="updates-channels-list">
+          <!-- Vertical channel rows rendered dynamically by drawChannelsList() -->
+        </div>
+      </section>
+
+      <p class="updates-note">Simulação visual · imagens e canais em tempo real</p>
+    </div>
   `;
 
-  const addBtn = panel.querySelector('.updates-add');
-  if (channels) {
-    addBtn.disabled = true;
-  } else {
-    addBtn.disabled = false;
-    addBtn.addEventListener('click', () => {
-      openStatusPurchaseModal({
-        onPublished: (pub) => {
-          draw();
-          onSelect(pub.id);
-        },
-      });
+  // Status creation triggers
+  function triggerCreateStatus() {
+    openStatusPurchaseModal({
+      onPublished: (pub) => {
+        draw();
+        onSelectStatus?.(pub.id);
+      },
     });
   }
 
-  const list = panel.querySelector('.updates-list');
+  panel.querySelector('.updates-add')?.addEventListener('click', triggerCreateStatus);
+  panel.querySelector('.btn-status-camera')?.addEventListener('click', triggerCreateStatus);
+  panel.querySelector('.btn-status-pencil')?.addEventListener('click', triggerCreateStatus);
+
+  const searchInput = panel.querySelector('.updates-search input');
+  const carouselContainer = panel.querySelector('.updates-status-carousel');
+  const channelsListContainer = panel.querySelector('.updates-channels-list');
   const followed = loadFollowedChannels();
-  let expanded = false;
-  let selected = null;
+  let selectedId = null;
+  let showAllChannels = false;
 
-  function heading(text) {
-    const el = document.createElement('h2');
-    el.className = 'updates-section-title';
-    el.textContent = text;
-    list.appendChild(el);
-  }
+  panel.querySelector('.updates-discover-pill')?.addEventListener('click', () => {
+    showAllChannels = !showAllChannels;
+    drawChannelsList();
+  });
 
-  function row(entry, self = false, isPurchased = false) {
-    const wrap = document.createElement('div');
-    wrap.className = 'updates-row';
-    wrap.dataset.id = entry.id;
-    wrap.classList.toggle('active', entry.id === selected);
+  function drawStatusCards() {
+    carouselContainer.replaceChildren();
+    const query = normalize(searchInput?.value.trim());
 
-    const open = document.createElement('button');
-    open.type = 'button';
-    open.className = 'updates-open';
-    open.setAttribute('aria-label', `${channels ? 'Abrir canal' : 'Ver status'} de ${entry.profile_name || entry.name}`);
+    // 1. First card: "Adicionar status" (Daniel Vorcaro)
+    const addCard = document.createElement('div');
+    addCard.className = 'status-card status-card--add';
+    addCard.setAttribute('role', 'button');
+    addCard.setAttribute('tabindex', '0');
+    addCard.setAttribute('aria-label', 'Adicionar status');
+    addCard.innerHTML = `
+      <div class="status-card-add-avatar-wrap">
+        <img src="/assets/avatar-dv.jpg" alt="Daniel Vorcaro" class="status-card-add-avatar" />
+        <span class="status-card-add-badge">+</span>
+      </div>
+      <span class="status-card-add-label">Adicionar<br/>status</span>
+    `;
+    addCard.addEventListener('click', triggerCreateStatus);
+    carouselContainer.appendChild(addCard);
 
-    const isImp = entry.plan_type === 'status_impulsionado';
-    const photo = avatar(entry, !channels && !self, isPurchased, isImp);
+    // 2. Published statuses from PostgreSQL / Supabase / IndexedDB cache
+    const published = loadCachedStatuses();
+    const filteredPublished = published.filter(p =>
+      !query ||
+      normalize(p.profile_name).includes(query) ||
+      normalize(p.user_handle).includes(query)
+    );
 
-    if (!channels && self) {
-      const plus = document.createElement('span');
-      plus.className = 'updates-avatar-plus';
-      plus.textContent = '+';
-      photo.appendChild(plus);
-    }
-    open.appendChild(photo);
+    filteredPublished.forEach(pub => {
+      const isImp = pub.plan_type === 'status_impulsionado';
+      const card = document.createElement('div');
+      card.className = `status-card status-card--story${pub.id === selectedId ? ' active' : ''}`;
+      card.dataset.id = pub.id;
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Ver status de ${pub.profile_name || 'Usuário'}`);
 
-    const text = document.createElement('span');
-    text.className = 'updates-row-text';
+      const mediaUrl = (pub.media_files && pub.media_files[0]?.url)
+        || pub.profile_pic
+        || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80';
 
-    const name = document.createElement('span');
-    name.className = 'updates-row-name';
+      const avatarMarkup = pub.profile_pic
+        ? `<img src="${sanitizeUrl(pub.profile_pic, true)}" alt="" />`
+        : defaultAvatarSvg(pub.id, 34);
 
-    if (!channels && self) {
-      name.textContent = 'Meu status';
-    } else if (isPurchased) {
-      name.innerHTML = `${escapeHtml(entry.profile_name || entry.name)}${isImp ? '<span class="updates-status-badge-boost">Impulsionado</span>' : ''}`;
-    } else {
-      name.textContent = entry.name;
-    }
+      card.innerHTML = `
+        <img src="${sanitizeUrl(mediaUrl, true)}" alt="" class="status-card-bg" />
+        <div class="status-card-overlay"></div>
+        <div class="status-card-avatar ${isImp ? 'is-impulsionado' : ''}">
+          ${avatarMarkup}
+        </div>
+        ${isImp ? '<span class="status-card-boost-badge">PRO</span>' : ''}
+        <span class="status-card-name">${escapeHtml(pub.profile_name || pub.user_handle || 'Status')}</span>
+      `;
 
-    const subtitle = document.createElement('span');
-    subtitle.className = 'updates-row-subtitle';
-
-    if (channels) {
-      subtitle.textContent = 'Nenhuma publicação ainda';
-    } else if (self) {
-      subtitle.textContent = 'Daniel Vorcaro · sem atualizações';
-    } else if (isPurchased) {
-      subtitle.textContent = entry.user_handle || '@user';
-    } else {
-      subtitle.textContent = 'Nenhum status publicado';
-    }
-
-    text.append(name, subtitle);
-    open.appendChild(text);
-    open.addEventListener('click', () => onSelect(entry.id));
-    wrap.appendChild(open);
-
-    if (channels && !self) {
-      const follow = document.createElement('button');
-      follow.className = 'updates-follow';
-      const isFollowing = followed.has(entry.id);
-      follow.textContent = isFollowing ? 'Seguindo' : 'Seguir';
-      follow.setAttribute('aria-label', `${isFollowing ? 'Deixar de seguir' : 'Seguir'} ${entry.name}`);
-      follow.setAttribute('aria-pressed', String(isFollowing));
-      follow.addEventListener('click', () => {
-        if (followed.has(entry.id)) followed.delete(entry.id);
-        else followed.add(entry.id);
-        saveFollowedChannels(followed);
-        draw();
-        list.querySelector(`[data-id="${entry.id}"] .updates-follow`)?.focus();
+      card.addEventListener('click', () => {
+        panel.setActive(pub.id);
+        onSelectStatus?.(pub.id);
       });
-      wrap.appendChild(follow);
-    }
+      carouselContainer.appendChild(card);
+    });
 
-    list.appendChild(wrap);
+    // 3. Contact simulation stories (from status entries)
+    const contacts = resolvedStatusEntries.filter(entry => entry.id !== 'vorcaro');
+    const filteredContacts = contacts.filter(c => !query || normalize(c.name).includes(query));
+
+    filteredContacts.forEach(contact => {
+      const card = document.createElement('div');
+      card.className = `status-card status-card--story status-card--contact${contact.id === selectedId ? ' active' : ''}`;
+      card.dataset.id = contact.id;
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Status de ${contact.name}`);
+
+      const bgUrl = contact.avatar || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=500&q=80';
+      const avatarMarkup = contact.avatar
+        ? `<img src="${sanitizeUrl(contact.avatar, true)}" alt="" />`
+        : defaultAvatarSvg(contact.id, 34);
+
+      card.innerHTML = `
+        <img src="${sanitizeUrl(bgUrl, true)}" alt="" class="status-card-bg" />
+        <div class="status-card-overlay"></div>
+        <div class="status-card-avatar">
+          ${avatarMarkup}
+        </div>
+        <span class="status-card-name">${escapeHtml(contact.name)}</span>
+      `;
+
+      card.addEventListener('click', () => {
+        panel.setActive(contact.id);
+        onSelectStatus?.(contact.id);
+      });
+      carouselContainer.appendChild(card);
+    });
   }
 
-  function draw() {
-    list.replaceChildren();
-    const term = normalize(panel.querySelector('input')?.value.trim() || '');
-    const matching = entries.filter(entry => normalize(entry.name).includes(term));
-    const own = matching.find(entry => entry.id === 'vorcaro');
-    if (own) row(own, true);
+  function drawChannelsList() {
+    channelsListContainer.replaceChildren();
+    const query = normalize(searchInput?.value.trim());
 
-    if (channels) {
-      const following = matching.filter(entry => entry.id !== 'vorcaro' && followed.has(entry.id));
-      if (following.length) {
-        heading('Canais que você segue');
-        following.forEach(entry => row(entry));
-      }
-      const suggestions = matching.filter(entry => entry.id !== 'vorcaro' && !followed.has(entry.id));
-      if (suggestions.length) {
-        heading('Encontrar canais para seguir');
-        (expanded || term ? suggestions : suggestions.slice(0, 5)).forEach(entry => row(entry));
-        if (!term && suggestions.length > 5) {
-          const more = document.createElement('button');
-          more.className = 'updates-discover';
-          more.textContent = expanded ? 'Mostrar menos' : 'Descobrir mais';
-          more.setAttribute('aria-expanded', String(expanded));
-          more.addEventListener('click', () => { expanded = !expanded; draw(); list.querySelector('.updates-discover')?.focus(); });
-          list.appendChild(more);
-        }
-      }
-    } else {
-      // Status mode: include purchased/published statuses from PostgreSQL / cache
-      const cached = loadCachedStatuses();
-      const filteredPurchased = cached.filter(p =>
-        normalize(p.profile_name || '').includes(term) ||
-        normalize(p.user_handle || '').includes(term)
-      );
-
-      if (filteredPurchased.length > 0) {
-        heading('Atualizações recentes');
-        filteredPurchased.forEach(pub => row(pub, false, true));
-      }
-
-      heading('Contatos · aguardando atualizações');
-      matching.filter(entry => entry.id !== 'vorcaro').forEach(entry => row(entry));
-    }
+    const matching = resolvedChannelEntries.filter(entry =>
+      !query || normalize(entry.name).includes(query) || normalize(entry.description).includes(query)
+    );
 
     if (!matching.length) {
       const empty = document.createElement('p');
       empty.className = 'updates-no-results';
-      empty.setAttribute('role', 'status');
-      empty.textContent = channels ? 'Nenhum canal encontrado.' : 'Nenhum status encontrado.';
-      list.appendChild(empty);
+      empty.textContent = 'Nenhum canal encontrado.';
+      channelsListContainer.appendChild(empty);
+      return;
+    }
+
+    // Followed channels first
+    const following = matching.filter(c => followed.has(c.id));
+    if (following.length > 0) {
+      const header = document.createElement('div');
+      header.className = 'updates-channel-subheading';
+      header.textContent = 'Canais que você segue';
+      channelsListContainer.appendChild(header);
+
+      following.forEach(channel => renderChannelRow(channel, true));
+    }
+
+    // Suggested channels
+    const suggestions = matching.filter(c => !followed.has(c.id));
+    if (suggestions.length > 0) {
+      const header = document.createElement('div');
+      header.className = 'updates-channel-subheading';
+      header.textContent = 'Encontrar canais para seguir';
+      channelsListContainer.appendChild(header);
+
+      const itemsToShow = (showAllChannels || query) ? suggestions : suggestions.slice(0, 6);
+      itemsToShow.forEach(channel => renderChannelRow(channel, false));
+
+      if (!query && suggestions.length > 6) {
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'updates-discover';
+        toggleBtn.textContent = showAllChannels ? 'Mostrar menos' : 'Descobrir mais canais';
+        toggleBtn.addEventListener('click', () => {
+          showAllChannels = !showAllChannels;
+          drawChannelsList();
+        });
+        channelsListContainer.appendChild(toggleBtn);
+      }
     }
   }
 
-  panel.querySelector('input')?.addEventListener('input', draw);
+  function renderChannelRow(channel, isFollowing) {
+    const row = document.createElement('div');
+    row.className = `updates-channel-row${channel.id === selectedId ? ' active' : ''}`;
+    row.dataset.id = channel.id;
+
+    const avatarWrap = document.createElement('div');
+    avatarWrap.className = 'updates-channel-avatar';
+    if (channel.avatar) {
+      const img = document.createElement('img');
+      img.src = channel.avatar;
+      img.alt = '';
+      avatarWrap.appendChild(img);
+    } else {
+      avatarWrap.innerHTML = defaultAvatarSvg(channel.id, 48);
+    }
+
+    const info = document.createElement('div');
+    info.className = 'updates-channel-info';
+
+    const topLine = document.createElement('div');
+    topLine.className = 'updates-channel-top-line';
+
+    const name = document.createElement('span');
+    name.className = 'updates-channel-name';
+    name.textContent = channel.name;
+
+    const date = document.createElement('span');
+    date.className = 'updates-channel-date';
+    date.textContent = '31/07/2026';
+
+    topLine.append(name, date);
+
+    const bottomLine = document.createElement('div');
+    bottomLine.className = 'updates-channel-bottom-line';
+
+    const snippet = document.createElement('span');
+    snippet.className = 'updates-channel-snippet';
+    snippet.innerHTML = `${ICON_CAM_SNIPPET} ${escapeHtml(channel.description || 'Publicações e atualizações do canal')}`;
+
+    bottomLine.appendChild(snippet);
+    info.append(topLine, bottomLine);
+
+    const followBtn = document.createElement('button');
+    followBtn.type = 'button';
+    followBtn.className = 'updates-channel-follow-btn';
+    followBtn.textContent = isFollowing ? 'Seguindo' : 'Seguir';
+    followBtn.setAttribute('aria-pressed', String(isFollowing));
+    followBtn.setAttribute('aria-label', `${isFollowing ? 'Deixar de seguir' : 'Seguir'} ${channel.name}`);
+
+    followBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (followed.has(channel.id)) followed.delete(channel.id);
+      else followed.add(channel.id);
+      saveFollowedChannels(followed);
+      drawChannelsList();
+    });
+
+    row.append(avatarWrap, info, followBtn);
+
+    row.addEventListener('click', () => {
+      panel.setActive(channel.id);
+      onSelectChannel?.(channel.id);
+    });
+
+    channelsListContainer.appendChild(row);
+  }
+
+  function draw() {
+    drawStatusCards();
+    drawChannelsList();
+  }
+
+  searchInput?.addEventListener('input', draw);
+
   panel.setActive = id => {
-    selected = id;
-    panel.querySelectorAll('.updates-row').forEach(row => row.classList.toggle('active', row.dataset.id === id));
+    selectedId = id;
+    panel.querySelectorAll('.status-card').forEach(c => c.classList.toggle('active', c.dataset.id === id));
+    panel.querySelectorAll('.updates-channel-row').forEach(r => r.classList.toggle('active', r.dataset.id === id));
   };
 
-  window.addEventListener('status:published', () => {
-    draw();
-  });
+  window.addEventListener('status:published', draw);
+  window.addEventListener('status:cache-updated', draw);
 
-  // Background sync with PostgreSQL
-  if (!channels) {
-    fetchPublishedStatuses().then(() => draw());
-  }
+  // Background fetch
+  fetchPublishedStatuses().then(() => draw());
 
   draw();
   return panel;
 }
 
-export function renderUpdatesDetail(container, { kind, entry, onBack, onConversation, onSelectStatus }) {
-  const channels = kind === 'channels';
-
-  // Check if entry is a purchased/published status with media files
-  const isPurchasedStatus = entry && (entry.media_files || entry.social_network);
+export function renderUpdatesDetail(container, { kind = 'status', entry, onBack, onConversation, onSelectStatus }) {
+  // Check if entry is a purchased/published status with media files or caption
+  const isPurchasedStatus = entry && (entry.media_files || entry.social_network || entry.plan_type?.includes('status'));
 
   if (isPurchasedStatus) {
     return renderStoryViewer(container, { entry, onBack, onSelectStatus });
   }
 
+  const isChannel = kind === 'channels' || entry?.description || entry?.name?.includes('Canal') || entry?.name?.includes('Vorcaro e ');
+
   const el = document.createElement('section');
-  el.className = `updates-detail updates-detail--${kind}${entry ? ' has-selection' : ''}`;
+  el.className = `updates-detail updates-detail--${isChannel ? 'channels' : 'status'}${entry ? ' has-selection' : ''}`;
+
   const header = document.createElement('header');
   header.className = 'updates-detail-header';
+
   const back = document.createElement('button');
   back.className = 'updates-back';
-  back.setAttribute('aria-label', channels ? 'Voltar aos canais' : 'Voltar aos status');
+  back.setAttribute('aria-label', 'Voltar');
   back.innerHTML = ICON_BACK;
   back.addEventListener('click', onBack);
   header.appendChild(back);
+
   if (entry) header.appendChild(avatar(entry));
+
   const title = document.createElement('span');
-  title.textContent = entry?.name || (channels ? 'Canais do Vorcaro' : 'Status do Vorcaro');
+  title.textContent = entry?.name || (isChannel ? 'Canal do Vorcaro' : 'Status do Vorcaro');
   header.appendChild(title);
   el.appendChild(header);
 
   const body = document.createElement('div');
   body.className = 'updates-detail-body';
+
   const icon = document.createElement('div');
   icon.className = 'updates-detail-icon';
-  icon.innerHTML = channels ? ICON_CHANNELS : ICON_STATUS;
+  icon.innerHTML = isChannel ? ICON_CHANNELS : ICON_STATUS;
   body.appendChild(icon);
+
   const badge = document.createElement('span');
   badge.className = 'updates-preview-label';
-  badge.textContent = 'Simulação · em preparação';
+  badge.textContent = isChannel ? 'Canal Oficial' : 'Status';
+
   const heading = document.createElement('h2');
   heading.textContent = entry
-    ? (channels ? 'Este canal ainda não tem publicações' : 'Nenhum status por enquanto')
-    : (channels ? 'Um novo jeito de explorar o acervo' : 'Os momentos, em formato de status');
+    ? (isChannel ? entry.name : 'Status de ' + entry.name)
+    : 'Atualizações e Canais';
+
   const text = document.createElement('p');
-  text.textContent = channels
-    ? 'Aqui entrarão simulações com imagens públicas de Daniel Vorcaro e seus contatos. Siga os canais que deseja acompanhar.'
-    : 'Aqui entrarão simulações de status com imagens públicas de Daniel Vorcaro e seus contatos.';
+  text.textContent = isChannel
+    ? (entry?.description || 'Canal de notícias e publicações públicas.')
+    : 'Simulação de status com imagens e momentos dos contatos no acervo.';
+
   body.append(badge, heading, text);
 
   if (entry?.conversationId) {
     const chat = document.createElement('button');
     chat.className = 'updates-open-conversation';
     chat.textContent = 'Ver histórico da conversa';
-    chat.addEventListener('click', () => onConversation(entry.conversationId));
+    chat.addEventListener('click', () => onConversation?.(entry.conversationId));
     body.appendChild(chat);
   }
 
@@ -427,7 +583,6 @@ function renderStoryViewer(container, { entry, onBack, onSelectStatus }) {
     mediaBox?.addEventListener('pointerdown', pauseTimer);
     mediaBox?.addEventListener('pointerup', resumeTimer);
     mediaBox?.addEventListener('pointercancel', resumeTimer);
-    mediaBox?.addEventListener('pointerleave', resumeTimer);
 
     playerEl.querySelector('.story-nav-btn.prev')?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -440,10 +595,14 @@ function renderStoryViewer(container, { entry, onBack, onSelectStatus }) {
     });
 
     playerEl.querySelector('.story-publish-more-btn')?.addEventListener('click', () => {
-      clearTimeout(timerId);
+      exitViewer();
       openStatusPurchaseModal({
         onPublished: (pub) => {
-          window.location.hash = `#/status/${pub.id}`;
+          if (onSelectStatus) {
+            onSelectStatus(pub.id);
+          } else {
+            window.location.hash = `#/status/${pub.id}`;
+          }
         },
       });
     });
