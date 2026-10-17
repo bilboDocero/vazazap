@@ -24,6 +24,9 @@ import { showImagePreview } from './components/ImagePreview.js';
 import { renderCallsPanel } from './components/CallsPanel.js';
 import { renderUpdatesPanel, renderUpdatesDetail } from './components/UpdatesPanel.js';
 import { createUpdatesCatalog } from './lib/updates-content.js';
+import { renderCommunitiesPanel } from './components/CommunitiesPanel.js';
+import { renderCommunitiesDetail } from './components/CommunitiesDetail.js';
+import { getCommunitiesData, findCommunitySelection } from './lib/communities-content.js';
 import { exportUrl, EXPORT_ALL_URL, downloadFile } from './lib/export.js';
 import { copyText } from './lib/utils.js';
 
@@ -478,17 +481,18 @@ async function init() {
       closeSettings();
       sidebar.showChats?.();
       navRail.setActive('chats');
-      if (['calls', 'status', 'channels'].includes(router.getCurrentRoute().route)) router.navigate('home');
+      if (['calls', 'status', 'channels', 'communities'].includes(router.getCurrentRoute().route)) router.navigate('home');
       sidebar.querySelector('.sidebar-search-input').focus();
     },
     onCalls: () => router.navigate('calls'),
     onStatus: () => router.navigate('status'),
     onChannels: () => router.navigate('channels'),
+    onCommunities: () => router.navigate('communities'),
     avatarSrc: '/assets/avatar-dv.jpg',
     onSettings: openSettings,
     onChat: () => {
       // From the calls screen, this is the way back to the list.
-      if (['calls', 'status', 'channels'].includes(router.getCurrentRoute().route)) { router.navigate('home'); return; }
+      if (['calls', 'status', 'channels', 'communities'].includes(router.getCurrentRoute().route)) { router.navigate('home'); return; }
       closeProfile();
       closeSettings();
     },
@@ -506,6 +510,7 @@ async function init() {
     onChats: () => router.navigate('home'),
     onStatus: () => router.navigate('status'),
     onChannels: () => router.navigate('channels'),
+    onCommunities: () => router.navigate('communities'),
     onSelect: (id) => {
       // Close profile/settings if open before navigating
       closeProfile();
@@ -579,6 +584,44 @@ async function init() {
     sidebar.showCalls?.(panel);
     navRail.setActive?.('calls');
   });
+
+  let activeCommunities = null;
+  router.on('communities', id => {
+    closeAll();
+    currentConversationId = null;
+    setActiveConversation(sidebar, null);
+
+    const communitiesList = getCommunitiesData();
+    const selection = findCommunitySelection(communitiesList, id);
+
+    if (!activeCommunities?.panel.isConnected) {
+      const panel = renderCommunitiesPanel({
+        communities: communitiesList,
+        selectedId: id,
+        onSelect: (selectedId) => router.navigate('communities', selectedId),
+        onCreateCommunity: (created) => {
+          showToast(mainArea, `Comunidade "${created.name}" criada`);
+          panel.refresh(getCommunitiesData());
+          router.navigate('communities', created.id);
+        },
+      });
+      sidebar.showCommunities?.(panel);
+      activeCommunities = { panel };
+    } else {
+      activeCommunities.panel.setActive(id);
+    }
+
+    navRail.setActive('communities');
+    container.classList.toggle('chat-open', !!selection);
+
+    renderCommunitiesDetail(mainArea, {
+      selection,
+      onBack: () => router.navigate('communities'),
+      onCreateCommunity: () => activeCommunities?.panel.openCreateModal(),
+      onSelectGroup: (groupId) => router.navigate('communities', groupId),
+    });
+  });
+
   router.on('chat', async (id, messageId) => {
     if (messageId) {
       // Look up the date for this message ID

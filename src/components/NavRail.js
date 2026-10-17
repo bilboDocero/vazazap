@@ -8,7 +8,7 @@ const ICON_AI = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none"><g 
 const ICON_ADD = `<svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="#2DD45B"/><path d="M12 6v12M6 12h12" stroke="#FFF" stroke-width="2.2"/></svg>`;
 const ICON_LIBRARY = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="15" height="15" rx="1.5"/><path d="M3 7v14h14M9 14l3-4 2 2 2-3 3 5H9Z"/><circle cx="10" cy="7" r="1" fill="currentColor" stroke="none"/></svg>`;
 
-export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCalls, onStatus, onChannels, onFind, onProfile, unreadCount = 0 } = {}) {
+export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCalls, onStatus, onChannels, onCommunities, onFind, onProfile, unreadCount = 0 } = {}) {
   const rail = document.createElement('nav');
   rail.className = 'nav-rail';
   rail.setAttribute('aria-label', 'Navegação');
@@ -37,6 +37,7 @@ export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCall
   const calls = button(ICON_CALLS, 'Chamadas', onCalls);
   const status = button(ICON_STATUS, 'Status', onStatus);
   const channels = button(ICON_CHANNELS, 'Canais', onChannels);
+  const communities = button(ICON_COMMUNITIES, 'Comunidades', onCommunities);
   const badge = document.createElement('span');
   badge.className = 'nav-rail-badge';
   badge.setAttribute('aria-hidden', 'true');
@@ -44,7 +45,7 @@ export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCall
   main.append(chats, calls,
     status,
     channels,
-    button(ICON_COMMUNITIES, 'Comunidades', null, true));
+    communities);
   top.appendChild(main);
 
   function separator() {
@@ -83,7 +84,7 @@ export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCall
     else chats.removeAttribute('aria-description');
   };
   rail.setActive = (which) => {
-    for (const [btn, key] of [[chats, 'chats'], [calls, 'calls'], [status, 'status'], [channels, 'channels']]) {
+    for (const [btn, key] of [[chats, 'chats'], [calls, 'calls'], [status, 'status'], [channels, 'channels'], [communities, 'communities']]) {
       btn.classList.toggle('active', which === key);
       if (which === key) btn.setAttribute('aria-current', 'page');
       else btn.removeAttribute('aria-current');
@@ -95,4 +96,4 @@ export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCall
   return rail;
 }
 
-export { ICON_CHAT, ICON_CALLS, ICON_STATUS, ICON_CHANNELS };
+export { ICON_CHAT, ICON_CALLS, ICON_STATUS, ICON_CHANNELS, ICON_COMMUNITIES };

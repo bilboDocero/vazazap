@@ -8,7 +8,7 @@ import { formatTime, escapeHtml, formatNumber, formatRelativeDate } from '../lib
 
 import { ICON_SEARCH as SEARCH_ICON, ICON_MEETBALL } from '../lib/icons.js';
 import { defaultAvatarSvg } from '../lib/avatar.js';
-import { ICON_CHAT, ICON_CALLS, ICON_STATUS, ICON_CHANNELS } from './NavRail.js';
+import { ICON_CHAT, ICON_CALLS, ICON_STATUS, ICON_CHANNELS, ICON_COMMUNITIES } from './NavRail.js';
 
 /**
  * The two conversations pinned under "Favoritas" — the leaks this project is
@@ -23,7 +23,7 @@ export const FAVORITE_CONVERSATIONS = new Set(['alexandre-de-moraes', 'martha-gr
  * @param {function} options.onSelect - called with conversation id
  * @param {Set<string>} [options.readConversations] - ids already opened
  */
-export function renderSidebar(container, { conversations, onSelect, onProfile, onAbout, onExportAll, onCalls, onChats, onStatus, onChannels, readConversations = new Set() }) {
+export function renderSidebar(container, { conversations, onSelect, onProfile, onAbout, onExportAll, onCalls, onChats, onStatus, onChannels, onCommunities, readConversations = new Set() }) {
   const el = document.createElement('aside');
   el.className = 'sidebar';
   el.setAttribute('role', 'navigation');
@@ -228,6 +228,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
     ['chats', 'Conversas', ICON_CHAT, onChats],
     ['status', 'Status', ICON_STATUS, onStatus],
     ['channels', 'Canais', ICON_CHANNELS, onChannels],
+    ['communities', 'Comunidades', ICON_COMMUNITIES, onCommunities],
     ['calls', 'Chamadas', ICON_CALLS, onCalls],
   ]) {
     const tab = document.createElement('button');
@@ -251,16 +252,18 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
 
   el.showSection = (kind, panel) => {
     closeSidebarMenu();
-    el.querySelectorAll('.calls-panel, .updates-panel').forEach(p => p.remove());
+    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel').forEach(p => p.remove());
     el.insertBefore(panel, bottomNav);
     el.classList.add('sidebar--section');
     el.classList.toggle('sidebar--calls', kind === 'calls');
+    el.classList.toggle('sidebar--communities', kind === 'communities');
     selectTab(kind);
   };
   el.showCalls = panel => el.showSection('calls', panel);
+  el.showCommunities = panel => el.showSection('communities', panel);
   el.showChats = () => {
-    el.classList.remove('sidebar--calls', 'sidebar--section');
-    el.querySelectorAll('.calls-panel, .updates-panel').forEach(p => p.remove());
+    el.classList.remove('sidebar--calls', 'sidebar--section', 'sidebar--communities');
+    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel').forEach(p => p.remove());
     selectTab('chats');
   };
 
