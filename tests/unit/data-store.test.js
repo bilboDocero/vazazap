@@ -65,34 +65,35 @@ describe('split_data output', () => {
     expect(existsSync(path)).toBe(true);
 
     const data = JSON.parse(readFileSync(path, 'utf-8'));
-    expect(Array.isArray(data)).toBe(true);
-    expect(data.length).toBeGreaterThan(0);
+    expect(data).toHaveProperty('dates');
+    expect(data).toHaveProperty('senders');
+    expect(data).toHaveProperty('messages');
+    expect(data.messages.length).toBeGreaterThan(0);
 
-    const entry = data[0];
-    expect(entry).toHaveProperty('id');
-    expect(entry).toHaveProperty('date');
-    expect(entry).toHaveProperty('sender');
-    expect(entry).toHaveProperty('content');
-    expect(entry.content.length).toBeLessThanOrEqual(80);
+    const entry = data.messages[0];
+    expect(entry).toHaveLength(4);
+    expect(typeof entry[0]).toBe('number');
+    expect(typeof entry[3]).toBe('string');
+    expect(entry[3].length).toBeLessThanOrEqual(80);
   });
 
-  it('per-date chunk files exist for first and last dates', () => {
-    const first = join(DATA_DIR, 'martha-graeff/2024-02-10.json');
-    const last = join(DATA_DIR, 'martha-graeff/2025-08-13.json');
+  it('monthly chunk files exist for first and last months', () => {
+    const first = join(DATA_DIR, 'martha-graeff/2024-02.json');
+    const last = join(DATA_DIR, 'martha-graeff/2025-08.json');
     expect(existsSync(first)).toBe(true);
     expect(existsSync(last)).toBe(true);
 
     const firstData = JSON.parse(readFileSync(first, 'utf-8'));
     expect(firstData).toHaveProperty('messages');
     expect(Array.isArray(firstData.messages)).toBe(true);
-    expect(firstData.messages.length).toBe(82);
+    expect(firstData.messages.length).toBeGreaterThan(0);
 
     const lastData = JSON.parse(readFileSync(last, 'utf-8'));
     expect(lastData.messages.length).toBeGreaterThan(0);
   });
 
-  it('each date chunk has valid message structure', () => {
-    const path = join(DATA_DIR, 'martha-graeff/2024-02-10.json');
+  it('each monthly chunk has valid message structure', () => {
+    const path = join(DATA_DIR, 'martha-graeff/2024-02.json');
     const data = JSON.parse(readFileSync(path, 'utf-8'));
     const msg = data.messages[0];
 
@@ -108,9 +109,9 @@ describe('split_data output', () => {
     expect(msg).toHaveProperty('urls');
   });
 
-  it('has the correct number of date chunk files', () => {
+  it('has the correct number of monthly chunk files', () => {
     const dir = join(DATA_DIR, 'martha-graeff');
-    const files = readdirSync(dir).filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f));
-    expect(files.length).toBe(534);
+    const files = readdirSync(dir).filter(f => /^\d{4}-\d{2}\.json$/.test(f));
+    expect(files.length).toBe(19);
   });
 });

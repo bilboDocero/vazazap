@@ -90,6 +90,15 @@ def group_messages_by_date(messages):
     return by_date
 
 
+def group_messages_by_month(messages):
+    """Group messages by YYYY-MM prefix."""
+    by_month = defaultdict(list)
+    for msg in messages:
+        ym = msg["date"][:7]
+        by_month[ym].append(msg)
+    return by_month
+
+
 # Martha's 65k messages need the 80-char cap to keep the index at ~5 MB, and her
 # messages are short enough that it costs nothing. The IPJ conversations are the
 # opposite: a few hundred messages, but each note runs several hundred characters,
@@ -99,23 +108,39 @@ FULL_TEXT_INDEX_MAX_MESSAGES = 5000
 
 
 def build_search_index(messages, max_content_len=80):
-    """Build lightweight search index, truncating content only when it pays off."""
+    """Build compact columnar search index with dictionary encoding."""
     if len(messages) <= FULL_TEXT_INDEX_MAX_MESSAGES:
         max_content_len = None
-    entries = []
+    dates_list = []
+    date_to_idx = {}
+    senders_list = []
+    sender_to_idx = {}
+    tuples = []
+
     for msg in messages:
         if msg["type"] == "system":
             continue
-        content = msg.get("content", "") or ""
-        if not content.strip():
+        content = (msg.get("content", "") or "").strip()
+        if not content:
             continue
-        entries.append({
-            "id": msg["id"],
-            "date": msg["date"],
-            "sender": msg["sender"],
-            "content": content if max_content_len is None else content[:max_content_len],
-        })
-    return entries
+        trunc = content if max_content_len is None else content[:max_content_len]
+        d = msg["date"]
+        s = msg["sender"]
+
+        if d not in date_to_idx:
+            date_to_idx[d] = len(dates_list)
+            dates_list.append(d)
+        if s not in sender_to_idx:
+            sender_to_idx[s] = len(senders_list)
+            senders_list.append(s)
+
+        tuples.append([msg["id"], date_to_idx[d], sender_to_idx[s], trunc])
+
+    return {
+        "dates": dates_list,
+        "senders": senders_list,
+        "messages": tuples,
+    }
 
 
 def write_json(path, data):
@@ -223,14 +248,21 @@ def split_conversation(conv_id, data, index):
     by_date = group_messages_by_date(messages)
     dates = sorted(by_date.keys())
 
+    by_month = group_messages_by_month(messages)
+    months = sorted(by_month.keys())
+
+    if conv_dir.exists():
+        for old_f in conv_dir.glob("*.json"):
+            old_f.unlink()
+
     write_json(conv_dir / "index.json", index)
 
     search_index = build_search_index(messages)
     write_json(conv_dir / "search-index.json", search_index)
     size_mb = os.path.getsize(conv_dir / "search-index.json") / (1024 * 1024)
 
-    for date in dates:
-        write_json(conv_dir / f"{date}.json", {"messages": by_date[date]})
+    for ym in months:
+        write_json(conv_dir / f"{ym}.json", {"month": ym, "messages": by_month[ym]})
 
     for msg in messages:
         if msg["type"] != "call":

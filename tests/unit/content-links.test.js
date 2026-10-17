@@ -8,6 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { unpackSearchIndex } from '../../src/lib/search.js';
 
 const ROOT = join(import.meta.dirname, '../..');
 const DATA_DIR = join(ROOT, 'public/data');
@@ -44,7 +45,7 @@ function loadIndex(conversationId) {
   if (!indexCache.has(conversationId)) {
     const path = join(DATA_DIR, conversationId, 'search-index.json');
     indexCache.set(conversationId, existsSync(path)
-      ? JSON.parse(readFileSync(path, 'utf-8'))
+      ? unpackSearchIndex(JSON.parse(readFileSync(path, 'utf-8')))
       : null);
   }
   return indexCache.get(conversationId);

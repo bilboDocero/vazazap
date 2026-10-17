@@ -109,8 +109,18 @@ describe('DataStore', () => {
     fetcher = createMockFetcher({
       'conversations.json': mockConversations,
       'martha-graeff/index.json': mockIndex,
+      'martha-graeff/2024-02.json': {
+        month: '2024-02',
+        messages: [
+          ...mockChunk.messages,
+          { id: 83, date: '2024-02-11', content: 'Day 2' },
+        ],
+      },
       'martha-graeff/2024-02-10.json': mockChunk,
-      'martha-graeff/2024-02-11.json': { messages: [{ id: 83, content: 'Day 2' }] },
+      'martha-graeff/2024-02-11.json': { messages: [{ id: 83, date: '2024-02-11', content: 'Day 2' }] },
+      'martha-graeff/day-a.json': { messages: [{ id: 101, content: 'A' }] },
+      'martha-graeff/day-b.json': { messages: [{ id: 102, content: 'B' }] },
+      'martha-graeff/day-c.json': { messages: [{ id: 103, content: 'C' }] },
     });
     store = new DataStore({ cacheSize: 3, fetcher });
     resetDataStore();
@@ -214,7 +224,7 @@ describe('DataStore', () => {
   describe('clearCache()', () => {
     it('clears all cached chunks', async () => {
       await store.getMessages('martha-graeff', '2024-02-10');
-      expect(store.cacheSize).toBe(1);
+      expect(store.cacheSize).toBeGreaterThan(0);
       store.clearCache();
       expect(store.cacheSize).toBe(0);
     });

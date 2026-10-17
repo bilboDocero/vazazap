@@ -12,6 +12,45 @@ let _loading = null;
 let _loadingId = null;
 const _normalizedCache = new WeakMap();
 
+let _worker = null;
+let _workerReqId = 0;
+const _workerCallbacks = new Map();
+
+function getWorker() {
+  if (typeof Worker === 'undefined') return null;
+  if (!_worker) {
+    try {
+      _worker = new Worker(new URL('./search-worker.js', import.meta.url), { type: 'module' });
+      _worker.onmessage = (e) => {
+        const { id, results, error } = e.data;
+        const cb = _workerCallbacks.get(id);
+        if (cb) {
+          _workerCallbacks.delete(id);
+          if (error) cb.reject(new Error(error));
+          else cb.resolve(results);
+        }
+      };
+    } catch {
+      _worker = null;
+    }
+  }
+  return _worker;
+}
+
+export function unpackSearchIndex(data) {
+  if (Array.isArray(data)) return data;
+  if (data && data.messages && data.dates && data.senders) {
+    const { dates, senders, messages } = data;
+    return messages.map(([id, dIdx, sIdx, content]) => ({
+      id,
+      date: dates[dIdx],
+      sender: senders[sIdx],
+      content,
+    }));
+  }
+  return [];
+}
+
 function getNormalized(entry) {
   let val = _normalizedCache.get(entry);
   if (val === undefined) {
@@ -69,12 +108,16 @@ export async function loadSearchIndex(conversationId, basePath = '/data') {
       // A newer load may have started while this one was in flight; only the
       // most recent conversation's result may claim the cache.
       if (_loadingId === conversationId) {
-        _index = data;
+        _index = unpackSearchIndex(data);
         _indexId = conversationId;
         _loading = null;
-        warmNormalizedCache(data);
+        warmNormalizedCache(_index);
+        const worker = getWorker();
+        if (worker) {
+          worker.postMessage({ type: 'load', id: 0, conversationId, basePath });
+        }
       }
-      return data;
+      return _index;
     })
     .catch(err => {
       if (_loadingId === conversationId) _loading = null;
@@ -163,12 +206,32 @@ export function search(query, { limit = 50, sender } = {}) {
   return results;
 }
 
+/**
+ * Search asynchronously using a Web Worker when available.
+ */
+export async function searchAsync(query, options = {}) {
+  const worker = getWorker();
+  if (worker && isIndexLoaded()) {
+    const id = ++_workerReqId;
+    return new Promise((resolve, reject) => {
+      _workerCallbacks.set(id, { resolve, reject });
+      worker.postMessage({ type: 'search', id, query, options });
+    });
+  }
+  return search(query, options);
+}
+
 /** Clear the loaded index (for testing). */
 export function resetSearchIndex() {
   _index = null;
   _indexId = null;
   _loading = null;
   _loadingId = null;
+  if (_worker) {
+    _worker.terminate();
+    _worker = null;
+    _workerCallbacks.clear();
+  }
 }
 
 /**

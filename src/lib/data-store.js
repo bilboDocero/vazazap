@@ -143,28 +143,69 @@ export class DataStore {
       return this._pending.get(cacheKey);
     }
 
-    const promise = this._fetcher(
-      `${this._basePath}/${conversationId}/${date}.json`
-    ).then(data => {
-      const messages = data.messages || [];
-      this._cache.set(cacheKey, messages);
-      this._pending.delete(cacheKey);
-      return messages;
-    }).catch(err => {
-      this._pending.delete(cacheKey);
-      throw err;
-    });
+    const isIsoDate = /^\d{4}-\d{2}-\d{2}$/.test(date);
+    const month = isIsoDate ? date.slice(0, 7) : null;
+    const chunkPath = month ? `${month}.json` : `${date}.json`;
+    const chunkKey = month ? `${conversationId}/${month}` : cacheKey;
+
+    let promise;
+    if (month && this._pending.has(chunkKey)) {
+      promise = this._pending.get(chunkKey).then(() => this._cache.get(cacheKey) || []);
+    } else {
+      const fetchPromise = this._fetcher(
+        `${this._basePath}/${conversationId}/${chunkPath}`
+      ).then(data => {
+        const allMsgs = data.messages || [];
+        if (month) {
+          const byDay = new Map();
+          for (const msg of allMsgs) {
+            const d = msg.date;
+            if (!byDay.has(d)) byDay.set(d, []);
+            byDay.get(d).push(msg);
+          }
+          for (const [d, msgs] of byDay) {
+            this._cache.set(`${conversationId}/${d}`, msgs);
+          }
+          if (!this._cache.has(cacheKey)) {
+            this._cache.set(cacheKey, byDay.get(date) || []);
+          }
+          this._pending.delete(chunkKey);
+          return this._cache.get(cacheKey);
+        } else {
+          this._cache.set(cacheKey, allMsgs);
+          this._pending.delete(chunkKey);
+          return allMsgs;
+        }
+      }).catch(err => {
+        if (month) {
+          return this._fetcher(
+            `${this._basePath}/${conversationId}/${date}.json`
+          ).then(data => {
+            const messages = data.messages || [];
+            this._cache.set(cacheKey, messages);
+            this._pending.delete(chunkKey);
+            return messages;
+          }).catch(innerErr => {
+            this._pending.delete(chunkKey);
+            throw innerErr;
+          });
+        }
+        this._pending.delete(chunkKey);
+        throw err;
+      });
+
+      if (month) {
+        this._pending.set(chunkKey, fetchPromise);
+      }
+      promise = fetchPromise.finally(() => {
+        this._pending.delete(cacheKey);
+      });
+    }
 
     this._pending.set(cacheKey, promise);
     return promise;
   }
 
-  /**
-   * Load messages for multiple dates at once.
-   * @param {string} conversationId
-   * @param {string[]} dates
-   * @returns {Promise<Array>} Flattened array of messages, in date order
-   */
   async getMessagesForDates(conversationId, dates) {
     const results = await Promise.all(
       dates.map(date => this.getMessages(conversationId, date))

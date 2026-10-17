@@ -96,10 +96,14 @@ describe('per-conversation chunks', () => {
       const index = JSON.parse(
         readFileSync(join(DATA_DIR, conv.id, 'index.json'), 'utf-8')
       );
-      // Spot-check the ends rather than every day of Martha's 534.
+      // Spot-check that chunks exist for the start and end of each conversation
       for (const entry of [index.dates[0], index.dates.at(-1)]) {
-        const chunk = join(DATA_DIR, conv.id, `${entry.date}.json`);
-        expect(existsSync(chunk), `${conv.id}/${entry.date}`).toBe(true);
+        const ym = entry.date.slice(0, 7);
+        const chunk = [
+          join(DATA_DIR, conv.id, `${ym}.json`),
+          join(DATA_DIR, conv.id, `${entry.date}.json`),
+        ].find(existsSync);
+        expect(Boolean(chunk), `${conv.id}/${entry.date}`).toBe(true);
       }
     }
   });
