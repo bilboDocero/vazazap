@@ -1,11 +1,18 @@
 import { defineConfig } from 'vite';
 import { existsSync, createReadStream } from 'node:fs';
 import { join } from 'node:path';
+import { statusApiMiddleware } from './server/status-api.js';
 
 export default defineConfig({
   root: '.',
   publicDir: 'public',
   plugins: [
+    {
+      name: 'status-postgresql-api',
+      configureServer(server) {
+        server.middlewares.use(statusApiMiddleware);
+      },
+    },
     {
       name: 'serve-export-fallback',
       configureServer(server) {

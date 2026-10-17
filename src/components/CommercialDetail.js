@@ -4,6 +4,7 @@
  */
 
 import { PLATFORM_PRODUCTS, saveCommercialPurchase, loadCommercialPurchases } from '../lib/commercial-content.js';
+import { openStatusPurchaseModal } from './StatusPurchaseModal.js';
 import { escapeHtml } from '../lib/utils.js';
 
 const ICON_BACK = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 5-7 7 7 7"/></svg>';
@@ -103,7 +104,17 @@ export function renderCommercialDetail(container, { activeSection = 'catalogo', 
 
     // Action 2: Open acquisition / contract modal
     card.querySelector('.product-btn-secondary').addEventListener('click', () => {
-      openAcquisitionModal(product);
+      if (product.id === 'product-status') {
+        openStatusPurchaseModal({
+          initialPlan: 'status_normal',
+          onPublished: (pub) => {
+            if (onShowToast) onShowToast(`Status de ${pub.user_handle} publicado com sucesso!`);
+            if (onNavigateTab) onNavigateTab('status', pub.id);
+          },
+        });
+      } else {
+        openAcquisitionModal(product);
+      }
     });
 
     grid.appendChild(card);

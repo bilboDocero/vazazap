@@ -2,21 +2,30 @@ import { ICON_SEARCH } from '../lib/icons.js';
 import { ICON_STATUS, ICON_CHANNELS } from './NavRail.js';
 import { defaultAvatarSvg } from '../lib/avatar.js';
 import { loadFollowedChannels, saveFollowedChannels } from '../lib/updates-content.js';
+import {
+  fetchPublishedStatuses,
+  loadCachedStatuses,
+  SOCIAL_NETWORKS,
+} from '../lib/status-db.js';
+import { openStatusPurchaseModal } from './StatusPurchaseModal.js';
+import { escapeHtml } from '../lib/utils.js';
 
 const ICON_PLUS = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/></svg>';
 const ICON_BACK = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 5-7 7 7 7"/></svg>';
 const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
-function avatar(entry, status = false) {
+function avatar(entry, status = false, hasStory = false, isImpulsionado = false) {
   const el = document.createElement('span');
-  el.className = `updates-avatar${status ? ' updates-avatar--status' : ''}`;
-  if (entry.avatar) {
+  const storyClasses = hasStory ? ` has-story${isImpulsionado ? ' is-impulsionado' : ''}` : '';
+  el.className = `updates-avatar${status ? ' updates-avatar--status' : ''}${storyClasses}`;
+  const pic = entry.avatar || entry.profile_pic;
+  if (pic) {
     const img = document.createElement('img');
-    img.src = entry.avatar;
+    img.src = pic;
     img.alt = '';
     el.appendChild(img);
   } else {
-    el.innerHTML = defaultAvatarSvg(entry.id); // Generated SVG, no user markup.
+    el.innerHTML = defaultAvatarSvg(entry.id);
   }
   return el;
 }
@@ -29,12 +38,28 @@ export function renderUpdatesPanel({ kind, entries, onSelect }) {
   panel.innerHTML = `
     <header class="updates-header">
       <h1>${channels ? 'Canais' : 'Status'}</h1>
-      <button class="updates-add" disabled aria-label="${channels ? 'Criar canal' : 'Adicionar status'}" title="Publicação disponível futuramente">${ICON_PLUS}</button>
+      <button class="updates-add" aria-label="${channels ? 'Criar canal' : 'Contratar status'}" title="${channels ? 'Publicação disponível futuramente' : 'Contratar e publicar novo status'}">${ICON_PLUS}</button>
     </header>
     ${channels ? `<label class="updates-search">${ICON_SEARCH}<input type="search" placeholder="Pesquisar" aria-label="Pesquisar canais" autocomplete="off"/></label>` : ''}
     <div class="updates-list"></div>
-    <p class="updates-note">Simulação visual · imagens em breve</p>
+    <p class="updates-note">Simulação visual · imagens em tempo real</p>
   `;
+
+  const addBtn = panel.querySelector('.updates-add');
+  if (channels) {
+    addBtn.disabled = true;
+  } else {
+    addBtn.disabled = false;
+    addBtn.addEventListener('click', () => {
+      openStatusPurchaseModal({
+        onPublished: (pub) => {
+          draw();
+          onSelect(pub.id);
+        },
+      });
+    });
+  }
+
   const list = panel.querySelector('.updates-list');
   const followed = loadFollowedChannels();
   let expanded = false;
@@ -47,16 +72,20 @@ export function renderUpdatesPanel({ kind, entries, onSelect }) {
     list.appendChild(el);
   }
 
-  function row(entry, self = false) {
+  function row(entry, self = false, isPurchased = false) {
     const wrap = document.createElement('div');
     wrap.className = 'updates-row';
     wrap.dataset.id = entry.id;
     wrap.classList.toggle('active', entry.id === selected);
+
     const open = document.createElement('button');
     open.type = 'button';
     open.className = 'updates-open';
-    open.setAttribute('aria-label', `${channels ? 'Abrir canal' : 'Ver status'} de ${entry.name}`);
-    const photo = avatar(entry, !channels && !self);
+    open.setAttribute('aria-label', `${channels ? 'Abrir canal' : 'Ver status'} de ${entry.profile_name || entry.name}`);
+
+    const isImp = entry.plan_type === 'status_impulsionado';
+    const photo = avatar(entry, !channels && !self, isPurchased, isImp);
+
     if (!channels && self) {
       const plus = document.createElement('span');
       plus.className = 'updates-avatar-plus';
@@ -64,18 +93,41 @@ export function renderUpdatesPanel({ kind, entries, onSelect }) {
       photo.appendChild(plus);
     }
     open.appendChild(photo);
+
     const text = document.createElement('span');
     text.className = 'updates-row-text';
+
     const name = document.createElement('span');
     name.className = 'updates-row-name';
-    name.textContent = !channels && self ? 'Meu status' : entry.name;
+
+    if (!channels && self) {
+      name.textContent = 'Meu status';
+    } else if (isPurchased) {
+      name.innerHTML = `${escapeHtml(entry.profile_name || entry.name)}${isImp ? '<span class="updates-status-badge-boost">Impulsionado</span>' : ''}`;
+    } else {
+      name.textContent = entry.name;
+    }
+
     const subtitle = document.createElement('span');
     subtitle.className = 'updates-row-subtitle';
-    subtitle.textContent = channels ? 'Nenhuma publicação ainda' : self ? 'Daniel Vorcaro · sem atualizações' : 'Nenhum status publicado';
+
+    if (channels) {
+      subtitle.textContent = 'Nenhuma publicação ainda';
+    } else if (self) {
+      subtitle.textContent = 'Daniel Vorcaro · sem atualizações';
+    } else if (isPurchased) {
+      const network = (entry.social_network || 'social').toUpperCase();
+      const filesCount = entry.media_files?.length || entry.file_count || 1;
+      subtitle.textContent = `${entry.user_handle || '@user'} · ${network} (${filesCount} mídias)`;
+    } else {
+      subtitle.textContent = 'Nenhum status publicado';
+    }
+
     text.append(name, subtitle);
     open.appendChild(text);
     open.addEventListener('click', () => onSelect(entry.id));
     wrap.appendChild(open);
+
     if (channels && !self) {
       const follow = document.createElement('button');
       follow.className = 'updates-follow';
@@ -92,6 +144,7 @@ export function renderUpdatesPanel({ kind, entries, onSelect }) {
       });
       wrap.appendChild(follow);
     }
+
     list.appendChild(wrap);
   }
 
@@ -101,6 +154,7 @@ export function renderUpdatesPanel({ kind, entries, onSelect }) {
     const matching = entries.filter(entry => normalize(entry.name).includes(term));
     const own = matching.find(entry => entry.id === 'vorcaro');
     if (own) row(own, true);
+
     if (channels) {
       const following = matching.filter(entry => entry.id !== 'vorcaro' && followed.has(entry.id));
       if (following.length) {
@@ -121,28 +175,60 @@ export function renderUpdatesPanel({ kind, entries, onSelect }) {
         }
       }
     } else {
+      // Status mode: include purchased/published statuses from PostgreSQL / cache
+      const cached = loadCachedStatuses();
+      const filteredPurchased = cached.filter(p =>
+        normalize(p.profile_name || '').includes(term) ||
+        normalize(p.user_handle || '').includes(term)
+      );
+
+      if (filteredPurchased.length > 0) {
+        heading('Atualizações recentes');
+        filteredPurchased.forEach(pub => row(pub, false, true));
+      }
+
       heading('Contatos · aguardando atualizações');
       matching.filter(entry => entry.id !== 'vorcaro').forEach(entry => row(entry));
     }
+
     if (!matching.length) {
       const empty = document.createElement('p');
       empty.className = 'updates-no-results';
       empty.setAttribute('role', 'status');
-      empty.textContent = 'Nenhum canal encontrado.';
+      empty.textContent = channels ? 'Nenhum canal encontrado.' : 'Nenhum status encontrado.';
       list.appendChild(empty);
     }
   }
+
   panel.querySelector('input')?.addEventListener('input', draw);
   panel.setActive = id => {
     selected = id;
     panel.querySelectorAll('.updates-row').forEach(row => row.classList.toggle('active', row.dataset.id === id));
   };
+
+  window.addEventListener('status:published', () => {
+    draw();
+  });
+
+  // Background sync with PostgreSQL
+  if (!channels) {
+    fetchPublishedStatuses().then(() => draw());
+  }
+
   draw();
   return panel;
 }
 
 export function renderUpdatesDetail(container, { kind, entry, onBack, onConversation }) {
   const channels = kind === 'channels';
+
+  // Check if entry is a purchased/published status with media files
+  const isPurchasedStatus = entry && (entry.media_files || entry.social_network);
+
+  if (isPurchasedStatus) {
+    return renderStoryViewer(container, { entry, onBack });
+  }
+
   const el = document.createElement('section');
   el.className = `updates-detail updates-detail--${kind}${entry ? ' has-selection' : ''}`;
   const header = document.createElement('header');
@@ -177,6 +263,7 @@ export function renderUpdatesDetail(container, { kind, entry, onBack, onConversa
     ? 'Aqui entrarão simulações com imagens públicas de Daniel Vorcaro e seus contatos. Siga os canais que deseja acompanhar.'
     : 'Aqui entrarão simulações de status com imagens públicas de Daniel Vorcaro e seus contatos.';
   body.append(badge, heading, text);
+
   if (entry?.conversationId) {
     const chat = document.createElement('button');
     chat.className = 'updates-open-conversation';
@@ -184,6 +271,158 @@ export function renderUpdatesDetail(container, { kind, entry, onBack, onConversa
     chat.addEventListener('click', () => onConversation(entry.conversationId));
     body.appendChild(chat);
   }
+
   el.appendChild(body);
   container.replaceChildren(el);
+  return el;
+}
+
+function renderStoryViewer(container, { entry, onBack }) {
+  const mediaList = entry.media_files && entry.media_files.length > 0
+    ? entry.media_files
+    : [{ id: 'm1', name: 'Story', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80' }];
+
+  let activeIdx = 0;
+  let timerId = null;
+  let isPaused = false;
+  let remainingTime = 5000;
+  let startTime = Date.now();
+  const SLIDE_DURATION = 5000;
+
+  const playerEl = document.createElement('section');
+  playerEl.className = 'story-player';
+
+  function exitViewer() {
+    clearTimeout(timerId);
+    onBack();
+  }
+
+  function startTimer(duration = SLIDE_DURATION) {
+    clearTimeout(timerId);
+    remainingTime = duration;
+    startTime = Date.now();
+    isPaused = false;
+    playerEl.classList.remove('is-paused');
+
+    timerId = setTimeout(() => {
+      if (activeIdx < mediaList.length - 1) {
+        activeIdx++;
+        drawStory();
+      } else {
+        exitViewer();
+      }
+    }, duration);
+  }
+
+  function pauseTimer() {
+    if (isPaused) return;
+    isPaused = true;
+    clearTimeout(timerId);
+    const elapsed = Date.now() - startTime;
+    remainingTime = Math.max(500, remainingTime - elapsed);
+    playerEl.classList.add('is-paused');
+  }
+
+  function resumeTimer() {
+    if (!isPaused) return;
+    startTimer(remainingTime);
+  }
+
+  function drawStory() {
+    startTimer(SLIDE_DURATION);
+    const currentMedia = mediaList[activeIdx] || mediaList[0];
+    const net = SOCIAL_NETWORKS[entry.social_network] || SOCIAL_NETWORKS.instagram;
+
+    playerEl.innerHTML = `
+      <div class="story-progress-bar">
+        ${mediaList.map((m, idx) => `
+          <div class="story-progress-seg ${idx === activeIdx ? 'active' : (idx < activeIdx ? 'passed' : '')}"></div>
+        `).join('')}
+      </div>
+
+      <header class="story-header">
+        <div class="story-header-user">
+          <div class="story-header-avatar">
+            ${entry.profile_pic
+              ? `<img src="${entry.profile_pic}" alt="${escapeHtml(entry.profile_name)}" />`
+              : defaultAvatarSvg(entry.id)
+            }
+          </div>
+          <div>
+            <div class="story-header-name">
+              ${escapeHtml(entry.profile_name)}
+              ${entry.plan_type === 'status_impulsionado' ? '<span class="updates-status-badge-boost">Impulsionado</span>' : ''}
+            </div>
+            <div class="story-header-meta">${escapeHtml(entry.user_handle)} · ${net.name}</div>
+          </div>
+        </div>
+        <button type="button" class="story-close-btn" aria-label="Fechar status">&times;</button>
+      </header>
+
+      <div class="story-media-box">
+        <img src="${currentMedia.url}" alt="${escapeHtml(currentMedia.name)}" class="story-media-image" />
+
+        ${mediaList.length > 1 ? `
+          <button type="button" class="story-nav-btn prev" aria-label="Mídia anterior" ${activeIdx === 0 ? 'style="display:none;"' : ''}>&#10094;</button>
+          <button type="button" class="story-nav-btn next" aria-label="Próxima mídia" ${activeIdx === mediaList.length - 1 ? 'style="display:none;"' : ''}>&#10095;</button>
+        ` : ''}
+      </div>
+
+      <footer class="story-footer">
+        ${entry.caption ? `
+          <div class="story-caption-box">
+            <p class="story-caption-text">${escapeHtml(entry.caption)}</p>
+          </div>
+        ` : ''}
+
+        <a href="${entry.social_link}" target="_blank" rel="noopener noreferrer" class="story-social-btn" style="background: ${net.color};">
+          ${net.icon}
+          <span>Visitar perfil no ${net.name} (${escapeHtml(entry.user_handle)}) ↗</span>
+        </a>
+
+        <button type="button" class="story-publish-more-btn">
+          + Contratar e publicar outro status
+        </button>
+      </footer>
+    `;
+
+    playerEl.querySelector('.story-close-btn')?.addEventListener('click', exitViewer);
+
+    const mediaBox = playerEl.querySelector('.story-media-box');
+    mediaBox?.addEventListener('pointerdown', pauseTimer);
+    mediaBox?.addEventListener('pointerup', resumeTimer);
+    mediaBox?.addEventListener('pointercancel', resumeTimer);
+    mediaBox?.addEventListener('pointerleave', resumeTimer);
+
+    playerEl.querySelector('.story-nav-btn.prev')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (activeIdx > 0) {
+        activeIdx--;
+        drawStory();
+      }
+    });
+
+    playerEl.querySelector('.story-nav-btn.next')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (activeIdx < mediaList.length - 1) {
+        activeIdx++;
+        drawStory();
+      } else {
+        exitViewer();
+      }
+    });
+
+    playerEl.querySelector('.story-publish-more-btn')?.addEventListener('click', () => {
+      clearTimeout(timerId);
+      openStatusPurchaseModal({
+        onPublished: (pub) => {
+          window.location.hash = `#/status/${pub.id}`;
+        },
+      });
+    });
+  }
+
+  drawStory();
+  container.replaceChildren(playerEl);
+  return playerEl;
 }

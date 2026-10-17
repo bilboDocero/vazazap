@@ -32,6 +32,7 @@ import { renderCommercialDetail } from './components/CommercialDetail.js';
 import { renderVitrinePanel } from './components/VitrinePanel.js';
 import { renderVitrineDetail } from './components/VitrineDetail.js';
 import { getVitrinesCatalog } from './lib/commercial-content.js';
+import { loadCachedStatuses } from './lib/status-db.js';
 import { exportUrl, EXPORT_ALL_URL, downloadFile } from './lib/export.js';
 import { copyText } from './lib/utils.js';
 
@@ -558,7 +559,11 @@ async function init() {
       currentConversationId = null;
       setActiveConversation(sidebar, null);
       const entries = updatesCatalog[kind];
-      const entry = entries.find(item => item.id === id) || null;
+      let entry = entries.find(item => item.id === id) || null;
+      if (!entry && kind === 'status' && id) {
+        const cached = loadCachedStatuses();
+        entry = cached.find(item => item.id === id) || null;
+      }
       if (!activeUpdates?.panel.isConnected || activeUpdates.kind !== kind) {
         const panel = renderUpdatesPanel({ kind, entries, onSelect: selected => router.navigate(kind, selected) });
         sidebar.showSection(kind, panel);
@@ -657,7 +662,7 @@ async function init() {
     renderCommercialDetail(mainArea, {
       activeSection: activeItem,
       onBack: () => router.navigate('home'),
-      onNavigateTab: (targetRoute) => router.navigate(targetRoute),
+      onNavigateTab: (targetRoute, targetId) => router.navigate(targetRoute, targetId),
       onShowToast: (msg) => showToast(mainArea, msg),
     });
   });

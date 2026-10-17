@@ -100,3 +100,228 @@
   .updates-detail-icon { width: 64px; height: 64px; margin-bottom: 16px; }
   .updates-detail-icon svg { width: 32px; height: 32px; }
 }
+
+/* ── Status Story Viewer Styles ──────────────────── */
+.story-player {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: #0B141A;
+  color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+}
+
+.story-progress-bar {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px 8px;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.story-progress-seg {
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.story-progress-seg.passed {
+  background: #FFFFFF;
+}
+
+.story-progress-seg.active::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #FFFFFF;
+  animation: storyProgress 5s linear forwards;
+}
+
+@keyframes storyProgress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.story-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  z-index: 10;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+}
+
+.story-header-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.story-header-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #00A884;
+}
+
+.story-header-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.story-header-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.story-header-meta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.story-close-btn {
+  border: 0;
+  background: transparent;
+  color: #FFFFFF;
+  font-size: 26px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.story-media-box {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.story-media-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.story-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: #FFFFFF;
+  border: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  transition: background .15s ease;
+  z-index: 5;
+}
+
+.story-nav-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.story-nav-btn.prev {
+  left: 16px;
+}
+
+.story-nav-btn.next {
+  right: 16px;
+}
+
+.story-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px 24px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+  z-index: 10;
+}
+
+.story-caption-box {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  padding: 8px 16px;
+  border-radius: 20px;
+  max-width: 80%;
+  text-align: center;
+}
+
+.story-caption-text {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.story-social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform .15s ease, filter .15s ease;
+}
+
+.story-social-btn:hover {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
+
+.story-publish-more-btn {
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.story-publish-more-btn:hover {
+  color: #00A884;
+  text-decoration: underline;
+}
+
+.updates-avatar--status.has-story {
+  border: 2.5px solid #00A884;
+  padding: 2px;
+}
+
+.updates-avatar--status.has-story.is-impulsionado {
+  border: 2.5px solid #00A884;
+  box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.3);
+}
+
+.updates-status-badge-boost {
+  font-size: 10px;
+  font-weight: 700;
+  color: #15803D;
+  background: #DCFCE7;
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-left: 6px;
+  text-transform: uppercase;
+}
