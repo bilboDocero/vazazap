@@ -56,7 +56,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
       <button class="sidebar-tag active" data-filter="todas">Todas</button>
       <button class="sidebar-tag" data-filter="nao-lidas">Não lidas <span class="sidebar-tag-count"></span></button>
       <button class="sidebar-tag" data-filter="favoritas">Favoritas</button>
-      <button class="sidebar-tag disabled" disabled title="Este acervo não contém grupos">Grupos</button>
+      <button class="sidebar-tag" data-filter="grupos">Grupos</button>
       <button class="sidebar-tag sidebar-tag--calls" data-action="calls" data-tab="calls" aria-label="Ver chamadas">Chamadas</button>
     </div>
     <div class="conversation-list" role="list"></div>
@@ -98,7 +98,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
 
     const lastPreview = escapeHtml(conv.last_message?.content || '');
     const displayName = escapeHtml(
-      conv.participants.find(p => p !== 'DV') || conv.participants[0]
+      conv.group_name || conv.name || (conv.participants.find(p => p !== 'DV') || conv.participants[0])
     );
     const msgCount = conv.total_messages ? formatNumber(conv.total_messages) : '';
 
@@ -163,6 +163,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   function matchesFilter(conv) {
     if (activeFilter === 'nao-lidas') return isUnread(conv);
     if (activeFilter === 'favoritas') return FAVORITE_CONVERSATIONS.has(conv.id);
+    if (activeFilter === 'grupos') return Boolean(conv.is_group || conv.group_name || conv.id === 'ciro-daniel-fabio-hugo');
     return true;
   }
 
@@ -198,7 +199,11 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
     emptyMsg.style.display = visible ? 'none' : '';
     emptyMsg.textContent = activeFilter === 'nao-lidas'
       ? 'Você já abriu todas as conversas.'
-      : 'Nenhuma conversa aqui.';
+      : (activeFilter === 'grupos'
+          ? 'Nenhum grupo encontrado.'
+          : (activeFilter === 'favoritas'
+              ? 'Nenhuma conversa favorita.'
+              : 'Nenhuma conversa aqui.'));
     // The lock note belongs at the end of the real list, not of an empty one.
     lockMsg.style.display = visible ? '' : 'none';
   }

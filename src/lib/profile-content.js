@@ -496,6 +496,18 @@ export const OTHER_PROFILES = {
       ],
     }],
   },
+
+  'ciro-daniel-fabio-hugo': {
+    about: 'Grupo de WhatsApp',
+    sections: [{
+      title: 'Grupo "Ciro Daniel Fábio Hugo"',
+      paragraphs: [
+        { text: 'Grupo de WhatsApp criado em abril de 2024 por Ciro Nogueira, reunindo Daniel Vorcaro, Fábio Faria e Hugo Motta. Teve a existência revelada pelo UOL e pelo Correio da Manhã em 30 de setembro de 2026.' },
+        { text: 'A perícia da Polícia Federal identificou mensagens trocadas entre agosto e novembro de 2025. O grupo era utilizado para marcar jantares e encontros em Brasília, na residência de Vorcaro, e para articular pautas institucionais e políticas no Congresso Nacional.' },
+        { text: 'As mensagens aqui presentes contam com transcrição simulada dos temas e registros jornalísticos apurados, com arquivo estruturado para atualização posterior conforme a íntegra dos autos for liberada.' },
+      ],
+    }],
+  },
 };
 
 /**

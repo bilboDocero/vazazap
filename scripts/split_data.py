@@ -303,8 +303,8 @@ def split_conversation(conv_id, data, index):
             "sender": last_msg["sender"],
         } if last_msg else None,
     }
-    for key in ("phone", "saved_as", "source", "note"):
-        if metadata.get(key):
+    for key in ("phone", "saved_as", "source", "note", "is_group", "group_name"):
+        if metadata.get(key) is not None:
             entry[key] = metadata[key]
     if str(metadata.get("source", "")).startswith("IPJ-A") and REPORT_DOCUMENT:
         entry["source_document"] = REPORT_DOCUMENT

@@ -36,7 +36,7 @@ const BACK_ICON = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" s
  * @param {Array} messages
  * @returns {HTMLElement}
  */
-function renderDaySection(date, messages) {
+function renderDaySection(date, messages, isGroup = false) {
   const section = document.createElement('section');
   section.className = 'chat-day';
   section.dataset.date = date;
@@ -50,7 +50,7 @@ function renderDaySection(date, messages) {
   // Messages
   let previous = null;
   for (const msg of messages) {
-    const row = renderMessage(msg);
+    const row = renderMessage(msg, isGroup);
     const gap = previous ? new Date(msg.timestamp) - new Date(previous.timestamp) : Infinity;
     const grouped = previous && previous.sender === msg.sender && previous.type !== 'system'
       && msg.type !== 'system' && gap >= 0 && gap < 5 * 60 * 1000;
@@ -414,12 +414,20 @@ function renderDeletedMessage() {
   return el;
 }
 
+function getSenderColor(sender) {
+  const colors = ['#1FAF38', '#E53935', '#0063CB', '#8257E5', '#D97706', '#0284C7', '#C2185B'];
+  let hash = 0;
+  for (let i = 0; i < sender.length; i++) hash = sender.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
+}
+
 /**
  * Render a single message bubble.
  * @param {object} msg
+ * @param {boolean} [isGroup=false]
  * @returns {HTMLElement}
  */
-function renderMessage(msg) {
+function renderMessage(msg, isGroup = false) {
   const isOutgoing = msg.sender === 'DV';
   const isSystem = msg.type === 'system';
 
@@ -437,6 +445,14 @@ function renderMessage(msg) {
 
   const bubble = document.createElement('div');
   bubble.className = `chat-msg-bubble ${isOutgoing ? 'outgoing' : 'incoming'}`;
+
+  if (isGroup && !isOutgoing && !isSystem && msg.sender) {
+    const senderEl = document.createElement('div');
+    senderEl.className = 'chat-msg-sender';
+    senderEl.style.color = getSenderColor(msg.sender);
+    senderEl.textContent = msg.sender;
+    bubble.appendChild(senderEl);
+  }
 
   const content = document.createElement('div');
   content.className = 'chat-msg-content';
@@ -543,7 +559,8 @@ export function renderChatView(container, { conversation, dateIndex, loadMessage
   el.className = 'chat-view';
 
   // Header
-  const displayName = conversation.participants.find(p => p !== 'DV') || conversation.participants[0];
+  const isGroup = Boolean(conversation.is_group || conversation.group_name || conversation.id === 'ciro-daniel-fabio-hugo');
+  const displayName = conversation.group_name || conversation.name || (conversation.participants.find(p => p !== 'DV') || conversation.participants[0]);
 
   const header = document.createElement('header');
   header.className = 'chat-header';
@@ -589,7 +606,12 @@ export function renderChatView(container, { conversation, dateIndex, loadMessage
 
   const subtitleEl = document.createElement('div');
   subtitleEl.className = 'chat-header-info';
-  subtitleEl.textContent = `${conversation.total_messages.toLocaleString('pt-BR')} mensagens`;
+  if (isGroup) {
+    const others = conversation.participants.filter(p => p !== 'DV').join(', ');
+    subtitleEl.textContent = `${conversation.participants.length} participantes: Você, ${others}`;
+  } else {
+    subtitleEl.textContent = `${conversation.total_messages.toLocaleString('pt-BR')} mensagens`;
+  }
   infoEl.appendChild(subtitleEl);
 
   header.appendChild(infoEl);
@@ -746,7 +768,7 @@ export function renderChatView(container, { conversation, dateIndex, loadMessage
     container: messagesArea,
     dateIndex,
     loadMessages,
-    renderDay: (date, messages) => renderDaySection(date, messages),
+    renderDay: (date, messages) => renderDaySection(date, messages, isGroup),
   });
 
   return { element: el, loader };
