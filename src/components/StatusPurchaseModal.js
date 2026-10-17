@@ -2,6 +2,8 @@
  * StatusPurchaseModal component — handles the purchase flow and publication
  * of a Status (Normal or Impulsionado) with Asaas real payment integration
  * (PIX QR Code / Copia e Cola & Cartão de Crédito) and PostgreSQL persistence.
+ *
+ * Flow: 1. Plano -> 2. Edição -> 3. Pagamento -> 4. Preview
  */
 
 import {
@@ -32,33 +34,12 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
   modalEl.setAttribute('aria-modal', 'true');
   modalEl.setAttribute('aria-label', 'Contratar Status / Story');
 
-  // State
-  let currentStep = 1; // 1: Plano, 2: Pagamento, 3: Edição, 4: Pré-visualização
+  // State: Standardized sequence [1. Plano -> 2. Edição -> 3. Pagamento -> 4. Preview]
+  let currentStep = 1;
   let selectedPlan = initialPlan;
   let fileCount = 1;
 
-  // Payment State (Asaas v3)
-  let selectedBillingType = 'PIX'; // 'PIX' | 'CREDIT_CARD'
-  let customerName = '';
-  let customerCpf = '';
-  let customerEmail = '';
-  let customerPhone = '';
-  let asaasPaymentId = null;
-  let statusRecordId = `status-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-  let pixData = null; // { encodedImage, payload, expirationDate }
-  let isProcessingPayment = false;
-  let paymentError = '';
-  let pollIntervalId = null;
-
-  // Credit Card Form State
-  let cardHolderName = '';
-  let cardNumber = '';
-  let cardExpiry = '';
-  let cardCcv = '';
-  let cardCep = '';
-  let cardAddressNumber = '';
-
-  // Content & Profile State
+  // Content & Profile State (captured in Step 2: Edição)
   let profilePicData = '';
   let profileName = '';
   let userHandle = '';
@@ -68,6 +49,25 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
   let selectedNetwork = 'instagram';
   let previewActiveIdx = 0;
   let uploadError = '';
+
+  // Payment State (Asaas v3, captured in Step 3: Pagamento)
+  let selectedBillingType = 'PIX'; // 'PIX' | 'CREDIT_CARD'
+  let customerCpf = '';
+  let asaasPaymentId = null;
+  let statusRecordId = `status-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  let pixData = null; // { encodedImage, payload, expirationDate }
+  let isProcessingPayment = false;
+  let paymentError = '';
+  let paymentApproved = false;
+  let pollIntervalId = null;
+
+  // Credit Card Form State
+  let cardHolderName = '';
+  let cardNumber = '';
+  let cardExpiry = '';
+  let cardCcv = '';
+  let cardCep = '';
+  let cardAddressNumber = '';
 
   function stopPolling() {
     if (pollIntervalId) {
@@ -96,7 +96,8 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         const data = await res.json();
         if (data.ok && data.isPaid) {
           stopPolling();
-          currentStep = 3; // Advance to edit step
+          paymentApproved = true;
+          currentStep = 4; // Advance to Preview!
           render();
         }
       } catch (err) {
@@ -112,10 +113,10 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       <div class="status-modal-dialog">
         <header class="status-modal-header">
           <div class="status-modal-steps">
-            <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">Plano</span>
-            <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">Pagamento</span>
-            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">Edição</span>
-            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">Preview</span>
+            <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">1. Plano</span>
+            <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">2. Edição</span>
+            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">3. Pagamento</span>
+            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">4. Preview</span>
           </div>
           <button class="status-modal-close" aria-label="Fechar modal">&times;</button>
         </header>
@@ -192,28 +193,133 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             </div>
           </div>
 
-          <button type="button" class="status-btn-primary btn-advance-payment">
-            Avançar para Pagamento (${pricing.formattedTotal})
+          <button type="button" class="status-btn-primary btn-advance-to-edit">
+            Avançar para Edição (${pricing.formattedTotal}) &rarr;
           </button>
         </div>
       `;
     }
 
-    // ── STEP 2: Pagamento Real Asaas v3 (PIX / Cartão) ────────
+    // ── STEP 2: Edição do Story (Foto, Nome, @User, Mídias) ──
     if (currentStep === 2) {
+      const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
+      const activeFile = (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length)
+        ? uploadedFiles[activeFileIndex]
+        : null;
+      const currentCaption = activeFile ? (activeFile.caption || '') : (caption || '');
+
+      return `
+        <div class="status-step-upload">
+          <h2 class="status-modal-title">Configurar seu Story</h2>
+          <p class="status-modal-desc">Informe seu nome ou marca, seu @usuário e selecione até ${fileCount} foto${fileCount > 1 ? 's' : ''}.</p>
+
+          <form class="status-publish-form">
+            <div class="status-profile-section">
+              <div class="status-avatar-upload-box">
+                <div class="status-avatar-preview">
+                  ${profilePicData
+                    ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" class="status-avatar-img" />`
+                    : `<div class="status-avatar-placeholder">${ICON_CAMERA}</div>`
+                  }
+                </div>
+                <label class="status-avatar-btn">
+                  <span>${profilePicData ? 'Alterar foto' : 'Enviar foto'}</span>
+                  <input type="file" class="input-profile-pic" accept="image/jpeg,image/png,image/webp" style="display:none;" />
+                </label>
+              </div>
+
+              <div class="status-names-group">
+                <label class="status-field-label">
+                  <span>Nome da Marca / Anunciante:</span>
+                  <input type="text" class="status-text-input input-profile-name" placeholder="Ex: Loja do Vorcaro" value="${escapeAttr(profileName)}" maxlength="60" required />
+                </label>
+
+                <div class="status-social-pick">
+                  <div class="status-social-networks">
+                    ${Object.entries(SOCIAL_NETWORKS).map(([key, net]) => `
+                      <button type="button" class="status-network-btn ${selectedNetwork === key ? 'active' : ''}" data-net="${key}" title="${net.name}">
+                        ${net.icon}
+                      </button>
+                    `).join('')}
+                  </div>
+                  <input type="text" class="status-text-input input-user-handle" placeholder="@seu.perfil" value="${escapeAttr(userHandle)}" maxlength="40" required />
+                </div>
+              </div>
+            </div>
+
+            <div class="status-link-preview-box">
+              <span class="status-link-preview-label">Link de destino do Story:</span>
+              <span class="status-link-preview-url"></span>
+            </div>
+
+            <div class="status-media-upload-section">
+              <div class="status-media-header">
+                <label class="status-field-label">
+                  <span>Fotos do Story (${uploadedFiles.length} de ${fileCount} anexadas)</span>
+                  <small class="status-media-hint">Formato 9:16 vertical (JPG, PNG ou WEBP). Vídeos não são permitidos.</small>
+                </label>
+              </div>
+
+              <div class="status-uploaded-grid">
+                ${uploadedFiles.map((f, i) => `
+                  <div class="status-uploaded-tile ${i === activeFileIndex ? 'selected' : ''}" data-id="${f.id}" title="Clique para editar a legenda desta imagem">
+                    <img src="${sanitizeUrl(f.url, true)}" alt="${escapeHtml(f.name)}" />
+                    <button type="button" class="status-tile-delete-btn" data-id="${f.id}" aria-label="Remover">&times;</button>
+                    <span class="status-tile-order-badge">${i + 1}</span>
+                  </div>
+                `).join('')}
+
+                ${uploadedFiles.length < fileCount ? `
+                  <label class="status-tile-add-btn">
+                    <input type="file" class="input-media-file" accept="image/jpeg,image/png,image/webp" style="display:none;" />
+                    ${ICON_PLUS_SIGN}
+                    <span>Anexar foto ${uploadedFiles.length + 1}</span>
+                  </label>
+                ` : ''}
+              </div>
+
+              ${uploadError ? `<div class="status-upload-error">${escapeHtml(uploadError)}</div>` : ''}
+
+              <div class="status-caption-box-wrapper">
+                <label class="status-field-label">
+                  <span>${activeFile ? `Legenda do arquivo #${activeFileIndex + 1} (${escapeHtml(activeFile.name)})` : 'Legenda do Story (opcional)'}:</span>
+                </label>
+                <textarea class="status-textarea input-caption" placeholder="Escreva a legenda que aparecerá no rodapé do Story..." rows="2" maxlength="300">${escapeHtml(currentCaption)}</textarea>
+              </div>
+            </div>
+
+            <div class="status-form-actions">
+              <button type="button" class="status-btn-primary btn-advance-to-payment">
+                Avançar para Pagamento (${pricing.formattedTotal}) &rarr;
+              </button>
+              <button type="button" class="btn-back-to-step1" style="margin-top: 10px; width: 100%; border: 0; background: transparent; color: #64748B; font-size: 13px; cursor: pointer; text-decoration: underline;">
+                &larr; Voltar para escolha do plano
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+    }
+
+    // ── STEP 3: Pagamento com Fricção Mínima (Nome já herdado) ─
+    if (currentStep === 3) {
       return `
         <div class="status-step-payment" style="text-align: left; width: 100%;">
           <h2 class="status-modal-title" style="text-align: center;">Pagamento Seguro via Asaas</h2>
-          <p class="status-modal-desc" style="text-align: center;">Escolha sua forma de pagamento. Confirmação instantânea para liberação do Story.</p>
+          <p class="status-modal-desc" style="text-align: center;">Liberação instantânea do seu Story com verificação automática.</p>
 
           <div class="status-receipt-box" style="margin-bottom: 16px;">
             <div class="status-receipt-row">
-              <span>Plano Selecionado:</span>
+              <span>Anunciante:</span>
+              <strong>${escapeHtml(profileName || 'Anunciante')} (${escapeHtml(userHandle ? (userHandle.startsWith('@') ? userHandle : '@' + userHandle) : '@user')})</strong>
+            </div>
+            <div class="status-receipt-row">
+              <span>Plano:</span>
               <strong>${selectedPlan === 'status_impulsionado' ? 'Status Impulsionado' : 'Status Normal'} (${fileCount} arquivo${fileCount > 1 ? 's' : ''})</strong>
             </div>
             <div class="status-receipt-row">
               <span>Valor a pagar:</span>
-              <strong style="color: #008069; font-size: 15px;">${pricing.formattedTotal}</strong>
+              <strong style="color: #008069; font-size: 16px;">${pricing.formattedTotal}</strong>
             </div>
           </div>
 
@@ -235,31 +341,15 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             </button>
           </div>
 
-          <!-- Dados do Pagador -->
-          <div class="payment-grid-2">
-            <div class="payment-input-group">
-              <label class="payment-input-label">Nome Completo</label>
-              <input type="text" class="payment-input-field input-customer-name" placeholder="Ex: João da Silva" value="${escapeAttr(customerName)}" />
-            </div>
-            <div class="payment-input-group">
-              <label class="payment-input-label">CPF / CNPJ</label>
-              <input type="text" class="payment-input-field input-customer-cpf" placeholder="000.000.000-00" value="${escapeAttr(customerCpf)}" maxlength="18" />
-            </div>
-          </div>
-
-          <div class="payment-grid-2">
-            <div class="payment-input-group">
-              <label class="payment-input-label">E-mail</label>
-              <input type="email" class="payment-input-field input-customer-email" placeholder="seu@email.com" value="${escapeAttr(customerEmail)}" />
-            </div>
-            <div class="payment-input-group">
-              <label class="payment-input-label">WhatsApp com DDD</label>
-              <input type="tel" class="payment-input-field input-customer-phone" placeholder="(11) 98765-4321" value="${escapeAttr(customerPhone)}" maxlength="15" />
-            </div>
+          <!-- CPF único obrigatório para emissão -->
+          <div class="payment-input-group" style="margin-bottom: 14px;">
+            <label class="payment-input-label">CPF ou CNPJ para Faturamento</label>
+            <input type="text" class="payment-input-field input-customer-cpf" placeholder="000.000.000-00" value="${escapeAttr(customerCpf)}" maxlength="18" required />
+            <small style="color: #64748B; font-size: 11px; margin-top: 2px;">Exigido pelo Banco Central para registro do Pix/cobrança no Asaas.</small>
           </div>
 
           ${selectedBillingType === 'PIX' ? `
-            <!-- Fluxo PIX -->
+            <!-- Fluxo PIX: Fricção Mínima! -->
             ${pixData ? `
               <div class="pix-qr-container">
                 <span style="font-size: 13px; font-weight: 600; color: #111B21;">Escaneie o QR Code abaixo no app do seu banco:</span>
@@ -290,7 +380,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
               </div>
               <div class="payment-input-group">
                 <label class="payment-input-label">Nome no Cartão</label>
-                <input type="text" class="payment-input-field input-card-holder" placeholder="COMO NO CARTÃO" value="${escapeAttr(cardHolderName)}" />
+                <input type="text" class="payment-input-field input-card-holder" placeholder="COMO NO CARTÃO" value="${escapeAttr(cardHolderName || profileName)}" />
               </div>
             </div>
 
@@ -311,7 +401,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
                 <input type="text" class="payment-input-field input-card-cep" placeholder="01001-000" value="${escapeAttr(cardCep)}" maxlength="9" />
               </div>
               <div class="payment-input-group">
-                <label class="payment-input-label">Número da Residência</label>
+                <label class="payment-input-label">Número</label>
                 <input type="text" class="payment-input-field input-card-num" placeholder="123" value="${escapeAttr(cardAddressNumber)}" />
               </div>
             </div>
@@ -321,119 +411,14 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             </button>
           `}
 
-          <button type="button" class="btn-back-step1" style="margin-top: 14px; width: 100%; border: 0; background: transparent; color: #64748B; font-size: 13px; cursor: pointer; text-decoration: underline;">
-            &larr; Voltar para escolha do plano
+          <button type="button" class="btn-back-to-step2" style="margin-top: 14px; width: 100%; border: 0; background: transparent; color: #64748B; font-size: 13px; cursor: pointer; text-decoration: underline;">
+            &larr; Voltar para edição do story
           </button>
         </div>
       `;
     }
 
-    // ── STEP 3: Configurar o Story ────────────────────────────
-    if (currentStep === 3) {
-      const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
-      const activeFile = (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length)
-        ? uploadedFiles[activeFileIndex]
-        : null;
-      const currentCaption = activeFile ? (activeFile.caption || '') : (caption || '');
-
-      return `
-        <div class="status-step-upload">
-          <div style="text-align: center; margin-bottom: 12px;">
-            <span style="display: inline-block; padding: 4px 12px; background: #DCFCE7; color: #15803D; border-radius: 12px; font-size: 12px; font-weight: 700;">
-              ✓ Pagamento Confirmado
-            </span>
-          </div>
-          <h2 class="status-modal-title">Configurar seu Story</h2>
-          <p class="status-modal-desc">Suba sua foto de perfil, defina seu @usuário e anexe os ${fileCount} arquivo${fileCount > 1 ? 's' : ''} do seu status.</p>
-
-          <form class="status-publish-form">
-            <div class="status-profile-section">
-              <div class="status-avatar-upload-box">
-                <div class="status-avatar-preview">
-                  ${profilePicData
-                    ? `<img src="${sanitizeUrl(profilePicData, true)}" alt="Avatar" class="status-avatar-img" />`
-                    : `<div class="status-avatar-placeholder">${ICON_CAMERA}</div>`
-                  }
-                </div>
-                <label class="status-avatar-btn">
-                  <span>${profilePicData ? 'Alterar foto' : 'Enviar foto'}</span>
-                  <input type="file" class="input-profile-pic" accept="image/jpeg,image/png,image/webp" style="display:none;" />
-                </label>
-              </div>
-
-              <div class="status-names-group">
-                <label class="status-field-label">
-                  <span>Nome do Anunciante / Marca:</span>
-                  <input type="text" class="status-text-input input-profile-name" placeholder="Ex: Loja do Vorcaro" value="${escapeAttr(profileName)}" maxlength="60" required />
-                </label>
-
-                <div class="status-social-pick">
-                  <div class="status-social-networks">
-                    ${Object.entries(SOCIAL_NETWORKS).map(([key, net]) => `
-                      <button type="button" class="status-network-btn ${selectedNetwork === key ? 'active' : ''}" data-net="${key}" title="${net.name}">
-                        ${net.icon}
-                      </button>
-                    `).join('')}
-                  </div>
-                  <input type="text" class="status-text-input input-user-handle" placeholder="@seu.perfil" value="${escapeAttr(userHandle)}" maxlength="40" required />
-                </div>
-              </div>
-            </div>
-
-            <div class="status-link-preview-box">
-              <span class="status-link-preview-label">Link de destino do Story:</span>
-              <span class="status-link-preview-url"></span>
-            </div>
-
-            <!-- Mídia Única por Seleção: Até fileCount arquivos, Máximo 5MB cada, Somente Imagens -->
-            <div class="status-media-upload-section">
-              <div class="status-media-header">
-                <label class="status-field-label">
-                  <span>Fotos do Story (${uploadedFiles.length} de ${fileCount} anexadas)</span>
-                  <small class="status-media-hint">Formato 9:16 vertical (JPG, PNG ou WEBP). Vídeos não são permitidos.</small>
-                </label>
-              </div>
-
-              <div class="status-uploaded-grid">
-                ${uploadedFiles.map((f, i) => `
-                  <div class="status-uploaded-tile ${i === activeFileIndex ? 'selected' : ''}" data-id="${f.id}" title="Clique para editar a legenda desta imagem">
-                    <img src="${sanitizeUrl(f.url, true)}" alt="${escapeHtml(f.name)}" />
-                    <button type="button" class="status-tile-delete-btn" data-id="${f.id}" aria-label="Remover">&times;</button>
-                    <span class="status-tile-order-badge">${i + 1}</span>
-                  </div>
-                `).join('')}
-
-                ${uploadedFiles.length < fileCount ? `
-                  <label class="status-tile-add-btn">
-                    <input type="file" class="input-media-file" accept="image/jpeg,image/png,image/webp" style="display:none;" />
-                    ${ICON_PLUS_SIGN}
-                    <span>Anexar foto ${uploadedFiles.length + 1}</span>
-                  </label>
-                ` : ''}
-              </div>
-
-              ${uploadError ? `<div class="status-upload-error">${escapeHtml(uploadError)}</div>` : ''}
-
-              <!-- Legenda individual para o arquivo ativo -->
-              <div class="status-caption-box-wrapper">
-                <label class="status-field-label">
-                  <span>${activeFile ? `Legenda do arquivo #${activeFileIndex + 1} (${escapeHtml(activeFile.name)})` : 'Legenda do Story (opcional)'}:</span>
-                </label>
-                <textarea class="status-textarea input-caption" placeholder="Escreva a legenda que aparecerá no rodapé do Story..." rows="2" maxlength="300">${escapeHtml(currentCaption)}</textarea>
-              </div>
-            </div>
-
-            <div class="status-form-actions">
-              <button type="button" class="status-btn-primary btn-advance-preview" ${uploadedFiles.length === 0 ? 'disabled' : ''}>
-                Visualizar Story Antes de Publicar &rarr;
-              </button>
-            </div>
-          </form>
-        </div>
-      `;
-    }
-
-    // ── STEP 4: Pré-visualização e Confirmação ─────────────────
+    // ── STEP 4: Pré-visualização e Publicação ─────────────────
     if (currentStep === 4) {
       const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
       const mediaList = uploadedFiles.length > 0 ? uploadedFiles : [];
@@ -442,10 +427,16 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
 
       return `
         <div class="status-step-preview">
+          <div style="text-align: center; margin-bottom: 8px;">
+            <span style="display: inline-block; padding: 4px 12px; background: #DCFCE7; color: #15803D; border-radius: 12px; font-size: 12px; font-weight: 700;">
+              ✓ Pagamento Confirmado
+            </span>
+          </div>
+
           <div class="status-preview-top-bar">
             <button type="button" class="status-preview-back-btn btn-back-to-edit">
               ${ICON_BACK_ARROW}
-              <span>Voltar e Ajustar</span>
+              <span>Ajustar Edição</span>
             </button>
             <span class="status-preview-step-title">Pré-visualização do Story (${previewActiveIdx + 1} de ${mediaList.length})</span>
           </div>
@@ -516,7 +507,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
   function wireEvents(pricing) {
     modalEl.querySelector('.status-modal-close')?.addEventListener('click', closeModal);
 
-    // ── Events Step 1 ─────────────────────────────────────────
+    // ── Events Step 1: Plano ──────────────────────────────────
     if (currentStep === 1) {
       modalEl.querySelectorAll('input[name="plan"]').forEach(input => {
         input.addEventListener('change', (e) => {
@@ -536,258 +527,14 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         });
       });
 
-      modalEl.querySelector('.btn-advance-payment')?.addEventListener('click', () => {
-        currentStep = 2;
+      modalEl.querySelector('.btn-advance-to-edit')?.addEventListener('click', () => {
+        currentStep = 2; // Advance to Edição!
         render();
       });
     }
 
-    // ── Events Step 2 (Pagamento Asaas) ───────────────────────
+    // ── Events Step 2: Edição ─────────────────────────────────
     else if (currentStep === 2) {
-      // Input formatting
-      const nameInput = modalEl.querySelector('.input-customer-name');
-      const cpfInput = modalEl.querySelector('.input-customer-cpf');
-      const emailInput = modalEl.querySelector('.input-customer-email');
-      const phoneInput = modalEl.querySelector('.input-customer-phone');
-
-      nameInput?.addEventListener('input', e => { customerName = e.target.value; });
-      emailInput?.addEventListener('input', e => { customerEmail = e.target.value; });
-
-      cpfInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 14);
-        if (v.length > 11) {
-          // CNPJ mask
-          v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
-        } else {
-          // CPF mask
-          v = v.replace(/(\d{3})(\d)/, '$1.$2')
-               .replace(/(\d{3})(\d)/, '$1.$2')
-               .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-        }
-        e.target.value = v;
-        customerCpf = v;
-      });
-
-      phoneInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 11);
-        v = v.replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2');
-        e.target.value = v;
-        customerPhone = v;
-      });
-
-      // Switch tab PIX / Cartão
-      modalEl.querySelectorAll('.payment-method-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          selectedBillingType = tab.dataset.type;
-          paymentError = '';
-          stopPolling();
-          pixData = null;
-          render();
-        });
-      });
-
-      // Gerar Pix
-      modalEl.querySelector('.btn-generate-pix')?.addEventListener('click', async () => {
-        if (!customerName.trim()) {
-          paymentError = 'Por favor informe o Nome Completo do pagador.';
-          render();
-          return;
-        }
-        if (customerCpf.replace(/\D/g, '').length < 11) {
-          paymentError = 'Por favor informe um CPF válido (11 dígitos).';
-          render();
-          return;
-        }
-
-        isProcessingPayment = true;
-        paymentError = '';
-        render();
-
-        try {
-          const res = await fetch('/api/payment/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              id: statusRecordId,
-              type: 'status',
-              billingType: 'PIX',
-              plan_type: selectedPlan,
-              file_count: fileCount,
-              customer: {
-                name: customerName.trim(),
-                cpfCnpj: customerCpf,
-                email: customerEmail.trim(),
-                phone: customerPhone,
-              },
-            }),
-          });
-
-          const data = await res.json();
-          isProcessingPayment = false;
-
-          if (!res.ok || !data.ok) {
-            paymentError = data.error || 'Não foi possível gerar a cobrança Pix no Asaas.';
-            render();
-            return;
-          }
-
-          asaasPaymentId = data.paymentId;
-          pixData = data.pix;
-          render();
-
-          // Start polling for payment confirmation
-          startPaymentPolling(data.paymentId, statusRecordId);
-        } catch (err) {
-          isProcessingPayment = false;
-          paymentError = 'Erro de conexão com o servidor de pagamentos: ' + err.message;
-          render();
-        }
-      });
-
-      // Copiar código Pix
-      modalEl.querySelector('.btn-copy-pix')?.addEventListener('click', async (e) => {
-        if (pixData?.payload) {
-          await copyText(pixData.payload);
-          const btn = e.currentTarget;
-          const origText = btn.textContent;
-          btn.textContent = 'Copiado! ✓';
-          setTimeout(() => { btn.textContent = origText; }, 2000);
-        }
-      });
-
-      // Cartão de Crédito Inputs
-      const cardNumInput = modalEl.querySelector('.input-card-number');
-      const cardHolderInput = modalEl.querySelector('.input-card-holder');
-      const cardExpInput = modalEl.querySelector('.input-card-expiry');
-      const cardCcvInput = modalEl.querySelector('.input-card-ccv');
-      const cardCepInput = modalEl.querySelector('.input-card-cep');
-      const cardNumResInput = modalEl.querySelector('.input-card-num');
-
-      cardNumInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 16);
-        v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
-        e.target.value = v;
-        cardNumber = v;
-      });
-
-      cardHolderInput?.addEventListener('input', e => { cardHolderName = e.target.value.toUpperCase(); });
-
-      cardExpInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 4);
-        if (v.length >= 2) v = `${v.slice(0, 2)}/${v.slice(2)}`;
-        e.target.value = v;
-        cardExpiry = v;
-      });
-
-      cardCcvInput?.addEventListener('input', e => {
-        cardCcv = e.target.value.replace(/\D/g, '').slice(0, 4);
-        e.target.value = cardCcv;
-      });
-
-      cardCepInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 8);
-        if (v.length >= 5) v = `${v.slice(0, 5)}-${v.slice(5)}`;
-        e.target.value = v;
-        cardCep = v;
-      });
-
-      cardNumResInput?.addEventListener('input', e => { cardAddressNumber = e.target.value; });
-
-      // Pagar Cartão
-      modalEl.querySelector('.btn-pay-card')?.addEventListener('click', async () => {
-        if (!customerName.trim() || customerCpf.replace(/\D/g, '').length < 11) {
-          paymentError = 'Informe o Nome Completo e CPF válido do titular.';
-          render();
-          return;
-        }
-        if (cardNumber.replace(/\D/g, '').length < 15) {
-          paymentError = 'Informe um número de cartão de crédito válido.';
-          render();
-          return;
-        }
-        if (!cardHolderName.trim()) {
-          paymentError = 'Informe o nome impresso no cartão.';
-          render();
-          return;
-        }
-        if (!cardExpiry.includes('/') || cardExpiry.replace(/\D/g, '').length < 4) {
-          paymentError = 'Validade do cartão inválida (formato MM/AA).';
-          render();
-          return;
-        }
-        if (cardCcv.length < 3) {
-          paymentError = 'Código de segurança (CVV) inválido.';
-          render();
-          return;
-        }
-
-        const [expMonth, expYear] = cardExpiry.split('/');
-        isProcessingPayment = true;
-        paymentError = '';
-        render();
-
-        try {
-          const res = await fetch('/api/payment/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              id: statusRecordId,
-              type: 'status',
-              billingType: 'CREDIT_CARD',
-              plan_type: selectedPlan,
-              file_count: fileCount,
-              customer: {
-                name: customerName.trim(),
-                cpfCnpj: customerCpf,
-                email: customerEmail.trim(),
-                phone: customerPhone,
-              },
-              creditCard: {
-                holderName: cardHolderName.trim(),
-                number: cardNumber,
-                expiryMonth: expMonth.trim(),
-                expiryYear: expYear.trim(),
-                ccv: cardCcv.trim(),
-              },
-              creditCardHolderInfo: {
-                name: customerName.trim(),
-                email: customerEmail.trim(),
-                cpfCnpj: customerCpf,
-                postalCode: cardCep,
-                addressNumber: cardAddressNumber || '1',
-                phone: customerPhone,
-              },
-            }),
-          });
-
-          const data = await res.json();
-          isProcessingPayment = false;
-
-          if (!res.ok || !data.ok) {
-            paymentError = data.error || 'Cartão recusado pela operadora. Verifique os dados ou utilize o Pix.';
-            render();
-            return;
-          }
-
-          asaasPaymentId = data.paymentId;
-          currentStep = 3; // Advance to edit step
-          render();
-        } catch (err) {
-          isProcessingPayment = false;
-          paymentError = 'Falha ao processar pagamento com cartão: ' + err.message;
-          render();
-        }
-      });
-
-      modalEl.querySelector('.btn-back-step1')?.addEventListener('click', () => {
-        stopPolling();
-        currentStep = 1;
-        render();
-      });
-    }
-
-    // ── Events Step 3 ─────────────────────────────────────────
-    else if (currentStep === 3) {
       const handleInput = modalEl.querySelector('.input-user-handle');
       const nameInput = modalEl.querySelector('.input-profile-name');
       const captionInput = modalEl.querySelector('.input-caption');
@@ -935,19 +682,259 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         });
       });
 
-      modalEl.querySelector('.btn-advance-preview')?.addEventListener('click', () => {
+      modalEl.querySelector('.btn-advance-to-payment')?.addEventListener('click', () => {
+        if (!profileName.trim()) {
+          uploadError = 'Por favor informe o Nome da Marca ou Anunciante.';
+          render();
+          return;
+        }
+        if (!userHandle.trim()) {
+          uploadError = 'Por favor informe seu @usuário da rede social.';
+          render();
+          return;
+        }
         if (uploadedFiles.length === 0) {
           uploadError = 'Por favor anexe pelo menos 1 foto para o seu Story.';
           render();
           return;
         }
-        currentStep = 4;
-        previewActiveIdx = 0;
+        uploadError = '';
+        currentStep = 3; // Advance to Pagamento!
+        render();
+      });
+
+      modalEl.querySelector('.btn-back-to-step1')?.addEventListener('click', () => {
+        currentStep = 1;
         render();
       });
     }
 
-    // ── Events Step 4 ─────────────────────────────────────────
+    // ── Events Step 3: Pagamento Asaas (Fricção Mínima) ───────
+    else if (currentStep === 3) {
+      const cpfInput = modalEl.querySelector('.input-customer-cpf');
+
+      cpfInput?.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 14);
+        if (v.length > 11) {
+          v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        } else {
+          v = v.replace(/(\d{3})(\d)/, '$1.$2')
+               .replace(/(\d{3})(\d)/, '$1.$2')
+               .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        }
+        e.target.value = v;
+        customerCpf = v;
+      });
+
+      // Switch tab PIX / Cartão
+      modalEl.querySelectorAll('.payment-method-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          selectedBillingType = tab.dataset.type;
+          paymentError = '';
+          stopPolling();
+          pixData = null;
+          render();
+        });
+      });
+
+      // Gerar Pix (Fricção mínima: nome e handle já herdados da edição!)
+      modalEl.querySelector('.btn-generate-pix')?.addEventListener('click', async () => {
+        if (customerCpf.replace(/\D/g, '').length < 11) {
+          paymentError = 'Por favor informe um CPF ou CNPJ válido.';
+          render();
+          return;
+        }
+
+        isProcessingPayment = true;
+        paymentError = '';
+        render();
+
+        try {
+          const res = await fetch('/api/payment/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: statusRecordId,
+              type: 'status',
+              billingType: 'PIX',
+              plan_type: selectedPlan,
+              file_count: uploadedFiles.length || fileCount,
+              profile_name: profileName,
+              user_handle: userHandle,
+              social_network: selectedNetwork,
+              customer: {
+                name: profileName || 'Anunciante VorcaroZap',
+                cpfCnpj: customerCpf,
+              },
+            }),
+          });
+
+          const data = await res.json();
+          isProcessingPayment = false;
+
+          if (!res.ok || !data.ok) {
+            paymentError = data.error || 'Não foi possível gerar a cobrança Pix no Asaas.';
+            render();
+            return;
+          }
+
+          asaasPaymentId = data.paymentId;
+          pixData = data.pix;
+          render();
+
+          // Inicia polling de verificação automática
+          startPaymentPolling(data.paymentId, statusRecordId);
+        } catch (err) {
+          isProcessingPayment = false;
+          paymentError = 'Erro de conexão com o servidor de pagamentos: ' + err.message;
+          render();
+        }
+      });
+
+      // Copiar código Pix
+      modalEl.querySelector('.btn-copy-pix')?.addEventListener('click', async (e) => {
+        if (pixData?.payload) {
+          await copyText(pixData.payload);
+          const btn = e.currentTarget;
+          const origText = btn.textContent;
+          btn.textContent = 'Copiado! ✓';
+          setTimeout(() => { btn.textContent = origText; }, 2000);
+        }
+      });
+
+      // Cartão de Crédito
+      const cardNumInput = modalEl.querySelector('.input-card-number');
+      const cardHolderInput = modalEl.querySelector('.input-card-holder');
+      const cardExpInput = modalEl.querySelector('.input-card-expiry');
+      const cardCcvInput = modalEl.querySelector('.input-card-ccv');
+      const cardCepInput = modalEl.querySelector('.input-card-cep');
+      const cardNumResInput = modalEl.querySelector('.input-card-num');
+
+      cardNumInput?.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 16);
+        v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+        e.target.value = v;
+        cardNumber = v;
+      });
+
+      cardHolderInput?.addEventListener('input', e => { cardHolderName = e.target.value.toUpperCase(); });
+
+      cardExpInput?.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 4);
+        if (v.length >= 2) v = `${v.slice(0, 2)}/${v.slice(2)}`;
+        e.target.value = v;
+        cardExpiry = v;
+      });
+
+      cardCcvInput?.addEventListener('input', e => {
+        cardCcv = e.target.value.replace(/\D/g, '').slice(0, 4);
+        e.target.value = cardCcv;
+      });
+
+      cardCepInput?.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+        if (v.length >= 5) v = `${v.slice(0, 5)}-${v.slice(5)}`;
+        e.target.value = v;
+        cardCep = v;
+      });
+
+      cardNumResInput?.addEventListener('input', e => { cardAddressNumber = e.target.value; });
+
+      // Pagar Cartão
+      modalEl.querySelector('.btn-pay-card')?.addEventListener('click', async () => {
+        if (customerCpf.replace(/\D/g, '').length < 11) {
+          paymentError = 'Informe um CPF válido para o titular do cartão.';
+          render();
+          return;
+        }
+        if (cardNumber.replace(/\D/g, '').length < 15) {
+          paymentError = 'Informe um número de cartão de crédito válido.';
+          render();
+          return;
+        }
+        const holder = cardHolderName.trim() || profileName.trim();
+        if (!holder) {
+          paymentError = 'Informe o nome impresso no cartão.';
+          render();
+          return;
+        }
+        if (!cardExpiry.includes('/') || cardExpiry.replace(/\D/g, '').length < 4) {
+          paymentError = 'Validade do cartão inválida (formato MM/AA).';
+          render();
+          return;
+        }
+        if (cardCcv.length < 3) {
+          paymentError = 'Código de segurança (CVV) inválido.';
+          render();
+          return;
+        }
+
+        const [expMonth, expYear] = cardExpiry.split('/');
+        isProcessingPayment = true;
+        paymentError = '';
+        render();
+
+        try {
+          const res = await fetch('/api/payment/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: statusRecordId,
+              type: 'status',
+              billingType: 'CREDIT_CARD',
+              plan_type: selectedPlan,
+              file_count: uploadedFiles.length || fileCount,
+              profile_name: profileName,
+              user_handle: userHandle,
+              social_network: selectedNetwork,
+              customer: {
+                name: profileName || holder,
+                cpfCnpj: customerCpf,
+              },
+              creditCard: {
+                holderName: holder,
+                number: cardNumber,
+                expiryMonth: expMonth.trim(),
+                expiryYear: expYear.trim(),
+                ccv: cardCcv.trim(),
+              },
+              creditCardHolderInfo: {
+                name: holder,
+                cpfCnpj: customerCpf,
+                postalCode: cardCep || '01001-000',
+                addressNumber: cardAddressNumber || '1',
+              },
+            }),
+          });
+
+          const data = await res.json();
+          isProcessingPayment = false;
+
+          if (!res.ok || !data.ok) {
+            paymentError = data.error || 'Cartão recusado pela operadora. Verifique os dados ou utilize o Pix.';
+            render();
+            return;
+          }
+
+          asaasPaymentId = data.paymentId;
+          paymentApproved = true;
+          currentStep = 4; // Advance to Preview!
+          render();
+        } catch (err) {
+          isProcessingPayment = false;
+          paymentError = 'Falha ao processar pagamento com cartão: ' + err.message;
+          render();
+        }
+      });
+
+      modalEl.querySelector('.btn-back-to-step2')?.addEventListener('click', () => {
+        stopPolling();
+        currentStep = 2; // Return to Edição!
+        render();
+      });
+    }
+
+    // ── Events Step 4: Preview e Publicação Final ─────────────
     else if (currentStep === 4) {
       const mediaList = uploadedFiles.length > 0 ? uploadedFiles : [];
 
@@ -966,19 +953,19 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
       });
 
       modalEl.querySelector('.btn-back-to-edit')?.addEventListener('click', () => {
-        currentStep = 3;
+        currentStep = 2; // Return to Edição
         render();
       });
 
       modalEl.querySelector('.status-btn-edit-preview')?.addEventListener('click', () => {
-        currentStep = 3;
+        currentStep = 2; // Return to Edição
         render();
       });
 
       modalEl.querySelector('.btn-confirm-publish')?.addEventListener('click', async (e) => {
         const btn = e.currentTarget;
         btn.disabled = true;
-        btn.textContent = 'Gravando no banco e publicando...';
+        btn.textContent = 'Publicando seu Story...';
 
         const finalHandle = userHandle.startsWith('@') ? userHandle : `@${userHandle}`;
         const finalLink = buildSocialLink(selectedNetwork, userHandle);
@@ -993,7 +980,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             total_price: pricing.finalTotal,
             payment_status: 'approved',
             payment_id: asaasPaymentId,
-            profile_name: profileName || customerName || 'Anunciante Parceiro',
+            profile_name: profileName || 'Anunciante Parceiro',
             user_handle: finalHandle,
             social_network: selectedNetwork,
             social_link: finalLink,

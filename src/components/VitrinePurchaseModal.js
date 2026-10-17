@@ -2,6 +2,8 @@
  * VitrinePurchaseModal component — exact counterpart of StatusPurchaseModal
  * for the Vitrine product, with real Asaas payment integration (PIX QR Code & Cartão)
  * and PostgreSQL persistence.
+ *
+ * Flow: 1. Plano -> 2. Edição -> 3. Pagamento -> 4. Preview
  */
 
 import {
@@ -32,33 +34,12 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
   modalEl.setAttribute('aria-modal', 'true');
   modalEl.setAttribute('aria-label', 'Contratar Vitrine Comercial');
 
-  // State
-  let currentStep = 1; // 1: Plano, 2: Pagamento, 3: Edição, 4: Pré-visualização
+  // State: Standardized sequence [1. Plano -> 2. Edição -> 3. Pagamento -> 4. Preview]
+  let currentStep = 1;
   let selectedPlan = initialPlan;
   let fileCount = 1;
 
-  // Payment State (Asaas v3)
-  let selectedBillingType = 'PIX';
-  let customerName = '';
-  let customerCpf = '';
-  let customerEmail = '';
-  let customerPhone = '';
-  let asaasPaymentId = null;
-  let vitrineRecordId = `vitrine-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-  let pixData = null;
-  let isProcessingPayment = false;
-  let paymentError = '';
-  let pollIntervalId = null;
-
-  // Credit Card Form State
-  let cardHolderName = '';
-  let cardNumber = '';
-  let cardExpiry = '';
-  let cardCcv = '';
-  let cardCep = '';
-  let cardAddressNumber = '';
-
-  // Content & Profile State
+  // Content & Profile State (captured in Step 2: Edição)
   let profilePicData = '';
   let profileName = '';
   let userHandle = '';
@@ -68,6 +49,25 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
   let selectedNetwork = 'instagram';
   let previewActiveIdx = 0;
   let uploadError = '';
+
+  // Payment State (Asaas v3, captured in Step 3: Pagamento)
+  let selectedBillingType = 'PIX';
+  let customerCpf = '';
+  let asaasPaymentId = null;
+  let vitrineRecordId = `vitrine-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  let pixData = null;
+  let isProcessingPayment = false;
+  let paymentError = '';
+  let paymentApproved = false;
+  let pollIntervalId = null;
+
+  // Credit Card Form State
+  let cardHolderName = '';
+  let cardNumber = '';
+  let cardExpiry = '';
+  let cardCcv = '';
+  let cardCep = '';
+  let cardAddressNumber = '';
 
   function stopPolling() {
     if (pollIntervalId) {
@@ -96,7 +96,8 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         const data = await res.json();
         if (data.ok && data.isPaid) {
           stopPolling();
-          currentStep = 3;
+          paymentApproved = true;
+          currentStep = 4; // Advance to Preview!
           render();
         }
       } catch (err) {
@@ -112,10 +113,10 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
       <div class="status-modal-dialog">
         <header class="status-modal-header">
           <div class="status-modal-steps">
-            <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">Plano</span>
-            <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">Pagamento</span>
-            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">Edição</span>
-            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">Preview</span>
+            <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">1. Plano</span>
+            <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">2. Edição</span>
+            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">3. Pagamento</span>
+            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">4. Preview</span>
           </div>
           <button class="status-modal-close" aria-label="Fechar modal">&times;</button>
         </header>
@@ -192,144 +193,15 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
             </div>
           </div>
 
-          <button type="button" class="status-btn-primary btn-advance-payment">
-            Avançar para Pagamento (${pricing.formattedTotal})
+          <button type="button" class="status-btn-primary btn-advance-to-edit">
+            Avançar para Edição (${pricing.formattedTotal}) &rarr;
           </button>
         </div>
       `;
     }
 
-    // ── STEP 2: Pagamento Real Asaas v3 ───────────────────────
+    // ── STEP 2: Edição dos Produtos da Vitrine ────────────────
     if (currentStep === 2) {
-      return `
-        <div class="status-step-payment" style="text-align: left; width: 100%;">
-          <h2 class="status-modal-title" style="text-align: center;">Pagamento Seguro via Asaas</h2>
-          <p class="status-modal-desc" style="text-align: center;">Escolha sua forma de pagamento. Liberação imediata da Vitrine após confirmação.</p>
-
-          <div class="status-receipt-box" style="margin-bottom: 16px;">
-            <div class="status-receipt-row">
-              <span>Plano da Vitrine:</span>
-              <strong>${selectedPlan === 'vitrine_impulsionado' ? 'Vitrine Impulsionada' : 'Vitrine Normal'} (${fileCount} foto${fileCount > 1 ? 's' : ''})</strong>
-            </div>
-            <div class="status-receipt-row">
-              <span>Valor a pagar:</span>
-              <strong style="color: #008069; font-size: 15px;">${pricing.formattedTotal}</strong>
-            </div>
-          </div>
-
-          ${paymentError ? `
-            <div class="payment-error-banner">
-              ${escapeHtml(paymentError)}
-            </div>
-          ` : ''}
-
-          <!-- Tabs PIX / Cartão -->
-          <div class="payment-method-selector">
-            <button type="button" class="payment-method-tab ${selectedBillingType === 'PIX' ? 'active' : ''}" data-type="PIX">
-              ${ICON_PIX}
-              <span>PIX (Instantâneo)</span>
-            </button>
-            <button type="button" class="payment-method-tab ${selectedBillingType === 'CREDIT_CARD' ? 'active' : ''}" data-type="CREDIT_CARD">
-              ${ICON_CARD}
-              <span>Cartão de Crédito</span>
-            </button>
-          </div>
-
-          <!-- Dados do Pagador -->
-          <div class="payment-grid-2">
-            <div class="payment-input-group">
-              <label class="payment-input-label">Nome Completo</label>
-              <input type="text" class="payment-input-field input-customer-name" placeholder="Ex: Maria Santos" value="${escapeAttr(customerName)}" />
-            </div>
-            <div class="payment-input-group">
-              <label class="payment-input-label">CPF / CNPJ</label>
-              <input type="text" class="payment-input-field input-customer-cpf" placeholder="000.000.000-00" value="${escapeAttr(customerCpf)}" maxlength="18" />
-            </div>
-          </div>
-
-          <div class="payment-grid-2">
-            <div class="payment-input-group">
-              <label class="payment-input-label">E-mail</label>
-              <input type="email" class="payment-input-field input-customer-email" placeholder="seu@email.com" value="${escapeAttr(customerEmail)}" />
-            </div>
-            <div class="payment-input-group">
-              <label class="payment-input-label">WhatsApp com DDD</label>
-              <input type="tel" class="payment-input-field input-customer-phone" placeholder="(11) 98765-4321" value="${escapeAttr(customerPhone)}" maxlength="15" />
-            </div>
-          </div>
-
-          ${selectedBillingType === 'PIX' ? `
-            <!-- Fluxo PIX -->
-            ${pixData ? `
-              <div class="pix-qr-container">
-                <span style="font-size: 13px; font-weight: 600; color: #111B21;">Escaneie o QR Code abaixo no app do seu banco:</span>
-                <img src="data:image/png;base64,${pixData.encodedImage}" alt="QR Code PIX" class="pix-qr-img" />
-
-                <div class="pix-waiting-box">
-                  <span class="pix-pulse-dot"></span>
-                  <span>Aguardando confirmação do pagamento...</span>
-                </div>
-
-                <span style="font-size: 12px; color: #64748B;">Ou copie o código Pix Copia e Cola:</span>
-                <div class="pix-copia-cola-box">
-                  <input type="text" readonly class="pix-copia-cola-input" value="${escapeAttr(pixData.payload)}" />
-                  <button type="button" class="pix-copy-btn btn-copy-pix">Copiar Código</button>
-                </div>
-              </div>
-            ` : `
-              <button type="button" class="status-btn-primary btn-generate-pix" ${isProcessingPayment ? 'disabled' : ''}>
-                ${isProcessingPayment ? 'Gerando QR Code no Asaas...' : `Gerar QR Code Pix (${pricing.formattedTotal})`}
-              </button>
-            `}
-          ` : `
-            <!-- Fluxo Cartão de Crédito -->
-            <div class="payment-grid-2">
-              <div class="payment-input-group">
-                <label class="payment-input-label">Número do Cartão</label>
-                <input type="text" class="payment-input-field input-card-number" placeholder="0000 0000 0000 0000" value="${escapeAttr(cardNumber)}" maxlength="19" />
-              </div>
-              <div class="payment-input-group">
-                <label class="payment-input-label">Nome no Cartão</label>
-                <input type="text" class="payment-input-field input-card-holder" placeholder="COMO NO CARTÃO" value="${escapeAttr(cardHolderName)}" />
-              </div>
-            </div>
-
-            <div class="payment-grid-2">
-              <div class="payment-input-group">
-                <label class="payment-input-label">Validade (MM/AA)</label>
-                <input type="text" class="payment-input-field input-card-expiry" placeholder="12/28" value="${escapeAttr(cardExpiry)}" maxlength="5" />
-              </div>
-              <div class="payment-input-group">
-                <label class="payment-input-label">CVV</label>
-                <input type="text" class="payment-input-field input-card-ccv" placeholder="123" value="${escapeAttr(cardCcv)}" maxlength="4" />
-              </div>
-            </div>
-
-            <div class="payment-grid-2">
-              <div class="payment-input-group">
-                <label class="payment-input-label">CEP</label>
-                <input type="text" class="payment-input-field input-card-cep" placeholder="01001-000" value="${escapeAttr(cardCep)}" maxlength="9" />
-              </div>
-              <div class="payment-input-group">
-                <label class="payment-input-label">Número da Residência</label>
-                <input type="text" class="payment-input-field input-card-num" placeholder="123" value="${escapeAttr(cardAddressNumber)}" />
-              </div>
-            </div>
-
-            <button type="button" class="status-btn-primary btn-pay-card" ${isProcessingPayment ? 'disabled' : ''}>
-              ${isProcessingPayment ? 'Processando transação com operadora...' : `Pagar com Cartão (${pricing.formattedTotal})`}
-            </button>
-          `}
-
-          <button type="button" class="btn-back-step1" style="margin-top: 14px; width: 100%; border: 0; background: transparent; color: #64748B; font-size: 13px; cursor: pointer; text-decoration: underline;">
-            &larr; Voltar para escolha do plano
-          </button>
-        </div>
-      `;
-    }
-
-    // ── STEP 3: Configurar Produtos da Vitrine ─────────────────
-    if (currentStep === 3) {
       const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
       const activeFile = (activeFileIndex >= 0 && activeFileIndex < uploadedFiles.length)
         ? uploadedFiles[activeFileIndex]
@@ -338,11 +210,6 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
 
       return `
         <div class="status-step-upload">
-          <div style="text-align: center; margin-bottom: 12px;">
-            <span style="display: inline-block; padding: 4px 12px; background: #DCFCE7; color: #15803D; border-radius: 12px; font-size: 12px; font-weight: 700;">
-              ✓ Pagamento Confirmado
-            </span>
-          </div>
           <h2 class="status-modal-title">Configurar sua Vitrine</h2>
           <p class="status-modal-desc">Cadastre a foto da sua loja, o nome do produto/marca e as fotos da sua vitrine.</p>
 
@@ -422,8 +289,11 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
             </div>
 
             <div class="status-form-actions">
-              <button type="button" class="status-btn-primary btn-advance-preview" ${uploadedFiles.length === 0 ? 'disabled' : ''}>
-                Visualizar Vitrine &rarr;
+              <button type="button" class="status-btn-primary btn-advance-to-payment">
+                Avançar para Pagamento (${pricing.formattedTotal}) &rarr;
+              </button>
+              <button type="button" class="btn-back-to-step1" style="margin-top: 10px; width: 100%; border: 0; background: transparent; color: #64748B; font-size: 13px; cursor: pointer; text-decoration: underline;">
+                &larr; Voltar para escolha do plano
               </button>
             </div>
           </form>
@@ -431,7 +301,124 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
       `;
     }
 
-    // ── STEP 4: Pré-visualização da Vitrine ────────────────────
+    // ── STEP 3: Pagamento com Fricção Mínima (Asaas v3) ────────
+    if (currentStep === 3) {
+      return `
+        <div class="status-step-payment" style="text-align: left; width: 100%;">
+          <h2 class="status-modal-title" style="text-align: center;">Pagamento Seguro via Asaas</h2>
+          <p class="status-modal-desc" style="text-align: center;">Liberação imediata da sua Vitrine Comercial com verificação automática.</p>
+
+          <div class="status-receipt-box" style="margin-bottom: 16px;">
+            <div class="status-receipt-row">
+              <span>Vitrine / Loja:</span>
+              <strong>${escapeHtml(profileName || 'Loja')} (${escapeHtml(userHandle ? (userHandle.startsWith('@') ? userHandle : '@' + userHandle) : '@loja')})</strong>
+            </div>
+            <div class="status-receipt-row">
+              <span>Plano:</span>
+              <strong>${selectedPlan === 'vitrine_impulsionado' ? 'Vitrine Impulsionada' : 'Vitrine Normal'} (${fileCount} foto${fileCount > 1 ? 's' : ''})</strong>
+            </div>
+            <div class="status-receipt-row">
+              <span>Valor a pagar:</span>
+              <strong style="color: #008069; font-size: 16px;">${pricing.formattedTotal}</strong>
+            </div>
+          </div>
+
+          ${paymentError ? `
+            <div class="payment-error-banner">
+              ${escapeHtml(paymentError)}
+            </div>
+          ` : ''}
+
+          <!-- Tabs PIX / Cartão -->
+          <div class="payment-method-selector">
+            <button type="button" class="payment-method-tab ${selectedBillingType === 'PIX' ? 'active' : ''}" data-type="PIX">
+              ${ICON_PIX}
+              <span>PIX (Instantâneo)</span>
+            </button>
+            <button type="button" class="payment-method-tab ${selectedBillingType === 'CREDIT_CARD' ? 'active' : ''}" data-type="CREDIT_CARD">
+              ${ICON_CARD}
+              <span>Cartão de Crédito</span>
+            </button>
+          </div>
+
+          <!-- CPF único obrigatório para emissão -->
+          <div class="payment-input-group" style="margin-bottom: 14px;">
+            <label class="payment-input-label">CPF ou CNPJ para Faturamento</label>
+            <input type="text" class="payment-input-field input-customer-cpf" placeholder="000.000.000-00" value="${escapeAttr(customerCpf)}" maxlength="18" required />
+            <small style="color: #64748B; font-size: 11px; margin-top: 2px;">Exigido pelo Banco Central para registro da cobrança no Asaas.</small>
+          </div>
+
+          ${selectedBillingType === 'PIX' ? `
+            <!-- Fluxo PIX: Fricção Mínima! -->
+            ${pixData ? `
+              <div class="pix-qr-container">
+                <span style="font-size: 13px; font-weight: 600; color: #111B21;">Escaneie o QR Code abaixo no app do seu banco:</span>
+                <img src="data:image/png;base64,${pixData.encodedImage}" alt="QR Code PIX" class="pix-qr-img" />
+
+                <div class="pix-waiting-box">
+                  <span class="pix-pulse-dot"></span>
+                  <span>Aguardando confirmação do pagamento...</span>
+                </div>
+
+                <span style="font-size: 12px; color: #64748B;">Ou copie o código Pix Copia e Cola:</span>
+                <div class="pix-copia-cola-box">
+                  <input type="text" readonly class="pix-copia-cola-input" value="${escapeAttr(pixData.payload)}" />
+                  <button type="button" class="pix-copy-btn btn-copy-pix">Copiar Código</button>
+                </div>
+              </div>
+            ` : `
+              <button type="button" class="status-btn-primary btn-generate-pix" ${isProcessingPayment ? 'disabled' : ''}>
+                ${isProcessingPayment ? 'Gerando QR Code no Asaas...' : `Gerar QR Code Pix (${pricing.formattedTotal})`}
+              </button>
+            `}
+          ` : `
+            <!-- Fluxo Cartão de Crédito -->
+            <div class="payment-grid-2">
+              <div class="payment-input-group">
+                <label class="payment-input-label">Número do Cartão</label>
+                <input type="text" class="payment-input-field input-card-number" placeholder="0000 0000 0000 0000" value="${escapeAttr(cardNumber)}" maxlength="19" />
+              </div>
+              <div class="payment-input-group">
+                <label class="payment-input-label">Nome no Cartão</label>
+                <input type="text" class="payment-input-field input-card-holder" placeholder="COMO NO CARTÃO" value="${escapeAttr(cardHolderName || profileName)}" />
+              </div>
+            </div>
+
+            <div class="payment-grid-2">
+              <div class="payment-input-group">
+                <label class="payment-input-label">Validade (MM/AA)</label>
+                <input type="text" class="payment-input-field input-card-expiry" placeholder="12/28" value="${escapeAttr(cardExpiry)}" maxlength="5" />
+              </div>
+              <div class="payment-input-group">
+                <label class="payment-input-label">CVV</label>
+                <input type="text" class="payment-input-field input-card-ccv" placeholder="123" value="${escapeAttr(cardCcv)}" maxlength="4" />
+              </div>
+            </div>
+
+            <div class="payment-grid-2">
+              <div class="payment-input-group">
+                <label class="payment-input-label">CEP</label>
+                <input type="text" class="payment-input-field input-card-cep" placeholder="01001-000" value="${escapeAttr(cardCep)}" maxlength="9" />
+              </div>
+              <div class="payment-input-group">
+                <label class="payment-input-label">Número</label>
+                <input type="text" class="payment-input-field input-card-num" placeholder="123" value="${escapeAttr(cardAddressNumber)}" />
+              </div>
+            </div>
+
+            <button type="button" class="status-btn-primary btn-pay-card" ${isProcessingPayment ? 'disabled' : ''}>
+              ${isProcessingPayment ? 'Processando transação com operadora...' : `Pagar com Cartão (${pricing.formattedTotal})`}
+            </button>
+          `}
+
+          <button type="button" class="btn-back-to-step2" style="margin-top: 14px; width: 100%; border: 0; background: transparent; color: #64748B; font-size: 13px; cursor: pointer; text-decoration: underline;">
+            &larr; Voltar para edição da vitrine
+          </button>
+        </div>
+      `;
+    }
+
+    // ── STEP 4: Pré-visualização e Publicação da Vitrine ──────
     if (currentStep === 4) {
       const network = SOCIAL_NETWORKS[selectedNetwork] || SOCIAL_NETWORKS.instagram;
       const mediaList = uploadedFiles.length > 0 ? uploadedFiles : [];
@@ -440,10 +427,16 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
 
       return `
         <div class="status-step-preview">
+          <div style="text-align: center; margin-bottom: 8px;">
+            <span style="display: inline-block; padding: 4px 12px; background: #DCFCE7; color: #15803D; border-radius: 12px; font-size: 12px; font-weight: 700;">
+              ✓ Pagamento Confirmado
+            </span>
+          </div>
+
           <div class="status-preview-top-bar">
             <button type="button" class="status-preview-back-btn btn-back-to-edit">
               ${ICON_BACK_ARROW}
-              <span>Voltar e Ajustar</span>
+              <span>Ajustar Edição</span>
             </button>
             <span class="status-preview-step-title">Pré-visualização da Vitrine (${previewActiveIdx + 1} de ${mediaList.length})</span>
           </div>
@@ -514,7 +507,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
   function wireEvents(pricing) {
     modalEl.querySelector('.status-modal-close')?.addEventListener('click', closeModal);
 
-    // ── Events Step 1 ─────────────────────────────────────────
+    // ── Events Step 1: Plano ──────────────────────────────────
     if (currentStep === 1) {
       modalEl.querySelectorAll('input[name="plan"]').forEach(input => {
         input.addEventListener('change', (e) => {
@@ -534,252 +527,14 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         });
       });
 
-      modalEl.querySelector('.btn-advance-payment')?.addEventListener('click', () => {
-        currentStep = 2;
+      modalEl.querySelector('.btn-advance-to-edit')?.addEventListener('click', () => {
+        currentStep = 2; // Advance to Edição!
         render();
       });
     }
 
-    // ── Events Step 2 (Pagamento Asaas) ───────────────────────
+    // ── Events Step 2: Edição ─────────────────────────────────
     else if (currentStep === 2) {
-      const nameInput = modalEl.querySelector('.input-customer-name');
-      const cpfInput = modalEl.querySelector('.input-customer-cpf');
-      const emailInput = modalEl.querySelector('.input-customer-email');
-      const phoneInput = modalEl.querySelector('.input-customer-phone');
-
-      nameInput?.addEventListener('input', e => { customerName = e.target.value; });
-      emailInput?.addEventListener('input', e => { customerEmail = e.target.value; });
-
-      cpfInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 14);
-        if (v.length > 11) {
-          v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
-        } else {
-          v = v.replace(/(\d{3})(\d)/, '$1.$2')
-               .replace(/(\d{3})(\d)/, '$1.$2')
-               .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-        }
-        e.target.value = v;
-        customerCpf = v;
-      });
-
-      phoneInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 11);
-        v = v.replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2');
-        e.target.value = v;
-        customerPhone = v;
-      });
-
-      // Switch tab PIX / Cartão
-      modalEl.querySelectorAll('.payment-method-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          selectedBillingType = tab.dataset.type;
-          paymentError = '';
-          stopPolling();
-          pixData = null;
-          render();
-        });
-      });
-
-      // Gerar Pix
-      modalEl.querySelector('.btn-generate-pix')?.addEventListener('click', async () => {
-        if (!customerName.trim()) {
-          paymentError = 'Por favor informe o Nome Completo do pagador.';
-          render();
-          return;
-        }
-        if (customerCpf.replace(/\D/g, '').length < 11) {
-          paymentError = 'Por favor informe um CPF válido (11 dígitos).';
-          render();
-          return;
-        }
-
-        isProcessingPayment = true;
-        paymentError = '';
-        render();
-
-        try {
-          const res = await fetch('/api/payment/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              id: vitrineRecordId,
-              type: 'vitrine',
-              billingType: 'PIX',
-              plan_type: selectedPlan,
-              file_count: fileCount,
-              customer: {
-                name: customerName.trim(),
-                cpfCnpj: customerCpf,
-                email: customerEmail.trim(),
-                phone: customerPhone,
-              },
-            }),
-          });
-
-          const data = await res.json();
-          isProcessingPayment = false;
-
-          if (!res.ok || !data.ok) {
-            paymentError = data.error || 'Não foi possível gerar a cobrança Pix no Asaas.';
-            render();
-            return;
-          }
-
-          asaasPaymentId = data.paymentId;
-          pixData = data.pix;
-          render();
-
-          startPaymentPolling(data.paymentId, vitrineRecordId);
-        } catch (err) {
-          isProcessingPayment = false;
-          paymentError = 'Erro de conexão com o servidor de pagamentos: ' + err.message;
-          render();
-        }
-      });
-
-      modalEl.querySelector('.btn-copy-pix')?.addEventListener('click', async (e) => {
-        if (pixData?.payload) {
-          await copyText(pixData.payload);
-          const btn = e.currentTarget;
-          const origText = btn.textContent;
-          btn.textContent = 'Copiado! ✓';
-          setTimeout(() => { btn.textContent = origText; }, 2000);
-        }
-      });
-
-      // Cartão de Crédito
-      const cardNumInput = modalEl.querySelector('.input-card-number');
-      const cardHolderInput = modalEl.querySelector('.input-card-holder');
-      const cardExpInput = modalEl.querySelector('.input-card-expiry');
-      const cardCcvInput = modalEl.querySelector('.input-card-ccv');
-      const cardCepInput = modalEl.querySelector('.input-card-cep');
-      const cardNumResInput = modalEl.querySelector('.input-card-num');
-
-      cardNumInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 16);
-        v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
-        e.target.value = v;
-        cardNumber = v;
-      });
-
-      cardHolderInput?.addEventListener('input', e => { cardHolderName = e.target.value.toUpperCase(); });
-
-      cardExpInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 4);
-        if (v.length >= 2) v = `${v.slice(0, 2)}/${v.slice(2)}`;
-        e.target.value = v;
-        cardExpiry = v;
-      });
-
-      cardCcvInput?.addEventListener('input', e => {
-        cardCcv = e.target.value.replace(/\D/g, '').slice(0, 4);
-        e.target.value = cardCcv;
-      });
-
-      cardCepInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 8);
-        if (v.length >= 5) v = `${v.slice(0, 5)}-${v.slice(5)}`;
-        e.target.value = v;
-        cardCep = v;
-      });
-
-      cardNumResInput?.addEventListener('input', e => { cardAddressNumber = e.target.value; });
-
-      modalEl.querySelector('.btn-pay-card')?.addEventListener('click', async () => {
-        if (!customerName.trim() || customerCpf.replace(/\D/g, '').length < 11) {
-          paymentError = 'Informe o Nome Completo e CPF válido do titular.';
-          render();
-          return;
-        }
-        if (cardNumber.replace(/\D/g, '').length < 15) {
-          paymentError = 'Informe um número de cartão de crédito válido.';
-          render();
-          return;
-        }
-        if (!cardHolderName.trim()) {
-          paymentError = 'Informe o nome impresso no cartão.';
-          render();
-          return;
-        }
-        if (!cardExpiry.includes('/') || cardExpiry.replace(/\D/g, '').length < 4) {
-          paymentError = 'Validade do cartão inválida (formato MM/AA).';
-          render();
-          return;
-        }
-        if (cardCcv.length < 3) {
-          paymentError = 'Código de segurança (CVV) inválido.';
-          render();
-          return;
-        }
-
-        const [expMonth, expYear] = cardExpiry.split('/');
-        isProcessingPayment = true;
-        paymentError = '';
-        render();
-
-        try {
-          const res = await fetch('/api/payment/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              id: vitrineRecordId,
-              type: 'vitrine',
-              billingType: 'CREDIT_CARD',
-              plan_type: selectedPlan,
-              file_count: fileCount,
-              customer: {
-                name: customerName.trim(),
-                cpfCnpj: customerCpf,
-                email: customerEmail.trim(),
-                phone: customerPhone,
-              },
-              creditCard: {
-                holderName: cardHolderName.trim(),
-                number: cardNumber,
-                expiryMonth: expMonth.trim(),
-                expiryYear: expYear.trim(),
-                ccv: cardCcv.trim(),
-              },
-              creditCardHolderInfo: {
-                name: customerName.trim(),
-                email: customerEmail.trim(),
-                cpfCnpj: customerCpf,
-                postalCode: cardCep,
-                addressNumber: cardAddressNumber || '1',
-                phone: customerPhone,
-              },
-            }),
-          });
-
-          const data = await res.json();
-          isProcessingPayment = false;
-
-          if (!res.ok || !data.ok) {
-            paymentError = data.error || 'Cartão recusado pela operadora. Verifique os dados ou utilize o Pix.';
-            render();
-            return;
-          }
-
-          asaasPaymentId = data.paymentId;
-          currentStep = 3;
-          render();
-        } catch (err) {
-          isProcessingPayment = false;
-          paymentError = 'Falha ao processar pagamento com cartão: ' + err.message;
-          render();
-        }
-      });
-
-      modalEl.querySelector('.btn-back-step1')?.addEventListener('click', () => {
-        stopPolling();
-        currentStep = 1;
-        render();
-      });
-    }
-
-    // ── Events Step 3 ─────────────────────────────────────────
-    else if (currentStep === 3) {
       const handleInput = modalEl.querySelector('.input-user-handle');
       const nameInput = modalEl.querySelector('.input-profile-name');
       const captionInput = modalEl.querySelector('.input-caption');
@@ -927,19 +682,256 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         });
       });
 
-      modalEl.querySelector('.btn-advance-preview')?.addEventListener('click', () => {
+      modalEl.querySelector('.btn-advance-to-payment')?.addEventListener('click', () => {
+        if (!profileName.trim()) {
+          uploadError = 'Por favor informe o Nome da Vitrine ou Loja.';
+          render();
+          return;
+        }
+        if (!userHandle.trim()) {
+          uploadError = 'Por favor informe o @usuário da loja.';
+          render();
+          return;
+        }
         if (uploadedFiles.length === 0) {
           uploadError = 'Por favor anexe pelo menos 1 foto do seu produto.';
           render();
           return;
         }
-        currentStep = 4;
-        previewActiveIdx = 0;
+        uploadError = '';
+        currentStep = 3; // Advance to Pagamento!
+        render();
+      });
+
+      modalEl.querySelector('.btn-back-to-step1')?.addEventListener('click', () => {
+        currentStep = 1;
         render();
       });
     }
 
-    // ── Events Step 4 ─────────────────────────────────────────
+    // ── Events Step 3: Pagamento Asaas (Fricção Mínima) ───────
+    else if (currentStep === 3) {
+      const cpfInput = modalEl.querySelector('.input-customer-cpf');
+
+      cpfInput?.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 14);
+        if (v.length > 11) {
+          v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        } else {
+          v = v.replace(/(\d{3})(\d)/, '$1.$2')
+               .replace(/(\d{3})(\d)/, '$1.$2')
+               .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        }
+        e.target.value = v;
+        customerCpf = v;
+      });
+
+      // Switch tab PIX / Cartão
+      modalEl.querySelectorAll('.payment-method-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          selectedBillingType = tab.dataset.type;
+          paymentError = '';
+          stopPolling();
+          pixData = null;
+          render();
+        });
+      });
+
+      // Gerar Pix (Fricção mínima: nome e handle já herdados da edição!)
+      modalEl.querySelector('.btn-generate-pix')?.addEventListener('click', async () => {
+        if (customerCpf.replace(/\D/g, '').length < 11) {
+          paymentError = 'Por favor informe um CPF ou CNPJ válido.';
+          render();
+          return;
+        }
+
+        isProcessingPayment = true;
+        paymentError = '';
+        render();
+
+        try {
+          const res = await fetch('/api/payment/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: vitrineRecordId,
+              type: 'vitrine',
+              billingType: 'PIX',
+              plan_type: selectedPlan,
+              file_count: uploadedFiles.length || fileCount,
+              profile_name: profileName,
+              user_handle: userHandle,
+              social_network: selectedNetwork,
+              customer: {
+                name: profileName || 'Loja Parceira',
+                cpfCnpj: customerCpf,
+              },
+            }),
+          });
+
+          const data = await res.json();
+          isProcessingPayment = false;
+
+          if (!res.ok || !data.ok) {
+            paymentError = data.error || 'Não foi possível gerar a cobrança Pix no Asaas.';
+            render();
+            return;
+          }
+
+          asaasPaymentId = data.paymentId;
+          pixData = data.pix;
+          render();
+
+          startPaymentPolling(data.paymentId, vitrineRecordId);
+        } catch (err) {
+          isProcessingPayment = false;
+          paymentError = 'Erro de conexão com o servidor de pagamentos: ' + err.message;
+          render();
+        }
+      });
+
+      modalEl.querySelector('.btn-copy-pix')?.addEventListener('click', async (e) => {
+        if (pixData?.payload) {
+          await copyText(pixData.payload);
+          const btn = e.currentTarget;
+          const origText = btn.textContent;
+          btn.textContent = 'Copiado! ✓';
+          setTimeout(() => { btn.textContent = origText; }, 2000);
+        }
+      });
+
+      // Cartão de Crédito
+      const cardNumInput = modalEl.querySelector('.input-card-number');
+      const cardHolderInput = modalEl.querySelector('.input-card-holder');
+      const cardExpInput = modalEl.querySelector('.input-card-expiry');
+      const cardCcvInput = modalEl.querySelector('.input-card-ccv');
+      const cardCepInput = modalEl.querySelector('.input-card-cep');
+      const cardNumResInput = modalEl.querySelector('.input-card-num');
+
+      cardNumInput?.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 16);
+        v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+        e.target.value = v;
+        cardNumber = v;
+      });
+
+      cardHolderInput?.addEventListener('input', e => { cardHolderName = e.target.value.toUpperCase(); });
+
+      cardExpInput?.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 4);
+        if (v.length >= 2) v = `${v.slice(0, 2)}/${v.slice(2)}`;
+        e.target.value = v;
+        cardExpiry = v;
+      });
+
+      cardCcvInput?.addEventListener('input', e => {
+        cardCcv = e.target.value.replace(/\D/g, '').slice(0, 4);
+        e.target.value = cardCcv;
+      });
+
+      cardCepInput?.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+        if (v.length >= 5) v = `${v.slice(0, 5)}-${v.slice(5)}`;
+        e.target.value = v;
+        cardCep = v;
+      });
+
+      cardNumResInput?.addEventListener('input', e => { cardAddressNumber = e.target.value; });
+
+      modalEl.querySelector('.btn-pay-card')?.addEventListener('click', async () => {
+        if (customerCpf.replace(/\D/g, '').length < 11) {
+          paymentError = 'Informe um CPF válido para o titular do cartão.';
+          render();
+          return;
+        }
+        if (cardNumber.replace(/\D/g, '').length < 15) {
+          paymentError = 'Informe um número de cartão de crédito válido.';
+          render();
+          return;
+        }
+        const holder = cardHolderName.trim() || profileName.trim();
+        if (!holder) {
+          paymentError = 'Informe o nome impresso no cartão.';
+          render();
+          return;
+        }
+        if (!cardExpiry.includes('/') || cardExpiry.replace(/\D/g, '').length < 4) {
+          paymentError = 'Validade do cartão inválida (formato MM/AA).';
+          render();
+          return;
+        }
+        if (cardCcv.length < 3) {
+          paymentError = 'Código de segurança (CVV) inválido.';
+          render();
+          return;
+        }
+
+        const [expMonth, expYear] = cardExpiry.split('/');
+        isProcessingPayment = true;
+        paymentError = '';
+        render();
+
+        try {
+          const res = await fetch('/api/payment/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: vitrineRecordId,
+              type: 'vitrine',
+              billingType: 'CREDIT_CARD',
+              plan_type: selectedPlan,
+              file_count: uploadedFiles.length || fileCount,
+              profile_name: profileName,
+              user_handle: userHandle,
+              social_network: selectedNetwork,
+              customer: {
+                name: profileName || holder,
+                cpfCnpj: customerCpf,
+              },
+              creditCard: {
+                holderName: holder,
+                number: cardNumber,
+                expiryMonth: expMonth.trim(),
+                expiryYear: expYear.trim(),
+                ccv: cardCcv.trim(),
+              },
+              creditCardHolderInfo: {
+                name: holder,
+                cpfCnpj: customerCpf,
+                postalCode: cardCep || '01001-000',
+                addressNumber: cardAddressNumber || '1',
+              },
+            }),
+          });
+
+          const data = await res.json();
+          isProcessingPayment = false;
+
+          if (!res.ok || !data.ok) {
+            paymentError = data.error || 'Cartão recusado pela operadora. Verifique os dados ou utilize o Pix.';
+            render();
+            return;
+          }
+
+          asaasPaymentId = data.paymentId;
+          paymentApproved = true;
+          currentStep = 4; // Advance to Preview!
+          render();
+        } catch (err) {
+          isProcessingPayment = false;
+          paymentError = 'Falha ao processar pagamento com cartão: ' + err.message;
+          render();
+        }
+      });
+
+      modalEl.querySelector('.btn-back-to-step2')?.addEventListener('click', () => {
+        stopPolling();
+        currentStep = 2; // Return to Edição!
+        render();
+      });
+    }
+
+    // ── Events Step 4: Preview e Publicação da Vitrine ────────
     else if (currentStep === 4) {
       const mediaList = uploadedFiles.length > 0 ? uploadedFiles : [];
 
@@ -958,19 +950,19 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
       });
 
       modalEl.querySelector('.btn-back-to-edit')?.addEventListener('click', () => {
-        currentStep = 3;
+        currentStep = 2; // Return to Edição
         render();
       });
 
       modalEl.querySelector('.status-btn-edit-preview')?.addEventListener('click', () => {
-        currentStep = 3;
+        currentStep = 2; // Return to Edição
         render();
       });
 
       modalEl.querySelector('.btn-confirm-publish')?.addEventListener('click', async (e) => {
         const btn = e.currentTarget;
         btn.disabled = true;
-        btn.textContent = 'Gravando no banco e publicando...';
+        btn.textContent = 'Publicando sua Vitrine...';
 
         const finalHandle = userHandle.startsWith('@') ? userHandle : `@${userHandle}`;
         const finalLink = buildSocialLink(selectedNetwork, userHandle);
@@ -985,7 +977,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
             total_price: pricing.finalTotal,
             payment_status: 'approved',
             payment_id: asaasPaymentId,
-            profile_name: profileName || customerName || 'Vitrine Parceira',
+            profile_name: profileName || 'Vitrine Parceira',
             user_handle: finalHandle,
             social_network: selectedNetwork,
             social_link: finalLink,

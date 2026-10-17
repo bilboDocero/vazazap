@@ -92,7 +92,12 @@ export async function findOrCreateCustomer({ name, cpfCnpj, email, phone }) {
   }
 
   const cleanCpf = (cpfCnpj || '').replace(/\D/g, '');
-  const cleanPhone = (phone || '').replace(/\D/g, '');
+  const fallbackEmail = email && email.trim()
+    ? email.trim()
+    : (cleanCpf ? `faturamento.${cleanCpf}@vorcarozap.com` : `cliente.${Date.now()}@vorcarozap.com`);
+  const fallbackPhone = phone && phone.replace(/\D/g, '').length >= 10
+    ? phone.replace(/\D/g, '')
+    : '11999999999';
 
   // 1. Search existing customer by CPF/CNPJ if provided
   if (cleanCpf) {
@@ -106,12 +111,12 @@ export async function findOrCreateCustomer({ name, cpfCnpj, email, phone }) {
     }
   }
 
-  // 2. Create customer
+  // 2. Create customer with automatic fallback
   const customerPayload = {
-    name: name || 'Anunciante VorcaroZap',
+    name: (name || 'Anunciante VorcaroZap').trim(),
     cpfCnpj: cleanCpf || undefined,
-    email: email || undefined,
-    mobilePhone: cleanPhone || undefined,
+    email: fallbackEmail,
+    mobilePhone: fallbackPhone,
   };
 
   const created = await asaasFetch('/customers', {
@@ -206,6 +211,14 @@ export async function createCreditCardPayment({
 
   const dueDate = new Date().toISOString().split('T')[0];
 
+  const cleanCpf = (creditCardHolderInfo.cpfCnpj || '').replace(/\D/g, '');
+  const fallbackEmail = creditCardHolderInfo.email && creditCardHolderInfo.email.trim()
+    ? creditCardHolderInfo.email.trim()
+    : `faturamento.${cleanCpf || 'card'}@vorcarozap.com`;
+  const fallbackPhone = (creditCardHolderInfo.phone || '').replace(/\D/g, '').length >= 10
+    ? creditCardHolderInfo.phone.replace(/\D/g, '')
+    : '11999999999';
+
   const paymentPayload = {
     customer: customerId,
     billingType: 'CREDIT_CARD',
@@ -222,12 +235,12 @@ export async function createCreditCardPayment({
       ccv: String(creditCard.ccv),
     },
     creditCardHolderInfo: {
-      name: creditCardHolderInfo.name,
-      email: creditCardHolderInfo.email,
-      cpfCnpj: creditCardHolderInfo.cpfCnpj.replace(/\D/g, ''),
-      postalCode: creditCardHolderInfo.postalCode.replace(/\D/g, ''),
+      name: creditCardHolderInfo.name || 'Titular do Cartão',
+      email: fallbackEmail,
+      cpfCnpj: cleanCpf,
+      postalCode: (creditCardHolderInfo.postalCode || '01001-000').replace(/\D/g, ''),
       addressNumber: creditCardHolderInfo.addressNumber || '1',
-      phone: (creditCardHolderInfo.phone || '').replace(/\D/g, '') || undefined,
+      phone: fallbackPhone,
     },
   };
 
