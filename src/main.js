@@ -35,6 +35,7 @@ import { getVitrinesCatalog } from './lib/commercial-content.js';
 import { renderAgendaPanel } from './components/AgendaPanel.js';
 import { renderAgendaDetail } from './components/AgendaDetail.js';
 import { loadCachedStatuses } from './lib/status-db.js';
+import { loadCachedVitrines } from './lib/vitrine-db.js';
 import { exportUrl, EXPORT_ALL_URL, downloadFile } from './lib/export.js';
 import { copyText } from './lib/utils.js';
 
@@ -679,14 +680,17 @@ async function init() {
     setActiveConversation(sidebar, null);
 
     const vitrinesList = vitrinesCatalog.vitrines;
-    const entry = vitrinesList.find(item => item.id === id) || null;
+    let entry = vitrinesList.find(item => item.id === id) || null;
+    if (!entry && id) {
+      const cached = loadCachedVitrines();
+      entry = cached.find(item => item.id === id) || null;
+    }
 
     if (!activeVitrine?.panel.isConnected) {
       const panel = renderVitrinePanel({
         vitrines: vitrinesList,
         selectedId: id,
         onSelect: selectedId => router.navigate('vitrine', selectedId),
-        onNewVitrine: () => router.navigate('anunciar'),
       });
       sidebar.showVitrine?.(panel);
       activeVitrine = { panel };
@@ -702,6 +706,7 @@ async function init() {
       onBack: () => router.navigate('vitrine'),
       onConversation: (convId) => router.navigate('chat', convId),
       onGoToAnunciar: () => router.navigate('anunciar'),
+      onSelectVitrine: (vitrineId) => router.navigate('vitrine', vitrineId),
       onShowToast: (msg) => showToast(mainArea, msg),
     });
   });

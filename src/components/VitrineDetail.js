@@ -1,10 +1,13 @@
 /**
  * VitrineDetail component — renders the main-area view for Vitrine,
- * similar to UpdatesDetail in Canais tab, with catalog products.
+ * with support for published vitrine showcase (story viewer with auto-advance)
+ * and partner catalog products.
  */
 
 import { ICON_STORE } from '../lib/commercial-content.js';
 import { defaultAvatarSvg } from '../lib/avatar.js';
+import { loadCachedVitrines, SOCIAL_NETWORKS } from '../lib/vitrine-db.js';
+import { openVitrinePurchaseModal } from './VitrinePurchaseModal.js';
 import { escapeHtml } from '../lib/utils.js';
 
 const ICON_BACK = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 5-7 7 7 7"/></svg>';
@@ -12,9 +15,10 @@ const ICON_BACK = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" s
 function vitrineDetailAvatar(entry) {
   const el = document.createElement('span');
   el.className = 'updates-avatar vitrine-detail-avatar';
-  if (entry?.avatar) {
+  const pic = entry?.avatar || entry?.profile_pic;
+  if (pic) {
     const img = document.createElement('img');
-    img.src = entry.avatar;
+    img.src = pic;
     img.alt = '';
     el.appendChild(img);
   } else if (entry) {
@@ -23,7 +27,13 @@ function vitrineDetailAvatar(entry) {
   return el;
 }
 
-export function renderVitrineDetail(container, { entry, onBack, onConversation, onGoToAnunciar, onShowToast }) {
+export function renderVitrineDetail(container, { entry, onBack, onConversation, onGoToAnunciar, onSelectVitrine, onShowToast }) {
+  const isPurchasedVitrine = entry && (entry.media_files || entry.social_network);
+
+  if (isPurchasedVitrine) {
+    return renderVitrineStoryViewer(container, { entry, onBack, onSelectVitrine });
+  }
+
   const el = document.createElement('section');
   el.className = `updates-detail vitrine-detail${entry ? ' has-selection' : ''}`;
 
@@ -137,4 +147,183 @@ export function renderVitrineDetail(container, { entry, onBack, onConversation, 
   el.appendChild(body);
   container.replaceChildren(el);
   return el;
+}
+
+function renderVitrineStoryViewer(container, { entry, onBack, onSelectVitrine }) {
+  const publishedList = loadCachedVitrines();
+  const currentClientIdx = publishedList.findIndex(item => item.id === entry.id);
+
+  const nextClient = (currentClientIdx !== -1 && currentClientIdx < publishedList.length - 1)
+    ? publishedList[currentClientIdx + 1]
+    : null;
+  const prevClient = (currentClientIdx > 0)
+    ? publishedList[currentClientIdx - 1]
+    : null;
+
+  const mediaList = entry.media_files && entry.media_files.length > 0
+    ? entry.media_files
+    : [{ id: 'm1', name: 'Vitrine', url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80', caption: entry.caption || '' }];
+
+  let activeIdx = 0;
+  let timerId = null;
+  let isPaused = false;
+  let remainingTime = 5000;
+  let startTime = Date.now();
+  const SLIDE_DURATION = 5000;
+
+  const playerEl = document.createElement('section');
+  playerEl.className = 'story-player';
+
+  function exitViewer() {
+    clearTimeout(timerId);
+    onBack();
+  }
+
+  function goToNext() {
+    if (activeIdx < mediaList.length - 1) {
+      activeIdx++;
+      drawStory();
+    } else if (nextClient) {
+      clearTimeout(timerId);
+      if (onSelectVitrine) {
+        onSelectVitrine(nextClient.id);
+      } else {
+        window.location.hash = `#/vitrine/${nextClient.id}`;
+      }
+    } else {
+      exitViewer();
+    }
+  }
+
+  function goToPrev() {
+    if (activeIdx > 0) {
+      activeIdx--;
+      drawStory();
+    } else if (prevClient) {
+      clearTimeout(timerId);
+      if (onSelectVitrine) {
+        onSelectVitrine(prevClient.id);
+      } else {
+        window.location.hash = `#/vitrine/${prevClient.id}`;
+      }
+    }
+  }
+
+  function startTimer(duration = SLIDE_DURATION) {
+    clearTimeout(timerId);
+    remainingTime = duration;
+    startTime = Date.now();
+    isPaused = false;
+    playerEl.classList.remove('is-paused');
+
+    timerId = setTimeout(() => {
+      goToNext();
+    }, duration);
+  }
+
+  function pauseTimer() {
+    if (isPaused) return;
+    isPaused = true;
+    clearTimeout(timerId);
+    const elapsed = Date.now() - startTime;
+    remainingTime = Math.max(500, remainingTime - elapsed);
+    playerEl.classList.add('is-paused');
+  }
+
+  function resumeTimer() {
+    if (!isPaused) return;
+    startTimer(remainingTime);
+  }
+
+  function drawStory() {
+    startTimer(SLIDE_DURATION);
+    const currentMedia = mediaList[activeIdx] || mediaList[0];
+    const net = SOCIAL_NETWORKS[entry.social_network] || SOCIAL_NETWORKS.instagram;
+    const slideCaption = currentMedia.caption || entry.caption || '';
+
+    const hasPrev = activeIdx > 0 || prevClient !== null;
+    const hasNext = activeIdx < mediaList.length - 1 || nextClient !== null;
+
+    playerEl.innerHTML = `
+      <div class="story-progress-bar">
+        ${mediaList.map((m, idx) => `
+          <div class="story-progress-seg ${idx === activeIdx ? 'active' : (idx < activeIdx ? 'passed' : '')}"></div>
+        `).join('')}
+      </div>
+
+      <header class="story-header">
+        <div class="story-header-user">
+          <div class="story-header-avatar">
+            ${entry.profile_pic
+              ? `<img src="${entry.profile_pic}" alt="${escapeHtml(entry.profile_name)}" />`
+              : defaultAvatarSvg(entry.id)
+            }
+          </div>
+          <div>
+            <div class="story-header-name">
+              ${escapeHtml(entry.profile_name || 'Vitrine Comercial')}
+              ${entry.plan_type === 'vitrine_impulsionado' ? '<span class="updates-status-badge-boost">Impulsionado</span>' : ''}
+            </div>
+            <div class="story-header-meta">${escapeHtml(entry.user_handle || '@vitrine')} · ${net.name}</div>
+          </div>
+        </div>
+        <button type="button" class="story-close-btn" aria-label="Fechar vitrine">&times;</button>
+      </header>
+
+      <div class="story-media-box">
+        <img src="${currentMedia.url}" alt="${escapeHtml(currentMedia.name)}" class="story-media-image" />
+
+        <button type="button" class="story-nav-btn prev" aria-label="Mídia anterior" ${hasPrev ? '' : 'style="display:none;"'}>&#10094;</button>
+        <button type="button" class="story-nav-btn next" aria-label="Próxima mídia" ${hasNext ? '' : 'style="display:none;"'}>&#10095;</button>
+      </div>
+
+      <footer class="story-footer">
+        ${slideCaption ? `
+          <div class="story-caption-box">
+            <p class="story-caption-text">${escapeHtml(slideCaption)}</p>
+          </div>
+        ` : ''}
+
+        <a href="${entry.social_link}" target="_blank" rel="noopener noreferrer" class="story-social-btn" style="background: ${net.color};">
+          ${net.icon}
+          <span>Visitar vitrine no ${net.name} (${escapeHtml(entry.user_handle || 'user')}) ↗</span>
+        </a>
+
+        <button type="button" class="story-publish-more-btn">
+          + Contratar e publicar outra vitrine
+        </button>
+      </footer>
+    `;
+
+    playerEl.querySelector('.story-close-btn')?.addEventListener('click', exitViewer);
+
+    const mediaBox = playerEl.querySelector('.story-media-box');
+    mediaBox?.addEventListener('pointerdown', pauseTimer);
+    mediaBox?.addEventListener('pointerup', resumeTimer);
+    mediaBox?.addEventListener('pointercancel', resumeTimer);
+    mediaBox?.addEventListener('pointerleave', resumeTimer);
+
+    playerEl.querySelector('.story-nav-btn.prev')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      goToPrev();
+    });
+
+    playerEl.querySelector('.story-nav-btn.next')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      goToNext();
+    });
+
+    playerEl.querySelector('.story-publish-more-btn')?.addEventListener('click', () => {
+      clearTimeout(timerId);
+      openVitrinePurchaseModal({
+        onPublished: (pub) => {
+          window.location.hash = `#/vitrine/${pub.id}`;
+        },
+      });
+    });
+  }
+
+  drawStory();
+  container.replaceChildren(playerEl);
+  return playerEl;
 }
