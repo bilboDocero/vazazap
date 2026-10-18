@@ -363,10 +363,10 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
           <!-- Container dinâmico Stripe Elements se disponível no aparelho -->
           <div class="stripe-wallet-section"></div>
 
-          <!-- Aviso de Métodos Pix e Cartão manual temporariamente em análise -->
+          <!-- Aviso informativo sobre carteiras digitais -->
           <div class="wallet-disabled-notice">
-            <strong>💳 Métodos Pix e Cartão manual temporariamente desabilitados (em análise no Stripe).</strong><br/>
-            Utilize uma das carteiras digitais acima (Apple Pay, Google Pay ou Link) para aprovação imediata da sua Vitrine.
+            <strong>💳 Pagamento via Carteira Digital (Stripe):</strong><br/>
+            O <strong>Apple Pay</strong> é acionado no Safari (iPhone/Mac) e o <strong>Google Pay</strong> no Chrome/Android. Caso o seu aparelho ou navegador não tenha uma carteira ativa configurada, a Stripe apresentará a opção segura de Cartão.
           </div>
 
           <button type="button" class="btn-back-to-step2" style="margin-top: 14px; width: 100%; border: 0; background: transparent; color: #64748B; font-size: 13px; cursor: pointer; text-decoration: underline;">
