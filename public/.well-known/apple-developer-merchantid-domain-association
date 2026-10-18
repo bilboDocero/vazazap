@@ -1,0 +1,4 @@
+# Apple Pay Domain Verification File
+# Download the official domain association file from your Stripe Dashboard:
+# https://dashboard.stripe.com/settings/payments/apple_pay
+# and place its contents here if required by Apple Pay domain registration.

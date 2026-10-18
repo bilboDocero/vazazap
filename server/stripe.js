@@ -199,6 +199,58 @@ export async function createStripeCardPayment({
   };
 }
 
+// ── STRIPE DIGITAL WALLET PAYMENT (APPLE PAY, GOOGLE PAY, LINK) ───
+
+export async function createStripePaymentWithMethod({
+  paymentMethodId,
+  value,
+  description,
+  recordId,
+  type = 'status',
+  planType = 'status_normal',
+  customerName = 'Anunciante VorcaroZap',
+  cpfCnpj = '',
+}) {
+  const stripe = getStripe();
+
+  if (!stripe) {
+    const mockId = `pi_mock_wallet_${Date.now()}`;
+    return {
+      paymentId: mockId,
+      status: 'succeeded',
+      billingType: 'WALLET',
+      simulated: true,
+    };
+  }
+
+  const cleanCpf = (cpfCnpj || '').replace(/\D/g, '');
+  const amountCents = Math.round(Number(value) * 100);
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: amountCents,
+    currency: 'brl',
+    payment_method: paymentMethodId,
+    confirm: true,
+    return_url: 'https://vorcarozap.com',
+    description: (description || `VorcaroZap - ${type} (${planType})`).slice(0, 500),
+    metadata: {
+      recordId: recordId || '',
+      type: type || 'status',
+      planType: planType || '',
+      cpf: cleanCpf,
+      name: (customerName || '').slice(0, 100),
+    },
+  });
+
+  return {
+    paymentIntent,
+    paymentId: paymentIntent.id,
+    status: paymentIntent.status,
+    billingType: 'WALLET',
+    simulated: false,
+  };
+}
+
 // ── STRIPE STATUS CHECK (POLLING) ─────────────────────────────────
 
 export async function getStripePaymentStatus(paymentId) {

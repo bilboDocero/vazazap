@@ -21,6 +21,10 @@
       "destination": "/llms.txt"
     },
     {
+      "source": "/.well-known/(.*)",
+      "destination": "/.well-known/$1"
+    },
+    {
       "source": "/site.webmanifest",
       "destination": "/site.webmanifest"
     },

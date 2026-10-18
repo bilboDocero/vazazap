@@ -13,6 +13,7 @@ import {
   createVitrinePurchase,
 } from '../lib/vitrine-db.js';
 import { escapeHtml, sanitizeUrl, escapeAttr, copyText, processAvatarImage } from '../lib/utils.js';
+import { mountWalletButton } from '../lib/stripe-client.js';
 
 const ICON_CHECK_CIRCLE = `<svg viewBox="0 0 24 24" width="48" height="48" fill="none"><circle cx="12" cy="12" r="11" fill="#00A884"/><path d="M7 12.5l3.5 3.5 7-7" stroke="#FFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const ICON_PLUS_SIGN = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
@@ -336,6 +337,9 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
               ${escapeHtml(paymentError)}
             </div>
           ` : ''}
+
+          <!-- Carteiras Digitais (Apple Pay, Google Pay, Link) se disponíveis no aparelho -->
+          <div class="stripe-wallet-section"></div>
 
           <!-- Tabs PIX / Cartão -->
           <div class="payment-method-selector">
@@ -747,6 +751,31 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         e.target.value = v;
         customerCpf = v;
       });
+
+      // Mount Stripe Wallet Button (Apple Pay, Google Pay, Link) if device supports it
+      const walletEl = modalEl.querySelector('.stripe-wallet-section');
+      if (walletEl) {
+        mountWalletButton({
+          containerEl: walletEl,
+          amount: pricing.finalTotal,
+          label: `VorcaroZap - ${selectedPlan === 'vitrine_impulsionado' ? 'Vitrine Impulsionada' : 'Vitrine Normal'}`,
+          customerName: profileName,
+          type: 'vitrine',
+          planType: selectedPlan,
+          fileCount: uploadedFiles.length || fileCount,
+          onPaymentSuccess: (data) => {
+            stopPolling();
+            paymentApproved = true;
+            asaasPaymentId = data.paymentId;
+            currentStep = 4;
+            render();
+          },
+          onPaymentError: (err) => {
+            paymentError = err.message || 'Falha ao processar pagamento pela carteira digital.';
+            render();
+          },
+        });
+      }
 
       // Switch tab PIX / Cartão
       modalEl.querySelectorAll('.payment-method-tab').forEach(tab => {

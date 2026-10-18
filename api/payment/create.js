@@ -8,6 +8,7 @@ import {
   getStripeConfig,
   createStripePixPayment,
   createStripeCardPayment,
+  createStripePaymentWithMethod,
 } from '../../server/stripe.js';
 
 import {
@@ -90,7 +91,20 @@ export default async function handler(req, res) {
     let pixData = null;
 
     if (useStripe) {
-      if (billingType === 'PIX') {
+      if (body.paymentMethodId) {
+        const stripeRes = await createStripePaymentWithMethod({
+          paymentMethodId: body.paymentMethodId,
+          value,
+          description,
+          recordId,
+          type,
+          planType,
+          customerName,
+          cpfCnpj: customerData.cpfCnpj,
+        });
+        paymentId = stripeRes.paymentId;
+        paymentStatus = stripeRes.status === 'succeeded' ? 'approved' : 'pending';
+      } else if (billingType === 'PIX') {
         const stripeRes = await createStripePixPayment({
           value,
           description,

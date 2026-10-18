@@ -1123,7 +1123,53 @@
   text-transform: uppercase;
 }
 
-/* ── Real Payment Tabs & Forms (Asaas v3) ──────────── */
+/* ── Real Payment Tabs & Forms (Stripe & Asaas) ──────────── */
+.stripe-wallet-section {
+  width: 100%;
+  margin-bottom: 14px;
+}
+.wallet-button-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1E293B;
+  margin-bottom: 8px;
+}
+.wallet-badge {
+  background: #008069;
+  color: #FFF;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+.stripe-wallet-button-mount {
+  width: 100%;
+  min-height: 46px;
+}
+.wallet-or-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 14px 0 12px;
+  color: #94A3B8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.wallet-or-divider::before,
+.wallet-or-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #E2E8F0;
+}
+.wallet-or-divider span {
+  padding: 0 10px;
+}
+
 .payment-method-selector {
   display: flex;
   gap: 10px;

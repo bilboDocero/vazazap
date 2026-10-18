@@ -16,6 +16,7 @@ import {
   getStripeConfig,
   createStripePixPayment,
   createStripeCardPayment,
+  createStripePaymentWithMethod,
   getStripePaymentStatus,
   getStripe,
 } from './stripe.js';
@@ -77,6 +78,18 @@ export function statusApiMiddleware(req, res, next) {
   const url = new URL(req.url, 'http://localhost');
   const pathname = url.pathname;
 
+  // ── PAYMENT CONFIG (STRIPE PUBLISHABLE KEY) ────────────────
+  // GET /api/payment/config
+  if (req.method === 'GET' && pathname === '/api/payment/config') {
+    const stripeConfig = getStripeConfig();
+    sendJson(res, 200, {
+      ok: true,
+      publishableKey: stripeConfig.publishableKey || '',
+      isConfigured: stripeConfig.isConfigured,
+    });
+    return;
+  }
+
   // ── PAYMENT CREATION (STRIPE COM FALLBACK ASAAS) ───────────
   // POST /api/payment/create
   if (req.method === 'POST' && pathname === '/api/payment/create') {
@@ -105,7 +118,20 @@ export function statusApiMiddleware(req, res, next) {
         let pixData = null;
 
         if (useStripe) {
-          if (billingType === 'PIX') {
+          if (body.paymentMethodId) {
+            const stripeRes = await createStripePaymentWithMethod({
+              paymentMethodId: body.paymentMethodId,
+              value,
+              description,
+              recordId,
+              type,
+              planType,
+              customerName,
+              cpfCnpj: customerData.cpfCnpj,
+            });
+            paymentId = stripeRes.paymentId;
+            paymentStatus = stripeRes.status === 'succeeded' ? 'approved' : 'pending';
+          } else if (billingType === 'PIX') {
             const stripeRes = await createStripePixPayment({
               value,
               description,
