@@ -20,9 +20,9 @@ const ICON_PLUS_SIGN = `<svg viewBox="0 0 24 24" width="22" height="22" fill="no
 const ICON_CAMERA = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0-2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/><path d="M9 3L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9zm11 16H4V7h3.83l1.83-2h4.68l1.83 2H20v12z"/></svg>`;
 const ICON_BACK_ARROW = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
 
-const ICON_PIX = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12.001 2.002a2.4 2.4 0 0 0-1.698.703L6.035 7.01a2.4 2.4 0 0 0 0 3.395l4.268 4.268a2.4 2.4 0 0 0 3.395 0l4.268-4.268a2.4 2.4 0 0 0 0-3.395L13.7 2.705a2.4 2.4 0 0 0-1.699-.703zm-5.966 9.362a2.4 2.4 0 0 0-1.698.703L2.705 13.7a2.4 2.4 0 0 0 0 3.395l4.268 4.268a2.4 2.4 0 0 0 3.395 0l1.633-1.633-4.268-4.268a2.4 2.4 0 0 1 0-3.395l1.633-1.633zm11.932 0-1.633 1.633a2.4 2.4 0 0 1 0 3.395l4.268 4.268 1.633-1.633a2.4 2.4 0 0 0 0-3.395l-4.268-4.268a2.4 2.4 0 0 0-1.699-.703z"/></svg>`;
+const ICON_PIX = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M5.283 18.36a3.505 3.505 0 0 0 2.493-1.032l3.6-3.6a.684.684 0 0 1 .946 0l3.613 3.613a3.504 3.504 0 0 0 2.493 1.032h.71l-4.56 4.56a3.647 3.647 0 0 1-5.156 0L4.85 18.36ZM18.428 5.627a3.505 3.505 0 0 0-2.493 1.032l-3.613 3.614a.67.67 0 0 1-.946 0l-3.6-3.6A3.505 3.505 0 0 0 5.283 5.64h-.434l4.573-4.572a3.646 3.646 0 0 1 5.156 0l4.559 4.559ZM1.068 9.422 3.79 6.699h1.492a2.483 2.483 0 0 1 1.744.722l3.6 3.6a1.73 1.73 0 0 0 2.443 0l3.614-3.613a2.482 2.482 0 0 1 1.744-.723h1.767l2.737 2.737a3.646 3.646 0 0 1 0 5.156l-2.736 2.736h-1.768a2.482 2.482 0 0 1-1.744-.722l-3.613-3.613a1.77 1.77 0 0 0-2.444 0l-3.6 3.6a2.483 2.483 0 0 1-1.744.722H3.791l-2.723-2.723a3.646 3.646 0 0 1 0-5.156"/></svg>`;
 const ICON_CARD = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>`;
-const ICON_APPLE_PAY = `<svg viewBox="0 0 50 32" width="38" height="24" fill="currentColor"><path d="M11.9 14.8c-.8 1-2.1 1.6-3.4 1.5-.2-1.3.4-2.7 1.2-3.6.8-1 2.2-1.6 3.3-1.6.2 1.3-.3 2.7-1.1 3.7zm1.2 1.8c-1.9 0-3.3-1.1-4.4-1.1-1.1 0-2.4 1-3.7 1-2 0-4-1.2-5-3.1-2.2-3.8-.6-9.4 1.5-12.4 1-1.5 2.3-3.1 4-3.1 1.3 0 2.2.9 3.4.9 1.2 0 2-.9 3.4-.9 1.7 0 2.9 1.5 3.9 3 1.2 1.7 1.6 3.4 1.7 3.5-.1.1-3.2 1.3-3.2 5 0 3.1 2.5 4.3 2.6 4.4-.3 1-1.7 4.1-3.7 5.4l-.5.4zM24.2 19V6.2h3.9c2.8 0 4.7 1.9 4.7 4.7 0 2.8-1.9 4.7-4.7 4.7h-1.9V19h-2zm2-5.3h1.8c1.7 0 2.8-1 2.8-2.6 0-1.6-1.1-2.6-2.8-2.6h-1.8v5.2zm8.7 5.3c-.8 0-1.5-.4-1.8-1l-.1-.4v1.2h-1.9V9.7h1.9v1.2l.1-.4c.3-.6 1-1 1.8-1 1.7 0 2.9 1.4 2.9 3.7v2c0 2.4-1.2 3.8-2.9 3.8zm-.3-1.6c1.1 0 1.8-.9 1.8-2.3v-1.7c0-1.4-.7-2.3-1.8-2.3s-1.8.9-1.8 2.3v1.7c0 1.4.7 2.3 1.8 2.3zm8.3 4.5l-2.6-7.8h2.1l1.5 5.2 1.5-5.2h2.1l-4.1 11.2h-2.1l1.6-3.4z"/></svg>`;
+const ICON_APPLE_PAY = `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>`;
 const ICON_GOOGLE_PAY = `<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.14-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>`;
 const ICON_LINK = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
 
@@ -60,7 +60,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
   let asaasPaymentId = null;
   let statusRecordId = `status-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   let pixData = null;
-  let isProcessingPayment = false;
+  let processingWallet = null;
   let paymentError = '';
   let paymentApproved = false;
   let pollIntervalId = null;
@@ -342,23 +342,46 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             </div>
           ` : ''}
 
-          <!-- Botões das Carteiras Digitais Ativas (Apple Pay, Google Pay e Link) -->
+          <!-- Botões das Formas de Pagamento (Apple Pay, Google Pay, Pix e Cartão/Link) -->
           <div class="wallet-buttons-stack">
-            <button type="button" class="btn-wallet-apple" data-wallet="apple_pay" ${isProcessingPayment ? 'disabled' : ''}>
+            <button type="button" class="btn-wallet-apple" data-wallet="apple_pay" ${processingWallet ? 'disabled' : ''}>
               ${ICON_APPLE_PAY}
-              <span>${isProcessingPayment ? 'Processando autorização...' : `Pagar com Apple Pay (${pricing.formattedTotal})`}</span>
+              <span>${processingWallet === 'apple_pay' ? 'Processando autorização Apple Pay...' : `Pagar com Apple Pay (${pricing.formattedTotal})`}</span>
             </button>
 
-            <button type="button" class="btn-wallet-google" data-wallet="google_pay" ${isProcessingPayment ? 'disabled' : ''}>
+            <button type="button" class="btn-wallet-google" data-wallet="google_pay" ${processingWallet ? 'disabled' : ''}>
               ${ICON_GOOGLE_PAY}
-              <span>${isProcessingPayment ? 'Processando autorização...' : `Pagar com Google Pay (${pricing.formattedTotal})`}</span>
+              <span>${processingWallet === 'google_pay' ? 'Processando autorização Google Pay...' : `Pagar com Google Pay (${pricing.formattedTotal})`}</span>
             </button>
 
-            <button type="button" class="btn-wallet-link" data-wallet="link" ${isProcessingPayment ? 'disabled' : ''}>
+            <button type="button" class="btn-wallet-pix" data-wallet="pix" ${processingWallet ? 'disabled' : ''}>
+              ${ICON_PIX}
+              <span>${processingWallet === 'pix' ? 'Gerando QR Code Pix...' : `Pagar com Pix Instantâneo (${pricing.formattedTotal})`}</span>
+            </button>
+
+            <button type="button" class="btn-wallet-link" data-wallet="link" ${processingWallet ? 'disabled' : ''}>
               ${ICON_LINK}
-              <span>${isProcessingPayment ? 'Processando autorização...' : `Pagar com Carteira Digital / Link (${pricing.formattedTotal})`}</span>
+              <span>${processingWallet === 'link' ? 'Processando autorização...' : `Pagar com Carteira Digital / Link (${pricing.formattedTotal})`}</span>
             </button>
           </div>
+
+          ${pixData ? `
+            <div class="pix-qr-container" style="margin-top: 14px;">
+              <span style="font-size: 13px; font-weight: 600; color: #111B21;">Escaneie o QR Code abaixo no app do seu banco:</span>
+              <img src="${pixData.imageUrl || (pixData.encodedImage ? `data:image/png;base64,${pixData.encodedImage}` : '')}" alt="QR Code PIX" class="pix-qr-img" />
+
+              <div class="pix-waiting-box">
+                <span class="pix-pulse-dot"></span>
+                <span>Aguardando confirmação do pagamento Pix...</span>
+              </div>
+
+              <span style="font-size: 12px; color: #64748B;">Ou copie o código Pix Copia e Cola:</span>
+              <div class="pix-copia-cola-box">
+                <input type="text" readonly class="pix-copia-cola-input" value="${escapeAttr(pixData.payload)}" />
+                <button type="button" class="pix-copy-btn btn-copy-pix">Copiar Código</button>
+              </div>
+            </div>
+          ` : ''}
 
           <!-- Container dinâmico Stripe Elements se disponível no aparelho -->
           <div class="stripe-wallet-section"></div>
@@ -729,14 +752,59 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         });
       }
 
-      // Listeners para os botões das Carteiras Digitais (Apple Pay, Google Pay, Link)
+      // Listeners para os botões das Formas de Pagamento (Apple Pay, Google Pay, Pix, Link)
       modalEl.querySelectorAll('.wallet-buttons-stack button').forEach(btn => {
         btn.addEventListener('click', async () => {
           const walletType = btn.dataset.wallet;
-          isProcessingPayment = true;
+          processingWallet = walletType;
           paymentError = '';
           render();
 
+          // Fluxo Pix
+          if (walletType === 'pix') {
+            try {
+              const res = await fetch('/api/payment/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  id: statusRecordId,
+                  type: 'status',
+                  billingType: 'PIX',
+                  plan_type: selectedPlan,
+                  file_count: uploadedFiles.length || fileCount,
+                  profile_name: profileName,
+                  user_handle: userHandle,
+                  social_network: selectedNetwork,
+                  customer: {
+                    name: profileName || 'Anunciante VorcaroZap',
+                    cpfCnpj: customerCpf || '000.000.000-00',
+                  },
+                }),
+              });
+
+              const data = await res.json();
+              processingWallet = null;
+
+              if (!res.ok || !data.ok) {
+                paymentError = data.error || 'Não foi possível gerar a cobrança Pix.';
+                render();
+                return;
+              }
+
+              pixData = data.pix;
+              render();
+              if (data.paymentId) {
+                startPaymentPolling(data.paymentId, statusRecordId);
+              }
+            } catch (err) {
+              processingWallet = null;
+              paymentError = 'Erro ao gerar Pix: ' + err.message;
+              render();
+            }
+            return;
+          }
+
+          // Fluxo Carteiras Digitais (Apple Pay, Google Pay, Link)
           try {
             const res = await fetch('/api/payment/create', {
               method: 'POST',
@@ -758,7 +826,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             });
 
             const data = await res.json();
-            isProcessingPayment = false;
+            processingWallet = null;
 
             if (!res.ok || !data.ok) {
               paymentError = data.error || 'Não foi possível processar o pagamento com a carteira digital.';
@@ -794,11 +862,21 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
               render();
             }
           } catch (err) {
-            isProcessingPayment = false;
+            processingWallet = null;
             paymentError = 'Erro ao conectar com o gateway de pagamento: ' + err.message;
             render();
           }
         });
+      });
+
+      modalEl.querySelector('.btn-copy-pix')?.addEventListener('click', async (e) => {
+        if (pixData?.payload) {
+          await copyText(pixData.payload);
+          const btn = e.currentTarget;
+          const origText = btn.textContent;
+          btn.textContent = 'Copiado! ✓';
+          setTimeout(() => { btn.textContent = origText; }, 2000);
+        }
       });
 
       modalEl.querySelector('.btn-back-to-step2')?.addEventListener('click', () => {
