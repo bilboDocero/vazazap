@@ -13,7 +13,6 @@ import {
   createStatusPurchase,
 } from '../lib/status-db.js';
 import { escapeHtml, sanitizeUrl, escapeAttr, copyText, processAvatarImage } from '../lib/utils.js';
-import { mountWalletButton } from '../lib/stripe-client.js';
 
 const ICON_CHECK_CIRCLE = `<svg viewBox="0 0 24 24" width="48" height="48" fill="none"><circle cx="12" cy="12" r="11" fill="#00A884"/><path d="M7 12.5l3.5 3.5 7-7" stroke="#FFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const ICON_PLUS_SIGN = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
@@ -383,13 +382,9 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
             </div>
           ` : ''}
 
-          <!-- Container dinâmico Stripe Elements se disponível no aparelho -->
-          <div class="stripe-wallet-section"></div>
-
-          <!-- Aviso informativo sobre carteiras digitais -->
-          <div class="wallet-disabled-notice">
-            <strong>💳 Pagamento via Carteira Digital (Stripe):</strong><br/>
-            O <strong>Apple Pay</strong> é acionado no Safari (iPhone/Mac) e o <strong>Google Pay</strong> no Chrome/Android. Caso o seu aparelho ou navegador não tenha uma carteira ativa configurada, a Stripe apresentará a opção segura de Cartão.
+          <div class="payment-trust-badge">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Ambiente seguro processado pela Stripe · Liberação imediata após pagamento</span>
           </div>
 
           <button type="button" class="btn-back-to-step2" style="margin-top: 14px; width: 100%; border: 0; background: transparent; color: #64748B; font-size: 13px; cursor: pointer; text-decoration: underline;">
@@ -727,31 +722,6 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
         customerCpf = v;
       });
 
-      // Mount Stripe Wallet Button (Apple Pay, Google Pay, Link) if device supports it
-      const walletEl = modalEl.querySelector('.stripe-wallet-section');
-      if (walletEl) {
-        mountWalletButton({
-          containerEl: walletEl,
-          amount: pricing.finalTotal,
-          label: `VorcaroZap - ${selectedPlan === 'status_impulsionado' ? 'Status Impulsionado' : 'Status Normal'}`,
-          customerName: profileName,
-          type: 'status',
-          planType: selectedPlan,
-          fileCount: uploadedFiles.length || fileCount,
-          onPaymentSuccess: (data) => {
-            stopPolling();
-            paymentApproved = true;
-            asaasPaymentId = data.paymentId;
-            currentStep = 4;
-            render();
-          },
-          onPaymentError: (err) => {
-            paymentError = err.message || 'Falha ao processar pagamento pela carteira digital.';
-            render();
-          },
-        });
-      }
-
       // Listeners para os botões das Formas de Pagamento (Apple Pay, Google Pay, Pix, Link)
       modalEl.querySelectorAll('.wallet-buttons-stack button').forEach(btn => {
         btn.addEventListener('click', async () => {
@@ -834,7 +804,12 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
               return;
             }
 
-            if (data.checkoutUrl) {
+            const isLocalOrSimulated =
+              Boolean(data.paymentId?.startsWith('cs_simulated_')) ||
+              Boolean(data.checkoutUrl?.includes('cs_simulated_')) ||
+              Boolean(data.checkoutUrl?.includes('payment=success'));
+
+            if (data.checkoutUrl && !isLocalOrSimulated) {
               try {
                 localStorage.setItem('vorcarozap:draft_story', JSON.stringify({
                   id: statusRecordId,
@@ -855,11 +830,13 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
               return;
             }
 
-            if (data.paymentStatus === 'approved') {
-              asaasPaymentId = data.paymentId;
+            if (isLocalOrSimulated || data.paymentStatus === 'approved') {
+              asaasPaymentId = data.paymentId || `cs_simulated_${Date.now()}`;
               paymentApproved = true;
+              processingWallet = null;
               currentStep = 4; // Advance to Preview!
               render();
+              return;
             }
           } catch (err) {
             processingWallet = null;

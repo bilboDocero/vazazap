@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     }
 
     let statusInfo = null;
-    if (paymentId.startsWith('pi_')) {
+    if (paymentId.startsWith('pi_') || paymentId.startsWith('cs_')) {
       statusInfo = await getStripePaymentStatus(paymentId);
     } else {
       statusInfo = await getAsaasPaymentStatus(paymentId);

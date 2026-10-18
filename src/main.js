@@ -592,6 +592,7 @@ async function init() {
     } catch {}
   }
   checkStripeCheckoutReturn();
+  window.addEventListener('hashchange', checkStripeCheckoutReturn);
 
   const updatesCatalog = createUpdatesCatalog(store.getConversations());
   let activeUpdates = null;

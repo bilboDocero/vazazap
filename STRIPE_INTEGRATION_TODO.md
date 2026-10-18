@@ -1,5 +1,9 @@
 # Stripe Integration Status & Next Steps
 
+## Status Atual da Integração
+- **Capacidades Ativadas**: Cobranças com Cartão de Crédito, Apple Pay, Google Pay, Link e Pix habilitadas no Stripe Dashboard.
+- **Padrão de UX Adotado**: **Ponto A (UX Híbrida)** — Pix instantâneo gerado e validado diretamente no modal (QR Code + Copia e Cola) e Carteiras Digitais (Apple Pay / Google Pay / Link / Cartão) via Stripe Checkout Session (`ui_mode: 'hosted_page'`).
+
 ## Values to Replace
 
 The following values are configured dynamically in the application code.
@@ -10,8 +14,8 @@ The following values are configured dynamically in the application code.
 | Field | Current Value | What to Set |
 |-------|--------------|-------------|
 | mode | payment | Set to "payment" for one-time charges or "subscription" for recurring billing. |
-| success_url | `http://localhost:5173/#/status?session_id={CHECKOUT_SESSION_ID}` | Your actual post-payment success page URL. Keep the `{CHECKOUT_SESSION_ID}` template. |
-| cancel_url | `http://localhost:5173/#/status` | Your actual cancel/return page URL. |
+| success_url | Dynamic origin + `/#/status?payment=success&session_id={CHECKOUT_SESSION_ID}` | Actual post-payment success return page URL. Keep the `{CHECKOUT_SESSION_ID}` template. |
+| cancel_url | Dynamic origin + `/#/status?payment=cancel` | Actual cancel/return page URL. |
 | line_items[].price_data | Dynamic BRL price calculation (`amountCents`) | Dynamic in-code calculation in BRL or custom Stripe Price IDs from Dashboard. |
 
 ## Configured Parameters
@@ -37,26 +41,24 @@ These parameters were configured in Checkout Studio and are already set correctl
 ### 1. Environment Variables & API Keys
 Configure the following variables in your `.env` file:
 ```env
-STRIPE_SECRET_KEY=sk_test_... (or sk_live_... for production)
-STRIPE_PUBLISHABLE_KEY=pk_test_... (or pk_live_... for production)
+STRIPE_SECRET_KEY=sk_live_... (ou sk_test_... em desenvolvimento)
+STRIPE_PUBLISHABLE_KEY=pk_live_... (ou pk_test_... em desenvolvimento)
 STRIPE_WEBHOOK_SECRET=whsec_...
 ```
-- For development and local testing before compliance verification, use test keys (`sk_test_...` and `pk_test_...`) from [Stripe Dashboard API Keys](https://dashboard.stripe.com/apikeys).
-- In production, ensure your live account has completed document verification and activated `card_payments`.
 
-### 2. How the Integration Works
-1. **Initiation**: The customer selects the Status or Vitrine plan and completes content editing.
-2. **Checkout Session Creation**: Clicking Apple Pay, Google Pay, or Digital Wallet invokes `/api/payment/create`, which creates a Stripe Checkout Session with `ui_mode: 'hosted_page'`.
-3. **Redirection & Authorization**: The customer is redirected to the Stripe hosted page where Apple Pay (iOS/macOS Safari), Google Pay (Android/Chrome), Link, and Card are displayed.
-4. **Fulfillment**: Once authorized, Stripe redirects back to `success_url` with `{CHECKOUT_SESSION_ID}`. The application verifies the session status and marks the story as published in Supabase and IndexedDB.
-5. **Webhook**: The endpoint `POST /api/webhook/stripe` verifies `payment_intent.succeeded` as asynchronous redundancy.
+### 2. How the Integration Works (Ponto A: UX Híbrida)
+1. **Etapa 1 (Plano)**: Cliente escolhe Plano Normal ou Impulsionado e a quantidade de fotos/arquivos.
+2. **Etapa 2 (Edição)**: Cliente faz o upload do avatar/logo, define nome, rede social, @usuário e fotos.
+3. **Etapa 3 (Pagamento)**:
+   - **Pix Instantâneo**: Gera o QR Code e código Copia e Cola direto no modal via `createStripePixPayment`. O sistema faz polling automático a cada 3s em `/api/payment/status`. Assim que pago no app do banco, avança para a Etapa 4 automaticamente.
+   - **Apple Pay / Google Pay / Carteira Digital**: Cria a Checkout Session na Stripe e redireciona o cliente para autorização em 1-clique. Ao retornar, o sistema captura o `session_id`, valida a aprovação e abre a Etapa 4.
+4. **Etapa 4 (Pré-visualização)**: Exibe a simulação realística do story/vitrine no celular com selo de pagamento confirmado e botão "Confirmar e Publicar".
 
-### 3. Testing and Test Cards
-- In test mode (`sk_test_...`), use official Stripe test cards:
-  - Card number: `4242 4242 4242 4242`
-  - Expiry: Any future date (e.g. `12/28`)
-  - CVC: Any 3 digits (e.g. `123`)
-  - Postal Code: Any 5-8 digits (e.g. `01001-000`)
+### 3. Webhook da Stripe em Produção
+Cadastre no [Stripe Dashboard > Webhooks](https://dashboard.stripe.com/webhooks):
+- **URL**: `https://seudominio.com/api/webhook/stripe`
+- **Eventos escutados**: `payment_intent.succeeded` e `checkout.session.completed`
+- Copie o **Segredo de assinatura** (`whsec_...`) para o seu arquivo `.env` como `STRIPE_WEBHOOK_SECRET`.
 
 ### 4. Resources
 - Support: https://support.stripe.com

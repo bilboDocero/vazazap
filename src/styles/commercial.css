@@ -1214,6 +1214,20 @@
   background: #00C063;
   transform: translateY(-1px);
 }
+.payment-trust-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: #64748B;
+  text-align: center;
+}
+.payment-trust-badge svg {
+  color: #00A884;
+  flex-shrink: 0;
+}
 .wallet-disabled-notice {
   background: #F8FAFC;
   border: 1px dashed #CBD5E1;

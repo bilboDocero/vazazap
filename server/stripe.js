@@ -299,7 +299,9 @@ export async function getStripePaymentStatus(paymentId) {
      paymentId.startsWith('pi_simulated_') ||
      paymentId.startsWith('pi_apple_') ||
      paymentId.startsWith('pi_google_') ||
-     paymentId.startsWith('pi_wallet_'))
+     paymentId.startsWith('pi_wallet_') ||
+     paymentId.startsWith('cs_simulated_') ||
+     paymentId.startsWith('cs_mock_'))
   ) {
     return {
       id: paymentId,

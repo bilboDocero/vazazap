@@ -288,7 +288,8 @@ export function statusApiMiddleware(req, res, next) {
       return;
     }
 
-    const checkPromise = paymentId.startsWith('pi_')
+    const isStripe = paymentId.startsWith('pi_') || paymentId.startsWith('cs_');
+    const checkPromise = isStripe
       ? getStripePaymentStatus(paymentId)
       : getAsaasPaymentStatus(paymentId);
 
