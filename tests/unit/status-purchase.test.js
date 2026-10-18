@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   calculateStatusPrice,
   buildSocialLink,
@@ -14,7 +14,11 @@ import {
 describe('Status Purchase & Pricing Calculator', () => {
   beforeEach(() => {
     localStorage.clear();
+    saveCachedStatuses([]);
+    vi.stubGlobal('fetch', vi.fn());
   });
+
+  afterEach(() => vi.unstubAllGlobals());
 
   describe('calculateStatusPrice - Status Normal (R$ 4,90)', () => {
     it('calculates 1 file without discount', () => {
@@ -107,7 +111,7 @@ describe('Status Purchase & Pricing Calculator', () => {
 
   describe('Status Storage & Purchase creation', () => {
     it('creates and caches a purchased status with media and approved status', async () => {
-      const created = await createStatusPurchase({
+      const serverPurchase = {
         plan_type: 'status_normal',
         file_count: 2,
         unit_price: 4.90,
@@ -121,7 +125,11 @@ describe('Status Purchase & Pricing Calculator', () => {
           { id: '1', name: 'foto1.jpg', url: 'https://example.com/1.jpg' },
           { id: '2', name: 'foto2.jpg', url: 'https://example.com/2.jpg' },
         ],
-      });
+        id: 'verified-purchase', payment_status: 'approved',
+        social_link: 'https://instagram.com/julianadev',
+      };
+      fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true, purchase: serverPurchase }) });
+      const created = await createStatusPurchase({ id: serverPurchase.id, payment_id: 'cs_test_verified', purchase_token: 'a'.repeat(32) });
 
       expect(created.id).toBeDefined();
       expect(created.payment_status).toBe('approved');
@@ -133,7 +141,7 @@ describe('Status Purchase & Pricing Calculator', () => {
     });
 
     it('supports individual captions for each media item', async () => {
-      const created = await createStatusPurchase({
+      const serverPurchase = {
         plan_type: 'status_normal',
         file_count: 2,
         unit_price: 4.90,
@@ -147,7 +155,11 @@ describe('Status Purchase & Pricing Calculator', () => {
           { id: '1', name: 'foto1.jpg', url: 'https://example.com/1.jpg', caption: 'Legenda da primeira foto' },
           { id: '2', name: 'foto2.jpg', url: 'https://example.com/2.jpg', caption: 'Legenda diferente da segunda foto' },
         ],
-      });
+        id: 'verified-purchase', payment_status: 'approved',
+        social_link: 'https://instagram.com/julianadev',
+      };
+      fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true, purchase: serverPurchase }) });
+      const created = await createStatusPurchase({ id: serverPurchase.id, payment_id: 'cs_test_verified', purchase_token: 'a'.repeat(32) });
 
       expect(created.media_files[0].caption).toBe('Legenda da primeira foto');
       expect(created.media_files[1].caption).toBe('Legenda diferente da segunda foto');
@@ -189,4 +201,13 @@ describe('Status Purchase & Pricing Calculator', () => {
       expect(clientSorted.map(s => s.id)).toEqual(['b1', 'n1']);
     });
   });
+  it('never publishes or caches an offline or rejected purchase', async () => {
+    fetch.mockRejectedValueOnce(new Error('Offline'));
+    await expect(createStatusPurchase({ id: 'offline', payment_status: 'approved' })).rejects.toThrow('Offline');
+    expect(loadCachedStatuses()).toEqual([]);
+    fetch.mockResolvedValueOnce({ ok: false, json: async () => ({ ok: false, error: 'Pagamento pendente' }) });
+    await expect(createStatusPurchase({ id: 'unpaid', payment_status: 'approved' })).rejects.toThrow('Pagamento pendente');
+    expect(loadCachedStatuses()).toEqual([]);
+  });
+
 });

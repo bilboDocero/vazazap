@@ -1,3 +1,4 @@
+import { handleCheckoutReturn } from './lib/checkout.js';
 // MasterWhats — WhatsApp-like web viewer
 // Entry point — initializes the app layout
 
@@ -34,8 +35,8 @@ import { renderVitrineDetail } from './components/VitrineDetail.js';
 import { getVitrinesCatalog } from './lib/commercial-content.js';
 import { renderAgendaPanel } from './components/AgendaPanel.js';
 import { renderAgendaDetail } from './components/AgendaDetail.js';
-import { loadCachedStatuses, createStatusPurchase } from './lib/status-db.js';
-import { loadCachedVitrines, createVitrinePurchase } from './lib/vitrine-db.js';
+import { loadCachedStatuses } from './lib/status-db.js';
+import { loadCachedVitrines } from './lib/vitrine-db.js';
 import { exportUrl, EXPORT_ALL_URL, downloadFile } from './lib/export.js';
 import { copyText } from './lib/utils.js';
 
@@ -553,46 +554,8 @@ async function init() {
   const router = new HashRouter();
   router.on('home', () => { sidebar.showChats?.(); navRail.setActive?.('chats'); showEmptyState(); });
 
-  // Handle Stripe Checkout return
-  function checkStripeCheckoutReturn() {
-    try {
-      const search = window.location.search || '';
-      const hash = window.location.hash || '';
-      const searchPart = search.replace(/^\?/, '') || (hash.includes('?') ? hash.split('?')[1] : '');
-      const params = new URLSearchParams(searchPart);
-
-      const sessionId = params.get('session_id');
-      const isSuccess = params.get('payment') === 'success';
-      const recordId = params.get('record_id');
-      const type = params.get('type') || 'status';
-
-      if (sessionId && isSuccess) {
-        const cleanHash = '#/' + type;
-        window.history.replaceState({}, '', window.location.pathname + cleanHash);
-
-        fetch(`/api/payment/status?paymentId=${encodeURIComponent(sessionId)}&recordId=${encodeURIComponent(recordId || '')}&type=${type}`)
-          .then(r => r.json())
-          .then(data => {
-            if (data.ok && data.isPaid) {
-              const draftKey = type === 'vitrine' ? 'vorcarozap:draft_vitrine' : 'vorcarozap:draft_story';
-              const raw = localStorage.getItem(draftKey);
-              if (raw) {
-                const draft = JSON.parse(raw);
-                localStorage.removeItem(draftKey);
-                if (type === 'vitrine') {
-                  createVitrinePurchase({ ...draft, payment_status: 'approved', payment_id: sessionId });
-                } else {
-                  createStatusPurchase({ ...draft, payment_status: 'approved', payment_id: sessionId });
-                }
-              }
-            }
-          })
-          .catch(() => {});
-      }
-    } catch {}
-  }
-  checkStripeCheckoutReturn();
-  window.addEventListener('hashchange', checkStripeCheckoutReturn);
+  handleCheckoutReturn();
+  window.addEventListener('hashchange', handleCheckoutReturn);
 
   const updatesCatalog = createUpdatesCatalog(store.getConversations());
   let activeUpdates = null;

@@ -1,29 +1,19 @@
-/**
- * VitrinePurchaseModal component — exact counterpart of StatusPurchaseModal
- * for the Vitrine product, with real Asaas payment integration (PIX QR Code & Cartão)
- * and PostgreSQL persistence.
- *
- * Sequence: 1. Plano -> 2. Edição -> 3. Pagamento -> 4. Preview
- */
+import { checkoutIdentity, startCheckout } from '../lib/checkout.js';
+/** Purchase flow: plan, content, review, secure Stripe Checkout. */
 
 import {
   SOCIAL_NETWORKS,
   calculateVitrinePrice,
   buildSocialLink,
-  createVitrinePurchase,
 } from '../lib/vitrine-db.js';
-import { escapeHtml, sanitizeUrl, escapeAttr, copyText, processAvatarImage } from '../lib/utils.js';
+import { escapeHtml, sanitizeUrl, escapeAttr, processAvatarImage } from '../lib/utils.js';
 
-const ICON_CHECK_CIRCLE = `<svg viewBox="0 0 24 24" width="48" height="48" fill="none"><circle cx="12" cy="12" r="11" fill="#00A884"/><path d="M7 12.5l3.5 3.5 7-7" stroke="#FFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const ICON_PLUS_SIGN = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
 const ICON_CAMERA = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0-2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/><path d="M9 3L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9zm11 16H4V7h3.83l1.83-2h4.68l1.83 2H20v12z"/></svg>`;
 const ICON_BACK_ARROW = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
 
 const ICON_PIX = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M5.283 18.36a3.505 3.505 0 0 0 2.493-1.032l3.6-3.6a.684.684 0 0 1 .946 0l3.613 3.613a3.504 3.504 0 0 0 2.493 1.032h.71l-4.56 4.56a3.647 3.647 0 0 1-5.156 0L4.85 18.36ZM18.428 5.627a3.505 3.505 0 0 0-2.493 1.032l-3.613 3.614a.67.67 0 0 1-.946 0l-3.6-3.6A3.505 3.505 0 0 0 5.283 5.64h-.434l4.573-4.572a3.646 3.646 0 0 1 5.156 0l4.559 4.559ZM1.068 9.422 3.79 6.699h1.492a2.483 2.483 0 0 1 1.744.722l3.6 3.6a1.73 1.73 0 0 0 2.443 0l3.614-3.613a2.482 2.482 0 0 1 1.744-.723h1.767l2.737 2.737a3.646 3.646 0 0 1 0 5.156l-2.736 2.736h-1.768a2.482 2.482 0 0 1-1.744-.722l-3.613-3.613a1.77 1.77 0 0 0-2.444 0l-3.6 3.6a2.483 2.483 0 0 1-1.744.722H3.791l-2.723-2.723a3.646 3.646 0 0 1 0-5.156"/></svg>`;
 const ICON_CARD = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>`;
-const ICON_APPLE_PAY = `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>`;
-const ICON_GOOGLE_PAY = `<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.14-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>`;
-const ICON_LINK = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB max per attachment
 
@@ -53,34 +43,11 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
   let previewActiveIdx = 0;
   let uploadError = '';
 
-  // Payment State (Asaas v3, captured in Step 3: Pagamento)
-  let selectedBillingType = 'PIX';
-  let customerCpf = '';
-  let asaasPaymentId = null;
-  let vitrineRecordId = `vitrine-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-  let pixData = null;
+  const identity = checkoutIdentity();
   let processingWallet = null;
   let paymentError = '';
-  let paymentApproved = false;
-  let pollIntervalId = null;
-
-  // Credit Card Form State
-  let cardHolderName = '';
-  let cardNumber = '';
-  let cardExpiry = '';
-  let cardCcv = '';
-  let cardCep = '';
-  let cardAddressNumber = '';
-
-  function stopPolling() {
-    if (pollIntervalId) {
-      clearInterval(pollIntervalId);
-      pollIntervalId = null;
-    }
-  }
 
   function closeModal() {
-    stopPolling();
     modalEl.classList.remove('open');
     setTimeout(() => modalEl.remove(), 200);
     document.removeEventListener('keydown', handleKey);
@@ -88,24 +55,6 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
 
   function handleKey(e) {
     if (e.key === 'Escape') closeModal();
-  }
-
-  function startPaymentPolling(paymentId, recordId) {
-    stopPolling();
-    pollIntervalId = setInterval(async () => {
-      try {
-        const res = await fetch(`/api/payment/status?paymentId=${encodeURIComponent(paymentId)}&recordId=${encodeURIComponent(recordId)}&type=vitrine`);
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.ok && data.isPaid) {
-          stopPolling();
-          currentStep = 4; // Advance to Preview!
-          render();
-        }
-      } catch (err) {
-        console.warn('[Vitrine Payment Polling Error]', err);
-      }
-    }, 3000);
   }
 
   function render() {
@@ -117,8 +66,8 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
           <div class="status-modal-steps">
             <span class="status-step-pill ${currentStep >= 1 ? 'active' : ''}">Plano</span>
             <span class="status-step-pill ${currentStep >= 2 ? 'active' : ''}">Edição</span>
-            <span class="status-step-pill ${currentStep >= 3 ? 'active' : ''}">Pagamento</span>
-            <span class="status-step-pill ${currentStep >= 4 ? 'active' : ''}">Preview</span>
+            <span class="status-step-pill ${currentStep === 4 || currentStep === 3 ? 'active' : ''}">Revisão</span>
+            <span class="status-step-pill ${currentStep === 3 ? 'active' : ''}">Pagamento</span>
           </div>
           <button class="status-modal-close" aria-label="Fechar modal">&times;</button>
         </header>
@@ -341,46 +290,15 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
             </div>
           ` : ''}
 
-          <!-- Botões das Formas de Pagamento (Apple Pay, Google Pay, Pix e Cartão/Link) -->
           <div class="wallet-buttons-stack">
-            <button type="button" class="btn-wallet-apple" data-wallet="apple_pay" ${processingWallet ? 'disabled' : ''}>
-              ${ICON_APPLE_PAY}
-              <span>${processingWallet === 'apple_pay' ? 'Processando autorização Apple Pay...' : `Pagar com Apple Pay (${pricing.formattedTotal})`}</span>
-            </button>
-
-            <button type="button" class="btn-wallet-google" data-wallet="google_pay" ${processingWallet ? 'disabled' : ''}>
-              ${ICON_GOOGLE_PAY}
-              <span>${processingWallet === 'google_pay' ? 'Processando autorização Google Pay...' : `Pagar com Google Pay (${pricing.formattedTotal})`}</span>
-            </button>
-
             <button type="button" class="btn-wallet-pix" data-wallet="pix" ${processingWallet ? 'disabled' : ''}>
-              ${ICON_PIX}
-              <span>${processingWallet === 'pix' ? 'Gerando QR Code Pix...' : `Pagar com Pix Instantâneo (${pricing.formattedTotal})`}</span>
+              ${ICON_PIX}<span>${processingWallet === 'pix' ? 'Abrindo pagamento…' : 'Pagar com Pix (' + pricing.formattedTotal + ')'}</span>
             </button>
-
-            <button type="button" class="btn-wallet-link" data-wallet="link" ${processingWallet ? 'disabled' : ''}>
-              ${ICON_LINK}
-              <span>${processingWallet === 'link' ? 'Processando autorização...' : `Pagar com Carteira Digital / Link (${pricing.formattedTotal})`}</span>
+            <button type="button" class="btn-wallet-link" data-wallet="card" ${processingWallet ? 'disabled' : ''}>
+              ${ICON_CARD}<span>${processingWallet === 'card' ? 'Abrindo pagamento…' : 'Pagar com cartão (' + pricing.formattedTotal + ')'}</span>
             </button>
           </div>
-
-          ${pixData ? `
-            <div class="pix-qr-container" style="margin-top: 14px;">
-              <span style="font-size: 13px; font-weight: 600; color: #111B21;">Escaneie o QR Code abaixo no app do seu banco:</span>
-              <img src="${pixData.imageUrl || (pixData.encodedImage ? `data:image/png;base64,${pixData.encodedImage}` : '')}" alt="QR Code PIX" class="pix-qr-img" />
-
-              <div class="pix-waiting-box">
-                <span class="pix-pulse-dot"></span>
-                <span>Aguardando confirmação do pagamento Pix...</span>
-              </div>
-
-              <span style="font-size: 12px; color: #64748B;">Ou copie o código Pix Copia e Cola:</span>
-              <div class="pix-copia-cola-box">
-                <input type="text" readonly class="pix-copia-cola-input" value="${escapeAttr(pixData.payload)}" />
-                <button type="button" class="pix-copy-btn btn-copy-pix">Copiar Código</button>
-              </div>
-            </div>
-          ` : ''}
+          <p class="status-modal-desc">Apple Pay e Google Pay aparecem no pagamento com cartão quando disponíveis no seu dispositivo.</p>
 
           <div class="payment-trust-badge">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -407,14 +325,8 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
 
       return `
         <div class="status-step-preview">
-          <div style="text-align: center; margin-bottom: 8px;">
-            <span style="display: inline-block; padding: 4px 12px; background: #DCFCE7; color: #15803D; border-radius: 12px; font-size: 12px; font-weight: 700;">
-              ✓ Pagamento Confirmado
-            </span>
-          </div>
-
           <h2 class="status-modal-title">Pré-visualização da Vitrine</h2>
-          <p class="status-modal-desc">Confira exatamente como seu produto será exibido na Vitrine antes de confirmar a publicação.</p>
+          <p class="status-modal-desc">Confira exatamente como seu produto será exibido na Vitrine antes de seguir para o pagamento. Após a confirmação, a publicação é automática.</p>
 
           <div class="status-preview-frame">
             <div class="status-preview-screen">
@@ -471,7 +383,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
               &larr; Voltar para editar
             </button>
             <button type="button" class="status-btn-primary btn-confirm-publish">
-              Confirmar e Publicar Vitrine
+              Continuar para pagamento
             </button>
           </div>
         </div>
@@ -694,165 +606,36 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         }
 
         uploadError = '';
-        currentStep = 3; // Advance to Pagamento!
+        fileCount = uploadedFiles.length;
+        currentStep = 4; // Review the exact purchase before payment.
         render();
       });
     }
 
-    // ── Events Step 3: Pagamento Asaas (Fricção Mínima) ───────
+    // ── Events Step 3: Pagamento no Checkout ───────
     else if (currentStep === 3) {
-      const cpfInput = modalEl.querySelector('.input-customer-cpf');
-
-      cpfInput?.addEventListener('input', e => {
-        let v = e.target.value.replace(/\D/g, '').slice(0, 14);
-        if (v.length > 11) {
-          v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
-        } else {
-          v = v.replace(/(\d{3})(\d)/, '$1.$2')
-               .replace(/(\d{3})(\d)/, '$1.$2')
-               .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-        }
-        e.target.value = v;
-        customerCpf = v;
-      });
-
-      // Listeners para os botões das Formas de Pagamento (Apple Pay, Google Pay, Pix, Link)
       modalEl.querySelectorAll('.wallet-buttons-stack button').forEach(btn => {
         btn.addEventListener('click', async () => {
-          const walletType = btn.dataset.wallet;
-          processingWallet = walletType;
+          if (processingWallet) return;
+          processingWallet = btn.dataset.wallet;
           paymentError = '';
           render();
-
-          // Fluxo Pix
-          if (walletType === 'pix') {
-            try {
-              const res = await fetch('/api/payment/create', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  id: vitrineRecordId,
-                  type: 'vitrine',
-                  billingType: 'PIX',
-                  plan_type: selectedPlan,
-                  file_count: uploadedFiles.length || fileCount,
-                  profile_name: profileName,
-                  user_handle: userHandle,
-                  social_network: selectedNetwork,
-                  customer: {
-                    name: profileName || 'Vitrine Parceira',
-                    cpfCnpj: customerCpf || '000.000.000-00',
-                  },
-                }),
-              });
-
-              const data = await res.json();
-              processingWallet = null;
-
-              if (!res.ok || !data.ok) {
-                paymentError = data.error || 'Não foi possível gerar a cobrança Pix.';
-                render();
-                return;
-              }
-
-              pixData = data.pix;
-              render();
-              if (data.paymentId) {
-                startPaymentPolling(data.paymentId, vitrineRecordId);
-              }
-            } catch (err) {
-              processingWallet = null;
-              paymentError = 'Erro ao gerar Pix: ' + err.message;
-              render();
-            }
-            return;
-          }
-
-          // Fluxo Carteiras Digitais (Apple Pay, Google Pay, Link)
           try {
-            const res = await fetch('/api/payment/create', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                id: vitrineRecordId,
-                type: 'vitrine',
-                billingType: 'WALLET',
-                walletType,
-                plan_type: selectedPlan,
-                file_count: uploadedFiles.length || fileCount,
-                profile_name: profileName,
-                user_handle: userHandle,
-                social_network: selectedNetwork,
-                customer: {
-                  name: profileName || 'Vitrine Parceira',
-                },
-              }),
+            const result = await startCheckout({
+              ...identity, type: 'vitrine', billingType: processingWallet === 'pix' ? 'PIX' : 'CREDIT_CARD',
+              plan_type: selectedPlan, file_count: uploadedFiles.length,
+              profile_name: profileName, user_handle: userHandle, social_network: selectedNetwork,
+              caption, profile_pic: profilePicData, media_files: uploadedFiles,
             });
-
-            const data = await res.json();
-            processingWallet = null;
-
-            if (!res.ok || !data.ok) {
-              paymentError = data.error || 'Não foi possível processar o pagamento com a carteira digital.';
-              render();
-              return;
-            }
-
-            const isLocalOrSimulated =
-              Boolean(data.paymentId?.startsWith('cs_simulated_')) ||
-              Boolean(data.checkoutUrl?.includes('cs_simulated_')) ||
-              Boolean(data.checkoutUrl?.includes('payment=success'));
-
-            if (data.checkoutUrl && !isLocalOrSimulated) {
-              try {
-                localStorage.setItem('vorcarozap:draft_vitrine', JSON.stringify({
-                  id: vitrineRecordId,
-                  plan_type: selectedPlan,
-                  file_count: uploadedFiles.length || fileCount,
-                  unit_price: pricing.unitPrice,
-                  discount_amount: pricing.discountAmount,
-                  total_price: pricing.finalTotal,
-                  profile_name: profileName || 'Vitrine Parceira',
-                  user_handle: userHandle ? (userHandle.startsWith('@') ? userHandle : `@${userHandle}`) : '@loja',
-                  social_network: selectedNetwork,
-                  caption,
-                  profile_pic: profilePicData || null,
-                  media_files: uploadedFiles,
-                }));
-              } catch {}
-              window.location.href = data.checkoutUrl;
-              return;
-            }
-
-            if (isLocalOrSimulated || data.paymentStatus === 'approved') {
-              asaasPaymentId = data.paymentId || `cs_simulated_${Date.now()}`;
-              paymentApproved = true;
-              processingWallet = null;
-              currentStep = 4; // Advance to Preview!
-              render();
-              return;
-            }
-          } catch (err) {
-            processingWallet = null;
-            paymentError = 'Erro ao conectar com o gateway de pagamento: ' + err.message;
-            render();
-          }
+            if (result.purchase) { closeModal(); onPublished?.(result.purchase); }
+            else window.location.assign(result.checkoutUrl);
+          } catch (error) { paymentError = error.message; }
+          finally { processingWallet = null; if (modalEl.isConnected) render(); }
         });
       });
-
-      modalEl.querySelector('.btn-copy-pix')?.addEventListener('click', async (e) => {
-        if (pixData?.payload) {
-          await copyText(pixData.payload);
-          const btn = e.currentTarget;
-          const origText = btn.textContent;
-          btn.textContent = 'Copiado! ✓';
-          setTimeout(() => { btn.textContent = origText; }, 2000);
-        }
-      });
-
       modalEl.querySelector('.btn-back-to-step2')?.addEventListener('click', () => {
-        stopPolling();
-        currentStep = 2; // Return to Edição!
+        if (processingWallet) return;
+        currentStep = 2;
         render();
       });
     }
@@ -885,42 +668,9 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
         render();
       });
 
-      modalEl.querySelector('.btn-confirm-publish')?.addEventListener('click', async (e) => {
-        const btn = e.currentTarget;
-        btn.disabled = true;
-        btn.textContent = 'Publicando sua Vitrine...';
-
-        const finalHandle = userHandle.startsWith('@') ? userHandle : `@${userHandle}`;
-        const finalLink = buildSocialLink(selectedNetwork, userHandle);
-
-        try {
-          const published = await createVitrinePurchase({
-            id: vitrineRecordId,
-            plan_type: selectedPlan,
-            file_count: uploadedFiles.length,
-            unit_price: pricing.unitPrice,
-            discount_amount: pricing.discountAmount,
-            total_price: pricing.finalTotal,
-            payment_status: 'approved',
-            payment_id: asaasPaymentId,
-            profile_name: profileName || 'Vitrine Parceira',
-            user_handle: finalHandle,
-            social_network: selectedNetwork,
-            social_link: finalLink,
-            caption: caption,
-            profile_pic: profilePicData || null,
-            media_files: uploadedFiles,
-          });
-
-          closeModal();
-
-          if (onPublished) {
-            onPublished(published);
-          }
-        } catch (err) {
-          console.error('Falha ao gravar no PostgreSQL', err);
-          closeModal();
-        }
+      modalEl.querySelector('.btn-confirm-publish')?.addEventListener('click', () => {
+        currentStep = 3;
+        render();
       });
     }
   }

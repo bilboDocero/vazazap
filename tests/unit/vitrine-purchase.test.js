@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   calculateVitrinePrice,
   loadCachedVitrines,
@@ -10,7 +10,11 @@ import {
 describe('Vitrine Purchase & Pricing Calculator (Counterpart of Status)', () => {
   beforeEach(() => {
     localStorage.clear();
+    saveCachedVitrines([]);
+    vi.stubGlobal('fetch', vi.fn());
   });
+
+  afterEach(() => vi.unstubAllGlobals());
 
   describe('calculateVitrinePrice - Vitrine Normal (R$ 4,90)', () => {
     it('calculates 1 file without discount', () => {
@@ -99,7 +103,7 @@ describe('Vitrine Purchase & Pricing Calculator (Counterpart of Status)', () => 
 
   describe('Vitrine Storage & Purchase creation', () => {
     it('creates and caches a purchased vitrine with media and approved status', async () => {
-      const created = await createVitrinePurchase({
+      const serverPurchase = {
         plan_type: 'vitrine_normal',
         file_count: 2,
         unit_price: 4.90,
@@ -113,7 +117,11 @@ describe('Vitrine Purchase & Pricing Calculator (Counterpart of Status)', () => 
           { id: '1', name: 'produto1.jpg', url: 'https://example.com/p1.jpg', caption: 'Produto 1 em destaque' },
           { id: '2', name: 'produto2.jpg', url: 'https://example.com/p2.jpg', caption: 'Produto 2 lançamento' },
         ],
-      });
+        id: 'verified-purchase', payment_status: 'approved',
+        social_link: 'https://instagram.com/lojaconceitosp',
+      };
+      fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true, purchase: serverPurchase }) });
+      const created = await createVitrinePurchase({ id: serverPurchase.id, payment_id: 'cs_test_verified', purchase_token: 'a'.repeat(32) });
 
       expect(created.id).toBeDefined();
       expect(created.payment_status).toBe('approved');
@@ -125,4 +133,13 @@ describe('Vitrine Purchase & Pricing Calculator (Counterpart of Status)', () => 
       expect(cached.some(c => c.id === created.id)).toBe(true);
     });
   });
+  it('never publishes or caches an offline or rejected purchase', async () => {
+    fetch.mockRejectedValueOnce(new Error('Offline'));
+    await expect(createVitrinePurchase({ id: 'offline', payment_status: 'approved' })).rejects.toThrow('Offline');
+    expect(loadCachedVitrines()).toEqual([]);
+    fetch.mockResolvedValueOnce({ ok: false, json: async () => ({ ok: false, error: 'Pagamento pendente' }) });
+    await expect(createVitrinePurchase({ id: 'unpaid', payment_status: 'approved' })).rejects.toThrow('Pagamento pendente');
+    expect(loadCachedVitrines()).toEqual([]);
+  });
+
 });

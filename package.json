@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "engines": { "node": ">=22" },
   "scripts": {
     "dev": "vite",
     "build": "python3 scripts/split_data.py && vite build && node scripts/export.mjs dist/export && node scripts/prerender.mjs",
@@ -13,6 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:payments:db": "node scripts/test-payment-db.mjs",
     "test:e2e": "playwright test --config tests/e2e/playwright.config.js",
     "verify": "npm run build && npm run test && npm run test:e2e"
   },

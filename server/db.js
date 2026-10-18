@@ -1,403 +1,81 @@
-import { readFileSync, existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import './env.js';
 import pg from 'pg';
-const { Pool } = pg;
 
-// Synchronously load .env if present in current working directory
-function loadEnvFile() {
-  try {
-    const envPath = resolve(process.cwd(), '.env');
-    if (existsSync(envPath)) {
-      const content = readFileSync(envPath, 'utf8');
-      for (const line of content.split('\n')) {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith('#')) continue;
-        const eqIdx = trimmed.indexOf('=');
-        if (eqIdx !== -1) {
-          const key = trimmed.slice(0, eqIdx).trim();
-          const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, '');
-          if (!process.env[key]) {
-            process.env[key] = val;
-          }
-        }
-      }
-    }
-  } catch {
-    // Ignore environment load issues
-  }
+let pgPool;
+export async function closeDatabase() {
+  if (pgPool) await pgPool.end();
+  pgPool = undefined;
 }
-loadEnvFile();
-
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
-const isSupabaseRest = Boolean(SUPABASE_URL && SUPABASE_KEY && SUPABASE_URL.startsWith('http'));
-
-const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.SUPABASE_DB_URL;
-const isSupabasePg = (connectionString && connectionString.includes('supabase')) ||
-  (process.env.PGHOST && process.env.PGHOST.includes('supabase')) ||
-  process.env.PGSSL === 'true';
-
-let pgPool = null;
-if (!isSupabaseRest && (connectionString || process.env.PGHOST)) {
-  const poolConfig = connectionString
-    ? {
-        connectionString,
-        ssl: isSupabasePg ? { rejectUnauthorized: false } : undefined,
-        connectionTimeoutMillis: 5000,
-      }
-    : {
-        host: process.env.PGHOST || '127.0.0.1',
-        port: Number(process.env.PGPORT) || 5432,
-        user: process.env.PGUSER || 'radar',
-        password: process.env.PGPASSWORD || 'radar_local',
-        database: process.env.PGDATABASE || 'vorcarozap',
-        ssl: isSupabasePg ? { rejectUnauthorized: false } : undefined,
-        connectionTimeoutMillis: 5000,
-      };
-
-  pgPool = new Pool(poolConfig);
-  pgPool.on('error', (err) => {
-    console.error('[PostgreSQL Pool Error]', err.message);
+function database() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (url && key) return { url: url.replace(/\/$/, ''), key };
+  const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.SUPABASE_DB_URL;
+  if (!connectionString && !process.env.PGHOST) throw new Error('Database not configured');
+  if (!pgPool) pgPool = new pg.Pool({ ...(connectionString ? { connectionString } : {}), connectionTimeoutMillis: 5000 });
+  return { pool: pgPool };
+}
+function tableFor(type) {
+  if (!['status', 'vitrine'].includes(type)) throw new Error('Invalid purchase type');
+  return type + '_purchases';
+}
+async function rest(db, table, query, method = 'GET', body, prefer = 'return=representation') {
+  const response = await fetch(db.url + '/rest/v1/' + table + '?' + new URLSearchParams(query), {
+    method, headers: { apikey: db.key, Authorization: 'Bearer ' + db.key, 'Content-Type': 'application/json', Prefer: prefer },
+    ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(15000),
   });
+  if (!response.ok) throw new Error('Database operation failed: ' + response.status);
+  return response.json();
 }
-
-function supabaseHeaders() {
-  return {
-    'apikey': SUPABASE_KEY,
-    'Authorization': `Bearer ${SUPABASE_KEY}`,
-    'Content-Type': 'application/json',
-    'Prefer': 'resolution=merge-duplicates,return=representation',
-    'User-Agent': 'vorcarozap-Server/1.0',
-  };
+export function publicPurchase(row) {
+  if (!row) return null;
+  const fields = ['id', 'plan_type', 'file_count', 'unit_price', 'discount_amount', 'total_price', 'payment_status', 'profile_name', 'user_handle', 'social_network', 'social_link', 'caption', 'profile_pic', 'media_files', 'published_at', 'created_at'];
+  return Object.fromEntries(fields.map(key => [key, row[key]]));
 }
-
-/**
- * Sorts items so impulsionados always stay at the top,
- * and normal items are positioned below, ordered by published_at DESC.
- */
-function sortBoostedFirst(list, boostKey = 'status_impulsionado') {
-  if (!Array.isArray(list)) return [];
-  return [...list].sort((a, b) => {
-    const aBoost = a.plan_type === boostKey ? 0 : 1;
-    const bBoost = b.plan_type === boostKey ? 0 : 1;
-    if (aBoost !== bBoost) return aBoost - bBoost;
-    return new Date(b.published_at || b.created_at || 0) - new Date(a.published_at || a.created_at || 0);
-  });
+export async function getPurchase(type, id) {
+  const db = database(), table = tableFor(type);
+  const rows = db.pool ? (await db.pool.query('SELECT * FROM ' + table + ' WHERE id = $1', [id])).rows
+    : await rest(db, table, { id: 'eq.' + id, select: '*' });
+  return rows[0] || null;
 }
-
-// ── STATUS PURCHASES CRUD ─────────────────────────────────────────
-
-export async function getStatusPurchases() {
-  if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases?select=*&payment_status=neq.pending&order=published_at.desc`, {
-      headers: supabaseHeaders(),
-    });
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Supabase GET status_purchases failed (${res.status}): ${errText}`);
-    }
-    const rows = await res.json();
-    return sortBoostedFirst(rows, 'status_impulsionado');
+export async function insertPendingPurchase(type, data) {
+  const db = database(), table = tableFor(type);
+  const record = { ...data, payment_status: 'pending', payment_id: null, payment_intent_id: null, revision: 0, published_at: null };
+  if (db.pool) {
+    const keys = Object.keys(record);
+    const values = keys.map(key => key === 'media_files' ? JSON.stringify(record[key]) : record[key]);
+    await db.pool.query('INSERT INTO ' + table + ' (' + keys.join(',') + ') VALUES (' + keys.map((_, i) => '$' + (i + 1)).join(',') + ') ON CONFLICT (id) DO NOTHING', values);
+  } else {
+    await rest(db, table, { on_conflict: 'id' }, 'POST', record, 'resolution=ignore-duplicates,return=representation');
   }
-
-  if (pgPool) {
-    const result = await pgPool.query(`
-      SELECT * FROM status_purchases
-      WHERE payment_status != 'pending'
-      ORDER BY
-        CASE WHEN plan_type = 'status_impulsionado' THEN 0 ELSE 1 END ASC,
-        published_at DESC
-    `);
-    return result.rows;
-  }
-
-  return [];
+  const stored = await getPurchase(type, record.id);
+  if (!stored) throw new Error('Purchase was not persisted');
+  return stored;
 }
-
-export async function createStatusPurchaseRecord(data) {
-  if (isSupabaseRest) {
-    const payload = { ...data };
-    let res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases`, {
-      method: 'POST',
-      headers: supabaseHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    // If column payment_id does not exist in Supabase schema cache yet, remove and retry
-    if (!res.ok && res.status === 400) {
-      const errText = await res.text();
-      if (errText.includes('payment_id')) {
-        delete payload.payment_id;
-        res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases`, {
-          method: 'POST',
-          headers: supabaseHeaders(),
-          body: JSON.stringify(payload),
-        });
-      }
-    }
-
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Supabase POST status_purchases failed (${res.status}): ${errText}`);
-    }
-    const created = await res.json();
-    return Array.isArray(created) ? created[0] : created;
-  }
-
-  if (pgPool) {
-    const query = `
-      INSERT INTO status_purchases (
-        id, plan_type, file_count, unit_price, discount_amount, total_price,
-        payment_status, profile_name, user_handle, social_network, social_link,
-        caption, profile_pic, media_files, published_at, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb, NOW(), NOW())
-      ON CONFLICT (id) DO UPDATE SET
-        plan_type = EXCLUDED.plan_type,
-        file_count = EXCLUDED.file_count,
-        unit_price = EXCLUDED.unit_price,
-        discount_amount = EXCLUDED.discount_amount,
-        total_price = EXCLUDED.total_price,
-        payment_status = EXCLUDED.payment_status,
-        profile_name = EXCLUDED.profile_name,
-        user_handle = EXCLUDED.user_handle,
-        social_network = EXCLUDED.social_network,
-        social_link = EXCLUDED.social_link,
-        caption = EXCLUDED.caption,
-        profile_pic = EXCLUDED.profile_pic,
-        media_files = EXCLUDED.media_files
-      RETURNING *;
-    `;
-    const values = [
-      data.id, data.plan_type, data.file_count, data.unit_price, data.discount_amount, data.total_price,
-      data.payment_status, data.profile_name, data.user_handle, data.social_network, data.social_link,
-      data.caption, data.profile_pic, JSON.stringify(data.media_files || [])
-    ];
-    const result = await pgPool.query(query, values);
-    return result.rows[0];
-  }
-
-  return data;
+export async function patchPurchase(type, row, changes) {
+  const allowed = ['payment_id', 'payment_intent_id', 'payment_status', 'published_at', 'billing_type'];
+  if (Object.keys(changes).some(key => !allowed.includes(key))) throw new Error('Invalid purchase update');
+  const db = database(), table = tableFor(type);
+  const data = { ...changes, revision: row.revision + 1 };
+  let rows;
+  if (db.pool) {
+    const keys = Object.keys(data), values = Object.values(data);
+    values.push(row.id, row.revision);
+    rows = (await db.pool.query('UPDATE ' + table + ' SET ' + keys.map((key, i) => key + ' = $' + (i + 1)).join(',') + ' WHERE id = $' + (keys.length + 1) + ' AND revision = $' + (keys.length + 2) + ' RETURNING *', values)).rows;
+  } else rows = await rest(db, table, { id: 'eq.' + row.id, revision: 'eq.' + row.revision }, 'PATCH', data);
+  return rows[0] || null;
 }
-
-export async function getStatusPurchaseById(id) {
-  if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases?id=eq.${encodeURIComponent(id)}`, {
-      headers: supabaseHeaders(),
-    });
-    if (!res.ok) return null;
-    const rows = await res.json();
-    return rows[0] || null;
-  }
-  if (pgPool) {
-    const res = await pgPool.query('SELECT * FROM status_purchases WHERE id = $1', [id]);
-    return res.rows[0] || null;
-  }
-  return null;
+async function published(type) {
+  const db = database(), table = tableFor(type);
+  const rows = db.pool ? (await db.pool.query("SELECT * FROM " + table + " WHERE payment_status = 'approved' AND published_at IS NOT NULL ORDER BY published_at DESC")).rows
+    : await rest(db, table, { payment_status: 'eq.approved', published_at: 'not.is.null', order: 'published_at.desc' });
+  return rows.map(publicPurchase).sort((a, b) => Number(b.plan_type.endsWith('_impulsionado')) - Number(a.plan_type.endsWith('_impulsionado')) || new Date(b.published_at) - new Date(a.published_at));
 }
+export const getStatusPurchases = () => published('status');
+export const getVitrinePurchases = () => published('vitrine');
+export const getStatusPurchaseById = id => getPurchase('status', id);
+export const getVitrinePurchaseById = id => getPurchase('vitrine', id);
 
-export async function updateStatusPurchasePayment(id, { payment_status = 'approved', media_files }) {
-  const updateData = { payment_status };
-  if (media_files) updateData.media_files = media_files;
-
-  if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases?id=eq.${encodeURIComponent(id)}`, {
-      method: 'PATCH',
-      headers: supabaseHeaders(),
-      body: JSON.stringify(updateData),
-    });
-    return res.ok;
-  }
-  if (pgPool) {
-    const res = await pgPool.query(
-      'UPDATE status_purchases SET payment_status = $1 WHERE id = $2 RETURNING id',
-      [payment_status, id]
-    );
-    return res.rowCount > 0;
-  }
-  return false;
-}
-
-export async function deleteStatusPurchaseRecord(id) {
-  if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases?id=eq.${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: supabaseHeaders(),
-    });
-    return res.ok;
-  }
-
-  if (pgPool) {
-    const result = await pgPool.query('DELETE FROM status_purchases WHERE id = $1 RETURNING id', [id]);
-    return result.rowCount > 0;
-  }
-
-  return false;
-}
-
-// ── VITRINE PURCHASES CRUD ────────────────────────────────────────
-
-export async function getVitrinePurchases() {
-  if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases?select=*&payment_status=neq.pending&order=published_at.desc`, {
-      headers: supabaseHeaders(),
-    });
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Supabase GET vitrine_purchases failed (${res.status}): ${errText}`);
-    }
-    const rows = await res.json();
-    return sortBoostedFirst(rows, 'vitrine_impulsionado');
-  }
-
-  if (pgPool) {
-    const result = await pgPool.query(`
-      SELECT * FROM vitrine_purchases
-      WHERE payment_status != 'pending'
-      ORDER BY
-        CASE WHEN plan_type = 'vitrine_impulsionado' THEN 0 ELSE 1 END ASC,
-        published_at DESC
-    `);
-    return result.rows;
-  }
-
-  return [];
-}
-
-export async function getVitrinePurchaseById(id) {
-  if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases?id=eq.${encodeURIComponent(id)}`, {
-      headers: supabaseHeaders(),
-    });
-    if (!res.ok) return null;
-    const rows = await res.json();
-    return rows[0] || null;
-  }
-  if (pgPool) {
-    const res = await pgPool.query('SELECT * FROM vitrine_purchases WHERE id = $1', [id]);
-    return res.rows[0] || null;
-  }
-  return null;
-}
-
-export async function updateVitrinePurchasePayment(id, { payment_status = 'approved', media_files }) {
-  const updateData = { payment_status };
-  if (media_files) updateData.media_files = media_files;
-
-  if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases?id=eq.${encodeURIComponent(id)}`, {
-      method: 'PATCH',
-      headers: supabaseHeaders(),
-      body: JSON.stringify(updateData),
-    });
-    return res.ok;
-  }
-  if (pgPool) {
-    const res = await pgPool.query(
-      'UPDATE vitrine_purchases SET payment_status = $1 WHERE id = $2 RETURNING id',
-      [payment_status, id]
-    );
-    return res.rowCount > 0;
-  }
-  return false;
-}
-
-export async function createVitrinePurchaseRecord(data) {
-  if (isSupabaseRest) {
-    const payload = { ...data };
-    let res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases`, {
-      method: 'POST',
-      headers: supabaseHeaders(),
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok && res.status === 400) {
-      const errText = await res.text();
-      if (errText.includes('payment_id')) {
-        delete payload.payment_id;
-        res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases`, {
-          method: 'POST',
-          headers: supabaseHeaders(),
-          body: JSON.stringify(payload),
-        });
-      }
-    }
-
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Supabase POST vitrine_purchases failed (${res.status}): ${errText}`);
-    }
-    const created = await res.json();
-    return Array.isArray(created) ? created[0] : created;
-  }
-
-  if (pgPool) {
-    const query = `
-      INSERT INTO vitrine_purchases (
-        id, plan_type, file_count, unit_price, discount_amount, total_price,
-        payment_status, profile_name, user_handle, social_network, social_link,
-        caption, profile_pic, media_files, published_at, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb, NOW(), NOW())
-      ON CONFLICT (id) DO UPDATE SET
-        plan_type = EXCLUDED.plan_type,
-        file_count = EXCLUDED.file_count,
-        unit_price = EXCLUDED.unit_price,
-        discount_amount = EXCLUDED.discount_amount,
-        total_price = EXCLUDED.total_price,
-        payment_status = EXCLUDED.payment_status,
-        profile_name = EXCLUDED.profile_name,
-        user_handle = EXCLUDED.user_handle,
-        social_network = EXCLUDED.social_network,
-        social_link = EXCLUDED.social_link,
-        caption = EXCLUDED.caption,
-        profile_pic = EXCLUDED.profile_pic,
-        media_files = EXCLUDED.media_files
-      RETURNING *;
-    `;
-    const values = [
-      data.id, data.plan_type, data.file_count, data.unit_price, data.discount_amount, data.total_price,
-      data.payment_status, data.profile_name, data.user_handle, data.social_network, data.social_link,
-      data.caption, data.profile_pic, JSON.stringify(data.media_files || [])
-    ];
-    const result = await pgPool.query(query, values);
-    return result.rows[0];
-  }
-
-  return data;
-}
-
-export async function deleteVitrinePurchaseRecord(id) {
-  if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases?id=eq.${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: supabaseHeaders(),
-    });
-    return res.ok;
-  }
-
-  if (pgPool) {
-    const result = await pgPool.query('DELETE FROM vitrine_purchases WHERE id = $1 RETURNING id', [id]);
-    return result.rowCount > 0;
-  }
-
-  return false;
-}
-
-/**
- * Compatibility pool proxy
- */
-export const pool = {
-  query: async (sql, values) => {
-    if (pgPool) return pgPool.query(sql, values);
-    throw new Error('Direct SQL queries not supported when using Supabase REST API mode. Use specific CRUD methods.');
-  },
-  on: (event, handler) => {
-    if (pgPool) pgPool.on(event, handler);
-  },
-};
-
-/**
- * Calculates server-side verified price for status and vitrine items.
- */
 export function calculateServerPrice({ planType = 'status_normal', fileCount = 1 }) {
   const count = Math.min(Math.max(Number(fileCount) || 1, 1), 4);
   const isImpulsionado = planType.includes('impulsionado');

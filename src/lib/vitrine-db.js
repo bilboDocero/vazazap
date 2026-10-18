@@ -1,3 +1,4 @@
+import { confirmPurchase } from './purchase-api.js';
 /**
  * Vitrine purchasing and PostgreSQL / LocalStorage synchronization layer.
  * Exact counterpart of status-db.js for the Vitrine product.
@@ -63,7 +64,7 @@ function formatCurrency(val) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 }
 
-const LOCAL_STORAGE_KEY = 'vorcarozap:published_vitrines';
+const LOCAL_STORAGE_KEY = 'vorcarozap:verified_vitrines:v2';
 
 /**
  * Sorts vitrines so impulsionados always stay at the top,
@@ -158,56 +159,10 @@ export async function fetchPublishedVitrines() {
 }
 
 export async function createVitrinePurchase(payload) {
-  const localList = loadCachedVitrines();
-  const createdRecord = {
-    id: payload.id || `vitrine-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    plan_type: payload.plan_type || 'vitrine_normal',
-    file_count: payload.file_count || 1,
-    unit_price: payload.unit_price,
-    discount_amount: payload.discount_amount,
-    total_price: payload.total_price,
-    payment_status: 'approved',
-    profile_name: payload.profile_name || 'Vitrine Comercial',
-    user_handle: payload.user_handle || '@vitrine',
-    social_network: payload.social_network || 'instagram',
-    social_link: payload.social_link || buildSocialLink(payload.social_network, payload.user_handle),
-    caption: payload.caption || '',
-    profile_pic: payload.profile_pic || '',
-    media_files: payload.media_files || [],
-    published_at: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-  };
-
-  // Add to local list and sort so impulsionados always stay at the top
-  const sortedList = sortVitrines([createdRecord, ...localList.filter(item => item.id !== createdRecord.id)]);
-  saveCachedVitrines(sortedList);
-
-  const isBrowser = typeof window !== 'undefined' && window.location?.origin && !window.location.origin.startsWith('about:');
-  if (isBrowser) {
-    try {
-      const res = await fetch('/api/vitrine/purchase', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(createdRecord),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.ok && data.purchase) {
-          const updated = sortedList.map(item => item.id === createdRecord.id ? data.purchase : item);
-          saveCachedVitrines(updated);
-          if (typeof window.dispatchEvent === 'function') {
-            window.dispatchEvent(new CustomEvent('vitrine:published', { detail: data.purchase }));
-          }
-          return data.purchase;
-        }
-      }
-    } catch {
-      // Offline fallback
-    }
-  }
-
-  if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
-    window.dispatchEvent(new CustomEvent('vitrine:published', { detail: createdRecord }));
-  }
-  return createdRecord;
+  const purchase = await confirmPurchase('vitrine', payload);
+  const list = loadCachedVitrines();
+  saveCachedVitrines([purchase, ...list.filter(row => row.id !== purchase.id)]);
+  
+  window.dispatchEvent(new CustomEvent('vitrine:published', { detail: purchase }));
+  return purchase;
 }
