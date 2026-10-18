@@ -17,6 +17,7 @@ import {
   createStripePixPayment,
   createStripeCardPayment,
   createStripePaymentWithMethod,
+  createStripeCheckoutSession,
   getStripePaymentStatus,
   getStripe,
 } from './stripe.js';
@@ -96,7 +97,7 @@ export function statusApiMiddleware(req, res, next) {
     readJsonBody(req)
       .then(async body => {
         const type = body.type === 'vitrine' ? 'vitrine' : 'status';
-        const billingType = body.billingType === 'CREDIT_CARD' ? 'CREDIT_CARD' : 'PIX';
+        const billingType = ['CREDIT_CARD', 'WALLET'].includes(body.billingType) ? body.billingType : 'PIX';
         const planType = body.plan_type || (type === 'vitrine' ? 'vitrine_normal' : 'status_normal');
         const fileCount = Math.min(Math.max(Number(body.file_count) || 1, 1), 4);
 
@@ -116,11 +117,13 @@ export function statusApiMiddleware(req, res, next) {
         let paymentId = null;
         let paymentStatus = 'pending';
         let pixData = null;
+        let checkoutUrl = null;
 
         if (useStripe) {
           if (body.paymentMethodId) {
             const stripeRes = await createStripePaymentWithMethod({
               paymentMethodId: body.paymentMethodId,
+              walletType: body.walletType,
               value,
               description,
               recordId,
@@ -131,6 +134,25 @@ export function statusApiMiddleware(req, res, next) {
             });
             paymentId = stripeRes.paymentId;
             paymentStatus = stripeRes.status === 'succeeded' ? 'approved' : 'pending';
+          } else if (billingType === 'WALLET') {
+            const origin = req.headers.origin || req.headers.referer?.replace(/#.*$/, '').replace(/\/$/, '') || 'http://localhost:5173';
+            const successUrl = `${origin}/#/${type}?payment=success&session_id={CHECKOUT_SESSION_ID}&record_id=${encodeURIComponent(recordId)}&type=${type}`;
+            const cancelUrl = `${origin}/#/${type}?payment=cancel`;
+
+            const session = await createStripeCheckoutSession({
+              value,
+              description,
+              recordId,
+              type,
+              planType,
+              customerName,
+              successUrl,
+              cancelUrl,
+            });
+
+            paymentId = session.sessionId;
+            checkoutUrl = session.url;
+            paymentStatus = 'pending';
           } else if (billingType === 'PIX') {
             const stripeRes = await createStripePixPayment({
               value,
@@ -242,6 +264,7 @@ export function statusApiMiddleware(req, res, next) {
           billingType,
           paymentId,
           paymentStatus,
+          checkoutUrl: checkoutUrl || null,
           pix: pixData || null,
           purchase: createdRecord,
         });

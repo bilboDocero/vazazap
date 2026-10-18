@@ -66,7 +66,7 @@ function supabaseHeaders() {
     'apikey': SUPABASE_KEY,
     'Authorization': `Bearer ${SUPABASE_KEY}`,
     'Content-Type': 'application/json',
-    'Prefer': 'return=representation',
+    'Prefer': 'resolution=merge-duplicates,return=representation',
     'User-Agent': 'vorcarozap-Server/1.0',
   };
 }
@@ -151,6 +151,20 @@ export async function createStatusPurchaseRecord(data) {
         payment_status, profile_name, user_handle, social_network, social_link,
         caption, profile_pic, media_files, published_at, created_at
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb, NOW(), NOW())
+      ON CONFLICT (id) DO UPDATE SET
+        plan_type = EXCLUDED.plan_type,
+        file_count = EXCLUDED.file_count,
+        unit_price = EXCLUDED.unit_price,
+        discount_amount = EXCLUDED.discount_amount,
+        total_price = EXCLUDED.total_price,
+        payment_status = EXCLUDED.payment_status,
+        profile_name = EXCLUDED.profile_name,
+        user_handle = EXCLUDED.user_handle,
+        social_network = EXCLUDED.social_network,
+        social_link = EXCLUDED.social_link,
+        caption = EXCLUDED.caption,
+        profile_pic = EXCLUDED.profile_pic,
+        media_files = EXCLUDED.media_files
       RETURNING *;
     `;
     const values = [
@@ -323,6 +337,20 @@ export async function createVitrinePurchaseRecord(data) {
         payment_status, profile_name, user_handle, social_network, social_link,
         caption, profile_pic, media_files, published_at, created_at
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb, NOW(), NOW())
+      ON CONFLICT (id) DO UPDATE SET
+        plan_type = EXCLUDED.plan_type,
+        file_count = EXCLUDED.file_count,
+        unit_price = EXCLUDED.unit_price,
+        discount_amount = EXCLUDED.discount_amount,
+        total_price = EXCLUDED.total_price,
+        payment_status = EXCLUDED.payment_status,
+        profile_name = EXCLUDED.profile_name,
+        user_handle = EXCLUDED.user_handle,
+        social_network = EXCLUDED.social_network,
+        social_link = EXCLUDED.social_link,
+        caption = EXCLUDED.caption,
+        profile_pic = EXCLUDED.profile_pic,
+        media_files = EXCLUDED.media_files
       RETURNING *;
     `;
     const values = [
