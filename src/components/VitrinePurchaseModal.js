@@ -313,7 +313,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
     if (currentStep === 3) {
       return `
         <div class="status-step-payment" style="text-align: left; width: 100%;">
-          <h2 class="status-modal-title" style="text-align: center;">Pagamento Seguro via Asaas</h2>
+          <h2 class="status-modal-title" style="text-align: center;">Pagamento Seguro</h2>
           <p class="status-modal-desc" style="text-align: center;">Liberação imediata da sua Vitrine Comercial com verificação automática.</p>
 
           <div class="status-receipt-box" style="margin-bottom: 16px;">
@@ -361,7 +361,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
             ${pixData ? `
               <div class="pix-qr-container">
                 <span style="font-size: 13px; font-weight: 600; color: #111B21;">Escaneie o QR Code abaixo no app do seu banco:</span>
-                <img src="data:image/png;base64,${pixData.encodedImage}" alt="QR Code PIX" class="pix-qr-img" />
+                <img src="${pixData.imageUrl || (pixData.encodedImage ? `data:image/png;base64,${pixData.encodedImage}` : '')}" alt="QR Code PIX" class="pix-qr-img" />
 
                 <div class="pix-waiting-box">
                   <span class="pix-pulse-dot"></span>

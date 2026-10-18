@@ -4,7 +4,11 @@ import {
 } from '../../server/db.js';
 
 import {
-  getPaymentStatus,
+  getStripePaymentStatus,
+} from '../../server/stripe.js';
+
+import {
+  getPaymentStatus as getAsaasPaymentStatus,
 } from '../../server/asaas.js';
 
 export default async function handler(req, res) {
@@ -34,7 +38,12 @@ export default async function handler(req, res) {
       return res.end(JSON.stringify({ ok: false, error: 'paymentId is required' }));
     }
 
-    const statusInfo = await getPaymentStatus(paymentId);
+    let statusInfo = null;
+    if (paymentId.startsWith('pi_')) {
+      statusInfo = await getStripePaymentStatus(paymentId);
+    } else {
+      statusInfo = await getAsaasPaymentStatus(paymentId);
+    }
 
     if (statusInfo.isPaid && recordId) {
       if (type === 'vitrine') {

@@ -13,10 +13,18 @@ import {
 } from './db.js';
 
 import {
+  getStripeConfig,
+  createStripePixPayment,
+  createStripeCardPayment,
+  getStripePaymentStatus,
+  getStripe,
+} from './stripe.js';
+
+import {
   findOrCreateCustomer,
-  createPixPayment,
-  createCreditCardPayment,
-  getPaymentStatus,
+  createPixPayment as createAsaasPix,
+  createCreditCardPayment as createAsaasCard,
+  getPaymentStatus as getAsaasPaymentStatus,
   getAsaasConfig,
 } from './asaas.js';
 
@@ -69,7 +77,7 @@ export function statusApiMiddleware(req, res, next) {
   const url = new URL(req.url, 'http://localhost');
   const pathname = url.pathname;
 
-  // ── PAYMENT CREATION (PIX & CARTÃO DE CRÉDITO) ─────────────
+  // ── PAYMENT CREATION (STRIPE COM FALLBACK ASAAS) ───────────
   // POST /api/payment/create
   if (req.method === 'POST' && pathname === '/api/payment/create') {
     readJsonBody(req)
@@ -84,58 +92,96 @@ export function statusApiMiddleware(req, res, next) {
 
         const recordId = sanitizeSafeString(body.id, 100) || `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
         const customerData = body.customer || {};
+        const customerName = customerData.name || body.profile_name || 'Anunciante VorcaroZap';
+        const description = `VorcaroZap - ${type === 'vitrine' ? 'Vitrine Comercial' : 'Status/Stories'} (${planType})`;
 
-        // 1. Find or create customer in Asaas
-        const customerId = await findOrCreateCustomer({
-          name: customerData.name || body.profile_name || 'Anunciante vorcarozap',
-          cpfCnpj: customerData.cpfCnpj,
-          email: customerData.email,
-          phone: customerData.phone,
-        });
+        const stripeConfig = getStripeConfig();
+        const asaasConfig = getAsaasConfig();
+        // Use Stripe by default for Brasil Pix & Cartão (cheaper, protects MEI privacy with STRIPE BRASIL)
+        const useStripe = process.env.PAYMENT_GATEWAY !== 'asaas';
 
-        // 2. Prepare description & external reference
-        const description = `vorcarozap - ${type === 'vitrine' ? 'Vitrine Comercial' : 'Status/Stories'} (${planType})`;
-        const externalReference = `${type}:${recordId}`;
-        const remoteIp = req.socket?.remoteAddress || '127.0.0.1';
-
-        let paymentResult = null;
+        let paymentId = null;
         let paymentStatus = 'pending';
+        let pixData = null;
 
-        if (billingType === 'PIX') {
-          paymentResult = await createPixPayment({
-            customerId,
-            value,
-            description,
-            externalReference,
-          });
-          paymentStatus = 'pending';
-        } else {
-          // CREDIT_CARD
-          paymentResult = await createCreditCardPayment({
-            customerId,
-            value,
-            description,
-            externalReference,
-            remoteIp,
-            creditCard: body.creditCard || {},
-            creditCardHolderInfo: body.creditCardHolderInfo || {
-              name: customerData.name || body.profile_name,
-              email: customerData.email || 'cliente@vorcarozap.com',
-              cpfCnpj: customerData.cpfCnpj || '00000000000',
-              postalCode: body.creditCardHolderInfo?.postalCode || '01001-000',
-              addressNumber: body.creditCardHolderInfo?.addressNumber || '1',
-              phone: customerData.phone || '11987654321',
-            },
-          });
-
-          if (paymentResult.payment?.status === 'CONFIRMED' || paymentResult.payment?.status === 'RECEIVED') {
-            paymentStatus = 'approved';
-          } else {
+        if (useStripe) {
+          if (billingType === 'PIX') {
+            const stripeRes = await createStripePixPayment({
+              value,
+              description,
+              recordId,
+              type,
+              planType,
+              customerName,
+              cpfCnpj: customerData.cpfCnpj,
+            });
+            paymentId = stripeRes.paymentId;
             paymentStatus = 'pending';
+            pixData = stripeRes.pix;
+          } else {
+            const stripeRes = await createStripeCardPayment({
+              value,
+              description,
+              recordId,
+              type,
+              planType,
+              customerName,
+              cpfCnpj: customerData.cpfCnpj,
+              creditCard: body.creditCard || {},
+              postalCode: body.creditCardHolderInfo?.postalCode || '01001-000',
+            });
+            paymentId = stripeRes.paymentId;
+            paymentStatus = stripeRes.status === 'succeeded' ? 'approved' : 'pending';
+          }
+        } else {
+          // Asaas fallback
+          const customerId = await findOrCreateCustomer({
+            name: customerName,
+            cpfCnpj: customerData.cpfCnpj,
+            email: customerData.email,
+            phone: customerData.phone,
+          });
+
+          const externalReference = `${type}:${recordId}`;
+          const remoteIp = req.socket?.remoteAddress || '127.0.0.1';
+
+          if (billingType === 'PIX') {
+            const asaasRes = await createAsaasPix({
+              customerId,
+              value,
+              description,
+              externalReference,
+            });
+            paymentId = asaasRes.payment?.id;
+            paymentStatus = 'pending';
+            pixData = {
+              payload: asaasRes.pix?.payload,
+              imageUrl: `data:image/png;base64,${asaasRes.pix?.encodedImage}`,
+            };
+          } else {
+            const asaasRes = await createAsaasCard({
+              customerId,
+              value,
+              description,
+              externalReference,
+              remoteIp,
+              creditCard: body.creditCard || {},
+              creditCardHolderInfo: body.creditCardHolderInfo || {
+                name: customerName,
+                cpfCnpj: customerData.cpfCnpj || '00000000000',
+                postalCode: body.creditCardHolderInfo?.postalCode || '01001-000',
+                addressNumber: body.creditCardHolderInfo?.addressNumber || '1',
+              },
+            });
+            paymentId = asaasRes.payment?.id;
+            if (asaasRes.payment?.status === 'CONFIRMED' || asaasRes.payment?.status === 'RECEIVED') {
+              paymentStatus = 'approved';
+            } else {
+              paymentStatus = 'pending';
+            }
           }
         }
 
-        // 3. Save initial record to database
         const recordPayload = {
           id: recordId,
           plan_type: planType,
@@ -144,6 +190,7 @@ export function statusApiMiddleware(req, res, next) {
           discount_amount: verifiedPrice.discountAmount,
           total_price: verifiedPrice.finalTotal,
           payment_status: paymentStatus,
+          payment_id: paymentId,
           profile_name: sanitizeSafeString(body.profile_name, 100) || 'Anunciante',
           user_handle: sanitizeSafeString(body.user_handle, 60) || '@user',
           social_network: ['instagram', 'tiktok', 'facebook', 'telegram'].includes(body.social_network) ? body.social_network : 'instagram',
@@ -164,11 +211,12 @@ export function statusApiMiddleware(req, res, next) {
 
         sendJson(res, 201, {
           ok: true,
+          gateway: useStripe ? 'stripe' : 'asaas',
           type,
           billingType,
-          paymentId: paymentResult.payment?.id,
+          paymentId,
           paymentStatus,
-          pix: paymentResult.pix || null,
+          pix: pixData || null,
           purchase: createdRecord,
         });
       })
@@ -191,7 +239,11 @@ export function statusApiMiddleware(req, res, next) {
       return;
     }
 
-    getPaymentStatus(paymentId)
+    const checkPromise = paymentId.startsWith('pi_')
+      ? getStripePaymentStatus(paymentId)
+      : getAsaasPaymentStatus(paymentId);
+
+    checkPromise
       .then(async statusInfo => {
         if (statusInfo.isPaid && recordId) {
           if (type === 'vitrine') {
@@ -206,13 +258,40 @@ export function statusApiMiddleware(req, res, next) {
           paymentId,
           isPaid: statusInfo.isPaid,
           status: statusInfo.status,
-          billingType: statusInfo.billingType,
           simulated: statusInfo.simulated || false,
         });
       })
       .catch(err => {
         console.error('[Payment Status Check Error]', err.message);
         sendJson(res, 500, { ok: false, error: err.message });
+      });
+    return;
+  }
+
+  // ── STRIPE WEBHOOK ─────────────────────────────────────────
+  // POST /api/webhook/stripe
+  if (req.method === 'POST' && pathname === '/api/webhook/stripe') {
+    readJsonBody(req)
+      .then(async eventData => {
+        if (eventData.type === 'payment_intent.succeeded') {
+          const paymentIntent = eventData.data?.object;
+          const recordId = paymentIntent?.metadata?.recordId;
+          const type = paymentIntent?.metadata?.type || 'status';
+
+          if (recordId) {
+            if (type === 'vitrine') {
+              await updateVitrinePurchasePayment(recordId, { payment_status: 'approved' });
+            } else {
+              await updateStatusPurchasePayment(recordId, { payment_status: 'approved' });
+            }
+          }
+        }
+
+        sendJson(res, 200, { ok: true, received: true });
+      })
+      .catch(err => {
+        console.error('[Stripe Webhook Error]', err.message);
+        sendJson(res, 400, { ok: false, error: err.message });
       });
     return;
   }

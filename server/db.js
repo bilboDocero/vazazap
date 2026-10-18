@@ -116,11 +116,26 @@ export async function getStatusPurchases() {
 
 export async function createStatusPurchaseRecord(data) {
   if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases`, {
+    const payload = { ...data };
+    let res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases`, {
       method: 'POST',
       headers: supabaseHeaders(),
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
+
+    // If column payment_id does not exist in Supabase schema cache yet, remove and retry
+    if (!res.ok && res.status === 400) {
+      const errText = await res.text();
+      if (errText.includes('payment_id')) {
+        delete payload.payment_id;
+        res = await fetch(`${SUPABASE_URL}/rest/v1/status_purchases`, {
+          method: 'POST',
+          headers: supabaseHeaders(),
+          body: JSON.stringify(payload),
+        });
+      }
+    }
+
     if (!res.ok) {
       const errText = await res.text();
       throw new Error(`Supabase POST status_purchases failed (${res.status}): ${errText}`);
@@ -274,11 +289,25 @@ export async function updateVitrinePurchasePayment(id, { payment_status = 'appro
 
 export async function createVitrinePurchaseRecord(data) {
   if (isSupabaseRest) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases`, {
+    const payload = { ...data };
+    let res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases`, {
       method: 'POST',
       headers: supabaseHeaders(),
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
+
+    if (!res.ok && res.status === 400) {
+      const errText = await res.text();
+      if (errText.includes('payment_id')) {
+        delete payload.payment_id;
+        res = await fetch(`${SUPABASE_URL}/rest/v1/vitrine_purchases`, {
+          method: 'POST',
+          headers: supabaseHeaders(),
+          body: JSON.stringify(payload),
+        });
+      }
+    }
+
     if (!res.ok) {
       const errText = await res.text();
       throw new Error(`Supabase POST vitrine_purchases failed (${res.status}): ${errText}`);
