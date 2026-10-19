@@ -38,7 +38,7 @@ describe('Communities Content & Routing', () => {
       expect(avisos.messages.every(msg => msg.sources.length > 0)).toBe(true);
     });
 
-    it('gossip community contains Avisos with date 06/07/2026 and mute flag', () => {
+    it('resenha community identifies its fictional announcements and characters', () => {
       const list = getBuiltinCommunities();
       const gossip = list.find(c => c.id === 'fofocas-caso-vorcaro');
       expect(gossip).toBeDefined();
@@ -46,8 +46,9 @@ describe('Communities Content & Routing', () => {
       const avisos = gossip.groups.find(g => g.id === 'fofocas-avisos');
       expect(avisos).toBeDefined();
       expect(avisos.name).toBe('Avisos');
-      expect(avisos.date).toBe('06/07/2026');
-      expect(avisos.snippet).toContain('Equipe da Resenha');
+      expect(avisos.date).toBe('Resenha simulada');
+      expect(gossip.simulated).toBe(true);
+      expect(avisos.messages.every(msg => msg.fictional)).toBe(true);
       expect(avisos.isMuted).toBe(true);
     });
   });

@@ -25,6 +25,16 @@ function publicLink(url, label) {
   return link;
 }
 
+function contextLink(url, label) {
+  if (/^#\/chat\/[a-z0-9-]+\/msg\/\d+$/.test(url)) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.textContent = label;
+    return link;
+  }
+  return publicLink(url, label);
+}
+
 function renderEditorialContent(bubble, msg) {
   const text = bubble.querySelector('.communities-bubble-text');
   if (msg.label) {
@@ -57,6 +67,36 @@ function renderEditorialContent(bubble, msg) {
     if (original) caption.appendChild(original);
     figure.append(img, caption);
     bubble.insertBefore(figure, bubble.querySelector('.communities-news-label, .communities-news-title, .communities-bubble-text'));
+  }
+  if (msg.meme) {
+    const card = document.createElement('figure');
+    const theme = ['green', 'neutral', 'cream'].includes(msg.meme.theme) ? msg.meme.theme : 'green';
+    card.className = `communities-meme-card communities-meme-card--${theme}`;
+    const eyebrow = document.createElement('span');
+    eyebrow.className = 'communities-meme-eyebrow';
+    eyebrow.textContent = 'Meme original';
+    const title = document.createElement('h3');
+    title.textContent = msg.meme.title;
+    const punchline = document.createElement('p');
+    punchline.textContent = msg.meme.punchline;
+    const caption = document.createElement('figcaption');
+    caption.textContent = 'Criação fictícia · Memes e Resenha';
+    card.append(eyebrow, title, punchline, caption);
+    bubble.insertBefore(card, bubble.querySelector('.communities-news-label, .communities-news-title, .communities-bubble-text'));
+  }
+  if (msg.context) {
+    const details = document.createElement('details');
+    details.className = 'communities-reaction-context';
+    const summary = document.createElement('summary');
+    summary.textContent = 'Contexto da resenha';
+    const context = document.createElement('p');
+    context.textContent = msg.context.text;
+    details.append(summary, context);
+    for (const reference of msg.context.links || []) {
+      const link = contextLink(reference.url, reference.label);
+      if (link) details.appendChild(link);
+    }
+    text.after(details);
   }
   if (msg.sources?.length) {
     const sources = document.createElement('div');
@@ -154,6 +194,10 @@ export function renderCommunitiesDetail(container, { selection, onBack, onCreate
       el.querySelector('.communities-notice-banner span:last-child').textContent =
         `Resumos da curadoria · Datas das fontes · Revisado em ${community.reviewedAt.split('-').reverse().join('/')}`;
       el.querySelector('.communities-footer-text').textContent = 'Curadoria de fontes públicas · Abra os links para ler os documentos e reportagens';
+    } else if (community.simulated) {
+      el.querySelector('.communities-notice-banner span:last-child').textContent =
+        'Resenha simulada · Personagens, horários e reações fictícios';
+      el.querySelector('.communities-footer-text').textContent = 'Humor criado para o acervo · Referências reais no grupo de VIPs';
     }
 
     const messagesContainer = el.querySelector('.communities-chat-messages');
@@ -195,7 +239,7 @@ export function renderCommunitiesDetail(container, { selection, onBack, onCreate
           </div>
         `;
         renderEditorialContent(bubble, msg);
-        if (community.editorial) bubble.querySelector('.communities-bubble-checks').remove();
+        if (community.editorial || community.simulated) bubble.querySelector('.communities-bubble-checks').remove();
         messagesContainer.appendChild(bubble);
       }
     });

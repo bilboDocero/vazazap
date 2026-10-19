@@ -567,6 +567,63 @@
 .communities-news-sources a { font-size: 12px; line-height: 1.5; }
 .communities-news-sources span { font-size: 11px; color: var(--WDS-content-deemphasized); }
 
+.communities-meme-card {
+  margin: 6px 0 12px;
+  padding: 20px 16px 12px;
+  border: 1px solid var(--WDS-lines-divider);
+  border-radius: 8px;
+  background: var(--WDS-green-75);
+  color: var(--WDS-content-default);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.communities-meme-card--neutral { background: var(--WDS-cool-gray-75); }
+.communities-meme-card--cream { background: var(--WDS-cream-75); }
+.communities-meme-eyebrow {
+  color: var(--WDS-accent);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+.communities-meme-card h3 {
+  margin: 14px 0 10px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.communities-meme-card p {
+  margin: 0 0 18px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+.communities-meme-card figcaption {
+  color: var(--WDS-content-deemphasized);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.communities-reaction-context {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--WDS-lines-divider);
+  color: var(--WDS-content-deemphasized);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.communities-reaction-context summary {
+  color: var(--WDS-accent);
+  cursor: pointer;
+}
+.communities-reaction-context p { margin: 8px 0; }
+.communities-reaction-context a {
+  display: block;
+  color: var(--WDS-accent);
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+
 .communities-bubble-meta {
   display: flex;
   align-items: center;

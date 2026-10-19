@@ -1,4 +1,5 @@
 import { getJournalisticGroups, NEWS_REVIEWED_AT } from './community-news.js';
+import { getResenhaGroups } from './community-resenha.js';
 
 /**
  * Data and models for Communities (Comunidades).
@@ -99,97 +100,11 @@ export function getBuiltinCommunities() {
     {
       id: 'fofocas-caso-vorcaro',
       name: 'Caso Vorcaro · Memes e Resenha',
-      description: 'Memes, comentários e reações sobre o caso. Um espaço informal para acompanhar a repercussão, compartilhar humor e conversar.',
+      description: 'Memes originais e reações fictícias sobre o caso. Uma resenha com personagens inventados, humor do cotidiano e referências reais no grupo de VIPs.',
       tagline: 'Humor e comentários',
       avatarSvg: renderDiscussionAvatar(),
-      groups: [
-        {
-          id: 'fofocas-avisos',
-          name: 'Avisos',
-          isAnnouncement: true,
-          avatarType: 'teal',
-          snippet: 'Equipe da Resenha: Memes, apelidos e comentários do caso.',
-          date: '06/07/2026',
-          isUnread: false,
-          unreadCount: 0,
-          isMuted: true,
-          messages: [
-            {
-              id: 'f-m1',
-              system: true,
-              text: 'Boas-vindas ao Caso Vorcaro · Memes e Resenha. Por aqui, o assunto é humor e comentários sobre o caso.',
-              time: '10:00',
-              date: '06/07/2026',
-            },
-            {
-              id: 'f-m2',
-              sender: 'Equipe da Resenha',
-              senderColor: '#E1306C',
-              text: 'Os apelidos "peleleca" e "colação" estão nas conversas do acervo e dão o tom desta resenha.\n\nEste espaço reúne humor, memes e comentários. Para acompanhar documentos, notícias e respostas dos envolvidos, veja a comunidade Caso Vorcaro · Notícias e Documentos.',
-              time: '10:05',
-              date: '06/07/2026',
-            },
-            {
-              id: 'f-m3',
-              sender: 'Equipe da Resenha',
-              senderColor: '#E1306C',
-              text: '🛥️ Proposta de US$ 100 milhões por um barco em Miami, jantares privados em São Paulo com Luciano Huck e encontros com Anitta e celebridades na mansão!',
-              time: '10:15',
-              date: '06/07/2026',
-            },
-          ],
-        },
-        {
-          id: 'fofocas-memes',
-          name: 'Peleleca, Memes & Colação',
-          isAnnouncement: false,
-          avatarType: 'default',
-          snippet: 'Equipe da Resenha: O diálogo do "PALAAAAAAA AGOLAAAA"...',
-          date: '05/07/2026',
-          isUnread: false,
-          unreadCount: 0,
-          isMuted: true,
-          messages: [
-            {
-              id: 'f-mm1',
-              sender: 'Equipe da Resenha',
-              senderColor: '#E1306C',
-              text: 'O diálogo imitando o Cebolinha — "PALAAAAAAA AGOLAAAA" — já virou figurinha no WhatsApp de 10 em cada 10 brasileiros kkkkk',
-              time: '17:40',
-              date: '05/07/2026',
-            },
-            {
-              id: 'f-mm2',
-              sender: 'Membro Fofoqueiro',
-              senderColor: '#0063CB',
-              text: 'A palavra "surreal" aparece 91 vezes nas conversas! É realmente uma vida de filme de cinema.',
-              time: '17:45',
-              date: '05/07/2026',
-            },
-          ],
-        },
-        {
-          id: 'fofocas-famosos',
-          name: 'VIPs, Famosos & Camarotes',
-          isAnnouncement: false,
-          avatarType: 'default',
-          snippet: 'Radar Famosos: Bastidores dos encontros com famosos...',
-          date: '04/07/2026',
-          isUnread: false,
-          unreadCount: 0,
-          isMuted: true,
-          messages: [
-            {
-              id: 'f-vf1',
-              sender: 'Radar Famosos',
-              senderColor: '#8257E5',
-              text: 'Vorcaro mantinha trânsito livre nos principais camarotes de Carnaval e eventos de gala entre Paris, Londres, Mônaco e Miami.',
-              time: '19:10',
-              date: '04/07/2026',
-            },
-          ],
-        },
-      ],
+      simulated: true,
+      groups: getResenhaGroups(),
     },
   ];
 }
