@@ -88,73 +88,43 @@
   background: none;
 }
 
-/* Distinct discovery cues for sections beyond conversations. */
-.nav-feature {
-  --nav-feature-color: #006b50;
-  --nav-feature-surface: #e4f5ed;
-  --nav-feature-border: #b8e4cf;
-}
-
-.nav-feature[data-feature="vitrine"] {
-  --nav-feature-color: #6b3db3;
-  --nav-feature-surface: #f0eafa;
-  --nav-feature-border: #d8c6f1;
-}
-
-.nav-feature[data-feature="anunciar"] {
-  --nav-feature-color: #995006;
-  --nav-feature-surface: #fff0d5;
-  --nav-feature-border: #f1ce91;
-}
-
-.nav-rail-btn.nav-feature {
-  flex-direction: column;
-  gap: 4px;
-  width: 64px;
-  height: 60px;
-  margin: 3px 0;
-  border: 1px solid var(--nav-feature-border);
-  border-radius: 15px;
-  background: var(--nav-feature-surface);
-  color: var(--nav-feature-color);
-  transition: box-shadow 150ms ease, transform 150ms ease;
-}
-
-.nav-rail-btn.nav-feature:hover,
+/* Subtle discovery dots using the same green as WhatsApp activity cues. */
 .nav-rail-btn.nav-feature.active {
-  background: var(--nav-feature-surface);
-  color: var(--nav-feature-color);
-  box-shadow: inset 0 0 0 1px var(--nav-feature-color);
+  background: var(--WDS-components-filter-surface-selected);
+  color: var(--WDS-accent);
 }
-
-.nav-rail-btn.nav-feature:hover { transform: translateY(-1px); }
-.nav-rail-btn.nav-feature.active { border-inline-start: 3px solid var(--nav-feature-color); }
-.nav-feature-caption { font-size: 9px; font-weight: 700; line-height: 1.2; }
 
 .nav-feature-indicator {
   position: absolute;
   top: 5px;
   right: 6px;
-  display: grid;
-  place-items: center;
-  background: var(--nav-feature-color);
-  color: #fff;
-  border: 2px solid var(--nav-feature-surface);
+  width: 8px;
+  height: 8px;
+  background: var(--WDS-persistent-always-branded);
+  border: 1px solid var(--WDS-background-wash-inset);
   border-radius: 50%;
   pointer-events: none;
 }
 
-.nav-feature-indicator--dot { width: 10px; height: 10px; }
-.nav-feature-indicator--count { width: 18px; height: 18px; font-size: 10px; font-weight: 700; }
-
-.nav-feature:focus-visible { outline: 2px solid var(--nav-feature-color); outline-offset: 3px; }
-
 @media (prefers-reduced-motion: no-preference) {
-  .nav-feature-indicator--dot { animation: nav-discovery-pulse 1.8s ease-out 2; }
-  @keyframes nav-discovery-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 transparent; }
-    40% { box-shadow: 0 0 0 5px var(--nav-feature-border); }
+  .nav-feature-indicator::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: var(--WDS-persistent-always-branded);
+    animation: nav-feature-pulse 2.6s ease-out infinite;
   }
+
+  @keyframes nav-feature-pulse {
+    0% { transform: scale(1); opacity: .28; }
+    70%, 100% { transform: scale(2.2); opacity: 0; }
+  }
+}
+
+.nav-feature:focus-visible {
+  outline: 2px solid var(--WDS-accent);
+  outline-offset: 3px;
 }
 
 .nav-rail-bottom {
