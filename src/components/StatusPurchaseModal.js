@@ -43,7 +43,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
   let previewActiveIdx = 0;
   let uploadError = '';
 
-  const identity = checkoutIdentity();
+  let identity = checkoutIdentity();
   let processingWallet = null;
   let paymentError = '';
 
@@ -627,6 +627,7 @@ export function openStatusPurchaseModal({ onPublished, initialPlan = 'status_nor
           paymentError = '';
           render();
           try {
+            identity = checkoutIdentity();
             const result = await startCheckout({
               ...identity, type: 'status', billingType: processingWallet === 'pix' ? 'PIX' : 'CREDIT_CARD',
               plan_type: selectedPlan, file_count: uploadedFiles.length,

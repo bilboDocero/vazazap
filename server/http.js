@@ -47,6 +47,7 @@ export function endpoint(method, action) {
     }
     try { return sendJson(res, 200, { ok: true, ...await action(req) }); }
     catch (error) {
+      console.error('[API Error]', error);
       // Provider/DB messages may contain customer data; don't return or log them.
       const status = error instanceof HttpError ? error.status : 503;
       return sendJson(res, status, { ok: false, error: error instanceof HttpError ? error.message : 'Não foi possível confirmar a operação. Tente novamente.' });

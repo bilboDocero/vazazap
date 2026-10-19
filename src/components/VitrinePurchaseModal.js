@@ -43,7 +43,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
   let previewActiveIdx = 0;
   let uploadError = '';
 
-  const identity = checkoutIdentity();
+  let identity = checkoutIdentity();
   let processingWallet = null;
   let paymentError = '';
 
@@ -621,6 +621,7 @@ export function openVitrinePurchaseModal({ onPublished, initialPlan = 'vitrine_n
           paymentError = '';
           render();
           try {
+            identity = checkoutIdentity();
             const result = await startCheckout({
               ...identity, type: 'vitrine', billingType: processingWallet === 'pix' ? 'PIX' : 'CREDIT_CARD',
               plan_type: selectedPlan, file_count: uploadedFiles.length,
