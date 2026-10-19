@@ -127,7 +127,7 @@ export function showMobileSearchBar(chatView, conversationId, { onNavigate, onDa
     if (results.length === 0) return;
     currentIndex = index;
     const r = results[currentIndex];
-    if (onNavigate) onNavigate(r.id, r.date);
+    if (onNavigate) onNavigate(r.id, r.date, input.value.trim());
   }
 
   upBtn.addEventListener('click', () => {

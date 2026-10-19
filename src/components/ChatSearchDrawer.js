@@ -155,7 +155,7 @@ export function showChatSearchDrawer(mainArea, conversationId, { dateIndex, onRe
 
       item.appendChild(meta);
       item.appendChild(content);
-      item.addEventListener('click', () => { if (onResultClick) onResultClick(r.id, r.date); });
+      item.addEventListener('click', () => { if (onResultClick) onResultClick(r.id, r.date, input.value.trim()); });
       resultsArea.appendChild(item);
     }
   }

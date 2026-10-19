@@ -52,7 +52,7 @@ let activeChatSearch = null;
 let activeProfileDrawer = null;
 let activeSettingsDrawer = null;
 let activeSearch = null;
-let pendingScrollTarget = null;
+let conversationVersion = 0;
 let mainAreaSavedContent = null;
 let currentConversationId = null;
 let activeImagePreview = null;
@@ -129,6 +129,8 @@ async function init() {
 
   /** Close the chat (loader, context menu, right drawers). */
   function closeChat() {
+    conversationVersion++;
+    currentConversationId = null;
     clearPreparedScreenshot();
     if (activeImagePreview) { activeImagePreview.destroy(); activeImagePreview = null; }
     closeRightDrawers();
@@ -206,7 +208,7 @@ async function init() {
         const chatViewEl = mainArea.querySelector('.chat-view');
         if (chatViewEl && !activeChatSearch) {
           activeChatSearch = showMobileSearchBar(chatViewEl, target, {
-            onNavigate: (messageId, date) => activeLoader?.scrollToMessage(messageId, date),
+            onNavigate: (messageId, date, query) => activeLoader?.scrollToMessage(messageId, date, true, query),
             onDateSelect: (date) => activeLoader?.scrollToDate(date),
             onClose: () => { activeChatSearch = null; },
           });
@@ -248,7 +250,7 @@ async function init() {
       const chatViewEl = mainArea.querySelector('.chat-view');
       if (chatViewEl) {
         activeChatSearch = showMobileSearchBar(chatViewEl, conversationId, {
-          onNavigate: (messageId, date) => activeLoader?.scrollToMessage(messageId, date),
+          onNavigate: (messageId, date, query) => activeLoader?.scrollToMessage(messageId, date, true, query),
           onDateSelect: (date) => activeLoader?.scrollToDate(date),
           onClose: () => { activeChatSearch = null; },
         });
@@ -256,7 +258,7 @@ async function init() {
     } else {
       activeChatSearch = showChatSearchDrawer(mainArea, conversationId, {
         dateIndex,
-        onResultClick: (messageId, date) => activeLoader?.scrollToMessage(messageId, date),
+        onResultClick: (messageId, date, query) => activeLoader?.scrollToMessage(messageId, date, true, query),
         onDateSelect: (date) => activeLoader?.scrollToDate(date),
         onClose: () => { activeChatSearch = null; },
       });
@@ -265,9 +267,10 @@ async function init() {
 
   // ── Open conversation ──────────────────────────────
 
-  async function openConversation(id) {
+  async function openConversation(id, scrollTarget = null) {
     // Close everything first
     closeAll();
+    const version = conversationVersion;
     sidebar.showChats();
 
     setActiveConversation(sidebar, id);
@@ -285,6 +288,7 @@ async function init() {
     currentConversationId = id;
 
     const dateIndex = await store.getConversationIndex(id);
+    if (version !== conversationVersion) return;
 
     // Build toggleSearch bound to this conversation
     const toggleSearch = () => toggleChatSearch(id, dateIndex);
@@ -383,13 +387,10 @@ async function init() {
     });
 
     activeLoader = loader;
-    await loader.init();
-
-    if (pendingScrollTarget) {
-      const { messageId, date } = pendingScrollTarget;
-      pendingScrollTarget = null;
-      await loader.scrollToMessage(messageId, date);
-    }
+    const initialization = loader.init();
+    if (scrollTarget) await loader.scrollToMessage(scrollTarget.messageId, scrollTarget.date, true, scrollTarget.query);
+    else await initialization;
+    if (version !== conversationVersion || activeLoader !== loader) return;
 
     const messagesArea = mainArea.querySelector('.chat-messages');
     if (messagesArea) {
@@ -542,13 +543,16 @@ async function init() {
 
   // Sidebar search
   const conversations = store.getConversations();
+  let selectedSearchMatch = null;
   if (conversations.length > 0) {
     activeSearch = attachSearch(sidebar, result => {
-      if (activeLoader && currentConversationId === result.conversationId) {
-        activeLoader.scrollToMessage(result.id, result.date);
+      const query = result.content.slice(result.matchStart, result.matchEnd);
+      selectedSearchMatch = { conversationId: result.conversationId, messageId: result.id, query };
+      const route = router.getCurrentRoute();
+      if (activeLoader && currentConversationId === result.conversationId && String(route.messageId) === String(result.id)) {
+        activeLoader.scrollToMessage(result.id, result.date, true, query);
       } else {
-        pendingScrollTarget = { messageId: result.id, date: result.date };
-        router.navigate('chat', result.conversationId);
+        router.navigate('chat', result.conversationId, result.id);
       }
     });
   }
@@ -770,14 +774,22 @@ async function init() {
   });
 
   router.on('chat', async (id, messageId) => {
+    let scrollTarget = null;
     if (messageId) {
-      // Look up the date for this message ID
       const date = await store.findDateForMessage(id, messageId);
+      const route = router.getCurrentRoute();
+      if (route.route !== 'chat' || route.param !== id || route.messageId !== messageId) return;
       if (date) {
-        pendingScrollTarget = { messageId, date };
+        const query = selectedSearchMatch?.conversationId === id && String(selectedSearchMatch.messageId) === String(messageId)
+          ? selectedSearchMatch.query : '';
+        scrollTarget = { messageId, date, query };
       }
     }
-    openConversation(id);
+    if (scrollTarget && activeLoader && currentConversationId === id) {
+      await activeLoader.scrollToMessage(messageId, scrollTarget.date, true, scrollTarget.query);
+      return;
+    }
+    await openConversation(id, scrollTarget);
   });
 
   renderEmptyState(mainArea);

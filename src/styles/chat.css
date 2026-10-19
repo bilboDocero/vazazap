@@ -609,6 +609,11 @@
   padding-right: 48px;
 }
 
+.msg-search-selected { background-color: rgba(29, 170, 97, 0.12); border-radius: 4px; }
+.msg-search-selected .chat-msg-bubble,
+.msg-search-selected .chat-msg-system { outline: 2px solid #008069; outline-offset: 2px; }
+.message-search-match { background: #ffe58a; color: #111b21; border-radius: 2px; scroll-margin-block: 24px; }
+
 @keyframes msgFlash {
   0% { background-color: rgba(29, 170, 97, 0.25); }
   100% { background-color: transparent; }

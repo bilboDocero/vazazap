@@ -1,211 +1,166 @@
-/**
- * ScrollLoader — lazy-loads day-chunks as user scrolls through chat history.
- *
- * Starts from the most recent days, loads older days when the user scrolls
- * near the top. Uses IntersectionObserver for efficient scroll detection.
- */
-
+/** Lazy chat history with navigation that waits for initialization and keeps the latest selection. */
+import { highlightMessageText, clearMessageTextHighlight } from './message-search-highlight.js';
 const INITIAL_DAYS = 5;
 const LOAD_MORE_DAYS = 5;
 
 export class ScrollLoader {
-  /**
-   * @param {object} options
-   * @param {HTMLElement} options.container - scrollable chat messages container
-   * @param {Array} options.dateIndex - array of { date, message_count } from conversation index
-   * @param {function} options.loadMessages - async (date) => messages[]
-   * @param {function} options.renderDay - (date, messages, container) => HTMLElement
-   */
   constructor({ container, dateIndex, loadMessages, renderDay }) {
     this._container = container;
     this._dateIndex = dateIndex;
     this._loadMessages = loadMessages;
     this._renderDay = renderDay;
     this._loadedDates = new Set();
+    this._pendingDates = new Map();
     this._loading = false;
-    this._nextIndex = dateIndex.length - 1; // Start from most recent
+    this._nextIndex = dateIndex.length - 1;
     this._observer = null;
     this._sentinel = null;
+    this._initialization = null;
+    this._destroyed = false;
+    this._navigationVersion = 0;
+    this._navigating = false;
+    this._selectedMessage = null;
+    this._highlightTimer = null;
   }
 
-  /** Load initial days and set up scroll observation. */
-  async init() {
-    // Create top sentinel for IntersectionObserver
+  init() {
+    if (!this._initialization) this._initialization = this._init();
+    return this._initialization;
+  }
+
+  async _init() {
+    if (this._destroyed) return;
     this._sentinel = document.createElement('div');
     this._sentinel.className = 'scroll-sentinel';
     this._sentinel.setAttribute('aria-hidden', 'true');
     this._container.prepend(this._sentinel);
-
-    // Load initial batch (most recent days)
     await this._loadBatch(INITIAL_DAYS);
-
-    // Scroll to bottom (most recent messages)
-    this._scrollToBottom();
-
-    // Observe sentinel to load more when user scrolls up
-    this._observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !this._loading) {
-          this._loadBatch(LOAD_MORE_DAYS);
-        }
-      },
-      { root: this._container, rootMargin: '200px 0px 0px 0px' }
-    );
+    if (this._destroyed) return;
+    // A pending message navigation owns the position instead of the initial bottom scroll.
+    if (this._navigationVersion === 0) this._scrollToBottom();
+    this._observer = new IntersectionObserver(entries => {
+      if (!this._destroyed && entries[0].isIntersecting && !this._loading && !this._navigating) this._loadBatch(LOAD_MORE_DAYS);
+    }, { root: this._container, rootMargin: '200px 0px 0px 0px' });
     this._observer.observe(this._sentinel);
   }
 
-  /**
-   * Load N more days (going backwards from current position).
-   * @param {number} count
-   */
   async _loadBatch(count) {
-    if (this._loading || this._nextIndex < 0) return;
+    if (this._destroyed || this._loading || this._nextIndex < 0) return;
     this._loading = true;
-
-    const scrollHeightBefore = this._container.scrollHeight;
-    const scrollTopBefore = this._container.scrollTop;
-
+    const heightBefore = this._container.scrollHeight;
+    const topBefore = this._container.scrollTop;
+    const navigationVersion = this._navigationVersion;
     let loaded = 0;
-    while (loaded < count && this._nextIndex >= 0) {
-      const entry = this._dateIndex[this._nextIndex];
-      this._nextIndex--;
-
-      if (this._loadedDates.has(entry.date)) continue;
-
-      try {
-        const messages = await this._loadMessages(entry.date);
-        const dayEl = this._renderDay(entry.date, messages);
-
-        // Insert after sentinel (which is always first child)
-        if (this._sentinel.nextSibling) {
-          this._container.insertBefore(dayEl, this._sentinel.nextSibling);
-        } else {
-          this._container.appendChild(dayEl);
-        }
-
-        this._loadedDates.add(entry.date);
-        loaded++;
-      } catch (err) {
-        console.error(`Failed to load day ${entry.date}:`, err);
+    try {
+      while (!this._destroyed && loaded < count && this._nextIndex >= 0) {
+        const entry = this._dateIndex[this._nextIndex--];
+        if (this._loadedDates.has(entry.date)) continue;
+        if (await this.loadDate(entry.date)) loaded++;
       }
+      // A background prepend must not overwrite a newer message selection.
+      if (!this._destroyed && navigationVersion === this._navigationVersion && loaded && topBefore > 0) {
+        this._container.scrollTop = topBefore + this._container.scrollHeight - heightBefore;
+      }
+    } finally {
+      this._loading = false;
     }
-
-    // Preserve scroll position when prepending content
-    if (loaded > 0 && scrollTopBefore > 0) {
-      const scrollHeightAfter = this._container.scrollHeight;
-      this._container.scrollTop = scrollTopBefore + (scrollHeightAfter - scrollHeightBefore);
-    }
-
-    this._loading = false;
-
-    // If no more days to load, hide sentinel
-    if (this._nextIndex < 0 && this._sentinel) {
-      this._observer?.unobserve(this._sentinel);
-    }
+    if (this._nextIndex < 0 && this._sentinel) this._observer?.unobserve(this._sentinel);
   }
 
-  /** Scroll container to the bottom. */
-  _scrollToBottom() {
-    this._container.scrollTop = this._container.scrollHeight;
-  }
-
-  /** Scroll to bottom (public, for use after conversation switch). */
-  scrollToBottom() {
+  _scrollToBottom() { this._container.scrollTop = this._container.scrollHeight; }
+  async scrollToBottom() {
+    const version = ++this._navigationVersion;
+    this._navigating = false;
+    this._clearHighlight();
+    await this._initialization;
+    if (this._destroyed || version !== this._navigationVersion) return;
     this._scrollToBottom();
   }
+  get isFullyLoaded() { return this._nextIndex < 0; }
+  get loadedCount() { return this._loadedDates.size; }
 
-  /** Check if all days have been loaded. */
-  get isFullyLoaded() {
-    return this._nextIndex < 0;
-  }
-
-  /** Number of days currently loaded in the DOM. */
-  get loadedCount() {
-    return this._loadedDates.size;
-  }
-
-  /**
-   * Load a specific date (if not already loaded) and return the day element.
-   * @param {string} date - ISO date string
-   * @returns {Promise<HTMLElement|null>}
-   */
+  /** Deduplicate dates requested by lazy loading and message navigation. */
   async loadDate(date) {
-    if (this._loadedDates.has(date)) {
-      return this._container.querySelector(`[data-date="${date}"]`);
-    }
+    if (this._destroyed) return null;
+    if (this._loadedDates.has(date)) return this._container.querySelector(`[data-date="${date}"]`);
+    if (this._pendingDates.has(date)) return this._pendingDates.get(date);
+    const task = (async () => {
+      try {
+        const messages = await this._loadMessages(date);
+        if (this._destroyed) return null;
+        const day = this._renderDay(date, messages);
+        const nextDay = [...this._container.querySelectorAll('.chat-day')].find(section => section.dataset.date > date);
+        if (nextDay) this._container.insertBefore(day, nextDay);
+        else this._container.appendChild(day);
+        this._loadedDates.add(date);
+        return day;
+      } catch (error) {
+        if (!this._destroyed) console.error(`Failed to load day ${date}:`, error);
+        return null;
+      }
+    })().finally(() => this._pendingDates.delete(date));
+    this._pendingDates.set(date, task);
+    return task;
+  }
 
+  _clearHighlight() {
+    clearTimeout(this._highlightTimer);
+    this._selectedMessage?.classList.remove('msg-highlight', 'msg-search-selected');
+    if (this._selectedMessage) clearMessageTextHighlight(this._selectedMessage);
+    this._selectedMessage = null;
+  }
+
+  _highlight(message, query = '') {
+    this._clearHighlight();
+    this._selectedMessage = message;
+    message.classList.add('msg-search-selected');
+    void message.offsetHeight;
+    message.classList.add('msg-highlight');
+    // Keep the selection visible after the introductory flash finishes.
+    this._highlightTimer = setTimeout(() => message.classList.remove('msg-highlight'), 1500);
+    return highlightMessageText(message, query) || message;
+  }
+
+  /** Wait for the initial batch; a slower earlier click cannot override a later one. */
+  async scrollToMessage(messageId, date, highlight = true, query = '') {
+    const version = ++this._navigationVersion;
+    this._navigating = true;
     try {
-      const messages = await this._loadMessages(date);
-      const dayEl = this._renderDay(date, messages);
-
-      // Insert in chronological order among existing day sections
-      const existingSections = Array.from(this._container.querySelectorAll('.chat-day'));
-      let inserted = false;
-      for (const section of existingSections) {
-        if (section.dataset.date > date) {
-          this._container.insertBefore(dayEl, section);
-          inserted = true;
-          break;
-        }
-      }
-      if (!inserted) {
-        this._container.appendChild(dayEl);
-      }
-
-      this._loadedDates.add(date);
-      return dayEl;
-    } catch (err) {
-      console.error(`Failed to load day ${date}:`, err);
-      return null;
+      await this._initialization;
+      if (this._destroyed || version !== this._navigationVersion) return false;
+      const day = await this.loadDate(date);
+      if (this._destroyed || version !== this._navigationVersion || !day) return false;
+      const message = [...day.querySelectorAll('[data-id]')].find(element => element.dataset.id === String(messageId));
+      if (!message) return false;
+      const target = highlight ? this._highlight(message, query) : message;
+      target.scrollIntoView({ block: 'center', behavior: 'instant' });
+      return true;
+    } finally {
+      if (version === this._navigationVersion) this._navigating = false;
     }
   }
 
-  /**
-   * Scroll to a specific message by ID, loading its date if needed.
-   * @param {string|number} messageId
-   * @param {string} date - the date the message belongs to
-   * @param {boolean} [highlight=true] - flash-highlight the message
-   */
-  async scrollToMessage(messageId, date, highlight = true) {
-    await this.loadDate(date);
-
-    const msgEl = this._container.querySelector(`[data-id="${messageId}"]`);
-    if (msgEl) {
-      msgEl.scrollIntoView({ block: 'center' });
-      if (highlight) {
-        // Remove + reflow + re-add to restart animation on repeated clicks
-        msgEl.classList.remove('msg-highlight');
-        void msgEl.offsetHeight;
-        msgEl.classList.add('msg-highlight');
-        setTimeout(() => msgEl.classList.remove('msg-highlight'), 1500);
-      }
-    }
-  }
-
-  /**
-   * Scroll to the first message of a specific date.
-   * @param {string} date - ISO date string
-   */
   async scrollToDate(date) {
-    const dayEl = await this.loadDate(date);
-    if (dayEl) {
-      // Find first message row in this day section
-      const firstMsg = dayEl.querySelector('.chat-msg-row');
-      if (firstMsg) {
-        firstMsg.scrollIntoView({ block: 'center' });
-        firstMsg.classList.remove('msg-highlight');
-        void firstMsg.offsetHeight;
-        firstMsg.classList.add('msg-highlight');
-        setTimeout(() => firstMsg.classList.remove('msg-highlight'), 1500);
-      } else {
-        dayEl.scrollIntoView({ block: 'center' });
-      }
+    const version = ++this._navigationVersion;
+    this._navigating = true;
+    try {
+      await this._initialization;
+      if (this._destroyed || version !== this._navigationVersion) return;
+      const day = await this.loadDate(date);
+      if (this._destroyed || version !== this._navigationVersion || !day) return;
+      const firstMessage = day.querySelector('.chat-msg-row');
+      if (firstMessage) this._highlight(firstMessage);
+      (firstMessage || day).scrollIntoView({ block: 'center', behavior: 'instant' });
+    } finally {
+      if (version === this._navigationVersion) this._navigating = false;
     }
   }
 
-  /** Clean up observer. */
   destroy() {
+    this._destroyed = true;
+    this._navigationVersion++;
     this._observer?.disconnect();
     this._observer = null;
+    this._clearHighlight();
   }
 }

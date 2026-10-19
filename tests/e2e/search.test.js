@@ -5,6 +5,18 @@ const sourceMessages = JSON.parse(readFileSync(new URL('../../data/messages.json
 const lateMessage = sourceMessages.find(message => message.type === 'text' && message.content.length > 200 && /[A-Za-zÀ-ÿ]{3,}(?: [A-Za-zÀ-ÿ]{2,}){3,6}/.test(message.content.slice(120)));
 const lateQuery = lateMessage.content.slice(120).match(/[A-Za-zÀ-ÿ]{3,}(?: [A-Za-zÀ-ÿ]{2,}){3,6}/)[0];
 
+async function expectSelectedMatch(page, messageId) {
+  const message = page.locator(`.chat-messages [data-id="${messageId}"]`);
+  await expect(message).toHaveClass(/msg-search-selected/);
+  const match = message.locator('.message-search-match').first();
+  await expect(match).toBeVisible();
+  await expect.poll(() => match.evaluate(element => {
+    const rect = element.getBoundingClientRect();
+    const area = element.closest('.chat-messages').getBoundingClientRect();
+    return rect.bottom > area.top && rect.top < area.bottom;
+  })).toBe(true);
+}
+
 test.describe('Search — Batch 7', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -178,6 +190,7 @@ test.describe('Search — Batch 7', () => {
     await expect(page).toHaveURL(/#\/chat\/martha-graeff/);
     await expect(page.locator('.chat-view')).toBeVisible();
     await expect(page.locator(`.chat-messages [data-id="${lateMessage.id}"]`)).toBeVisible();
+    await expectSelectedMatch(page, lateMessage.id);
   });
 
   test('paginates results instead of stopping after the first 50 messages', async ({ page }) => {
@@ -217,6 +230,58 @@ test.describe('Search — Batch 7', () => {
       await page.locator('.chat-search-result-item').first().click();
     }
     await expect(page.locator(`.chat-messages [data-id="${lateMessage.id}"]`)).toBeVisible();
+    await expectSelectedMatch(page, lateMessage.id);
     await expect(page).toHaveURL(/#\/chat\/martha-graeff/);
+  });
+
+  test('keeps the latest selection when another result is chosen before initial history finishes loading', async ({ page }) => {
+    let release;
+    const gate = new Promise(resolve => { release = resolve; });
+    let requested;
+    const loading = new Promise(resolve => { requested = resolve; });
+    await page.route('**/data/martha-graeff/2025-08.json', async route => { requested(); await gate; await route.continue(); });
+    const input = page.locator('.sidebar-search-input');
+    await input.fill('Bom dia');
+    const first = page.locator('.search-result-item[data-conversation-id="martha-graeff"]').first();
+    await first.click();
+    await loading;
+    await expect(page.locator('.chat-header-name')).toHaveText('Martha Graeff');
+    if (page.viewportSize().width <= 600) await page.getByRole('button', { name: 'Voltar', exact: true }).click();
+    await input.fill('peleleca');
+    const latest = page.locator('.search-result-item').first();
+    const messageId = await latest.getAttribute('data-message-id');
+    await latest.click();
+    await expect(page).toHaveURL(new RegExp('#/chat/martha-graeff/msg/' + messageId));
+    release();
+    await expectSelectedMatch(page, messageId);
+    await expect(page.locator(`.chat-messages [data-id="${messageId}"]`)).not.toHaveClass(/msg-highlight/);
+    await expectSelectedMatch(page, messageId);
+    await expect(page.locator('.chat-messages .msg-search-selected')).toHaveCount(1);
+    // Choosing the same result again must work even when the hash is unchanged.
+    if (page.viewportSize().width > 600) {
+      await latest.click();
+      await expectSelectedMatch(page, messageId);
+    }
+  });
+
+  test('does not let an older conversation request replace a newer selected result', async ({ page }) => {
+    let release;
+    const gate = new Promise(resolve => { release = resolve; });
+    let requested;
+    const loading = new Promise(resolve => { requested = resolve; });
+    await page.route('**/data/martha-graeff/index.json', async route => { requested(); await gate; await route.continue(); });
+    const input = page.locator('.sidebar-search-input');
+    await input.fill('peleleca');
+    await page.locator('.search-result-item').first().click();
+    await loading;
+    await input.fill('sem nota');
+    const result = page.locator('.search-result-item').first();
+    const messageId = await result.getAttribute('data-message-id');
+    await result.click();
+    await expect(page).toHaveURL(/#\/chat\/romy-banco-master/);
+    await expectSelectedMatch(page, messageId);
+    release();
+    await expect(page.locator('.chat-header-name')).toHaveText('Romy Banco Master');
+    await expectSelectedMatch(page, messageId);
   });
 });
