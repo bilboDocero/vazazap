@@ -13,6 +13,67 @@ import { escapeHtml } from '../lib/utils.js';
 const ICON_BACK = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 5-7 7 7 7"/></svg>';
 const ICON_CHECKS = '<svg viewBox="0 0 16 11" width="16" height="11" fill="none"><path d="M11 1L5.5 8.5L2 5" stroke="#53BDEB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 1L9 8.5" stroke="#53BDEB" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
+function publicLink(url, label) {
+  try {
+    if (new URL(url).protocol !== 'https:') return null;
+  } catch { return null; }
+  const link = document.createElement('a');
+  link.href = url;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = label;
+  return link;
+}
+
+function renderEditorialContent(bubble, msg) {
+  const text = bubble.querySelector('.communities-bubble-text');
+  if (msg.label) {
+    const label = document.createElement('div');
+    label.className = 'communities-news-label';
+    label.textContent = msg.label;
+    bubble.insertBefore(label, text);
+  }
+  if (msg.title) {
+    const title = document.createElement('h3');
+    title.className = 'communities-news-title';
+    title.textContent = msg.title;
+    bubble.insertBefore(title, text);
+  }
+  if (msg.image?.src?.startsWith('/assets/communities/')) {
+    const figure = document.createElement('figure');
+    figure.className = 'communities-news-image';
+    const img = document.createElement('img');
+    img.src = msg.image.src;
+    img.alt = msg.image.alt || '';
+    img.setAttribute('loading', 'lazy');
+    img.setAttribute('decoding', 'async');
+    if (msg.image.width && msg.image.height) {
+      img.width = msg.image.width;
+      img.height = msg.image.height;
+    }
+    const caption = document.createElement('figcaption');
+    caption.textContent = `${msg.image.caption} Foto: ${msg.image.credit}. `;
+    const original = publicLink(msg.image.sourceUrl, 'Origem da foto');
+    if (original) caption.appendChild(original);
+    figure.append(img, caption);
+    bubble.insertBefore(figure, bubble.querySelector('.communities-news-label, .communities-news-title, .communities-bubble-text'));
+  }
+  if (msg.sources?.length) {
+    const sources = document.createElement('div');
+    sources.className = 'communities-news-sources';
+    for (const source of msg.sources) {
+      const link = publicLink(source.url, `${source.publisher} · ${source.title}`);
+      if (!link) continue;
+      const item = document.createElement('div');
+      const date = document.createElement('span');
+      date.textContent = `Fonte publicada em ${source.publishedAt.split('-').reverse().join('/')}`;
+      item.append(link, date);
+      sources.appendChild(item);
+    }
+    text.after(sources);
+  }
+}
+
 export function renderCommunitiesDetail(container, { selection, onBack, onCreateCommunity, onSelectGroup }) {
   const el = document.createElement('section');
   el.className = `communities-detail${selection ? ' has-selection' : ''}`;
@@ -64,7 +125,7 @@ export function renderCommunitiesDetail(container, { selection, onBack, onCreate
         </div>
         <div class="communities-chat-info">
           <div class="communities-chat-name">${escapeHtml(group.name)}</div>
-          <div class="communities-chat-subtext">${escapeHtml(community.name)} · ${escapeHtml(community.membersCount || '')}</div>
+          <div class="communities-chat-subtext">${escapeHtml(community.name)} · ${escapeHtml(community.tagline || community.membersCount || '')}</div>
         </div>
         <div class="communities-chat-actions">
           <button class="communities-action-btn" disabled aria-label="Pesquisar">${ICON_SEARCH}</button>
@@ -89,6 +150,12 @@ export function renderCommunitiesDetail(container, { selection, onBack, onCreate
 
     el.querySelector('.communities-back-btn')?.addEventListener('click', onBack);
 
+    if (community.editorial) {
+      el.querySelector('.communities-notice-banner span:last-child').textContent =
+        `Resumos da curadoria · Datas das fontes · Revisado em ${community.reviewedAt.split('-').reverse().join('/')}`;
+      el.querySelector('.communities-footer-text').textContent = 'Curadoria de fontes públicas · Abra os links para ler os documentos e reportagens';
+    }
+
     const messagesContainer = el.querySelector('.communities-chat-messages');
     const messages = group.messages || [];
 
@@ -110,6 +177,7 @@ export function renderCommunitiesDetail(container, { selection, onBack, onCreate
       } else {
         const bubble = document.createElement('div');
         bubble.className = 'communities-bubble';
+        bubble.dataset.messageId = msg.id;
 
         const senderColor = msg.senderColor || '#008069';
         const formattedText = escapeHtml(msg.text).replace(/\n/g, '<br/>');
@@ -126,6 +194,8 @@ export function renderCommunitiesDetail(container, { selection, onBack, onCreate
             <span class="communities-bubble-checks">${ICON_CHECKS}</span>
           </div>
         `;
+        renderEditorialContent(bubble, msg);
+        if (community.editorial) bubble.querySelector('.communities-bubble-checks').remove();
         messagesContainer.appendChild(bubble);
       }
     });
@@ -151,7 +221,7 @@ export function renderCommunitiesDetail(container, { selection, onBack, onCreate
           ${community.avatarSvg}
         </div>
         <h2 class="communities-overview-title">${escapeHtml(community.name)}</h2>
-        <span class="communities-overview-members">Comunidade · ${escapeHtml(community.membersCount || 'Membros')}</span>
+        <span class="communities-overview-members">Comunidade · ${escapeHtml(community.tagline || community.membersCount || 'Membros')}</span>
       </div>
 
       <div class="communities-overview-desc-box">

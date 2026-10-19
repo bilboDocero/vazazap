@@ -18,11 +18,11 @@ describe('Communities Content & Routing', () => {
       expect(list).toHaveLength(2);
 
       const names = list.map(c => c.name);
-      expect(names).toContain('🔴 Plantão Brasília · Caso Vorcaro');
-      expect(names).toContain('🔥 Choquei no Acervo · Babados do Vorcaro');
+      expect(names).toContain('Caso Vorcaro · Notícias e Documentos');
+      expect(names).toContain('Caso Vorcaro · Memes e Resenha');
     });
 
-    it('journalistic community contains Avisos group with 4 unread messages and mute flag', () => {
+    it('journalistic community contains sourced announcements with publication dates', () => {
       const list = getBuiltinCommunities();
       const news = list.find(c => c.id === 'plantao-caso-vorcaro');
       expect(news).toBeDefined();
@@ -30,11 +30,12 @@ describe('Communities Content & Routing', () => {
       const avisos = news.groups.find(g => g.id === 'plantao-avisos');
       expect(avisos).toBeDefined();
       expect(avisos.name).toBe('Avisos');
-      expect(avisos.date).toBe('domingo');
-      expect(avisos.snippet).toContain('~Plantão Notícias: 🚨 🚨 URGENTE: PF...');
-      expect(avisos.unreadCount).toBe(4);
+      expect(avisos.date).toBe('14/10/2026');
+      expect(avisos.snippet).toContain('PGR');
+      expect(avisos.unreadCount).toBe(0);
       expect(avisos.isMuted).toBe(true);
-      expect(avisos.messages.length).toBeGreaterThanOrEqual(4);
+      expect(avisos.messages.length).toBeGreaterThanOrEqual(3);
+      expect(avisos.messages.every(msg => msg.sources.length > 0)).toBe(true);
     });
 
     it('gossip community contains Avisos with date 06/07/2026 and mute flag', () => {
@@ -46,7 +47,7 @@ describe('Communities Content & Routing', () => {
       expect(avisos).toBeDefined();
       expect(avisos.name).toBe('Avisos');
       expect(avisos.date).toBe('06/07/2026');
-      expect(avisos.snippet).toContain('~Gossip VIP: 💣 BABADO');
+      expect(avisos.snippet).toContain('Equipe da Resenha');
       expect(avisos.isMuted).toBe(true);
     });
   });

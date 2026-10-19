@@ -160,7 +160,10 @@ export function renderCommunitiesPanel({ communities, selectedId, onSelect, onCr
 
       headerRow.innerHTML = `
         <div class="community-avatar">${community.avatarSvg}</div>
-        <span class="community-name">${escapeHtml(community.name)}</span>
+        <div class="community-heading">
+          <span class="community-name">${escapeHtml(community.name)}</span>
+          ${community.tagline ? `<span class="community-tagline">${escapeHtml(community.tagline)}</span>` : ''}
+        </div>
       `;
 
       headerRow.addEventListener('click', () => {

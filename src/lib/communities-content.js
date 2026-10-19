@@ -1,3 +1,5 @@
+import { getJournalisticGroups, NEWS_REVIEWED_AT } from './community-news.js';
+
 /**
  * Data and models for Communities (Comunidades).
  * Inspired by WhatsApp Web communities layout and mechanisms.
@@ -16,31 +18,24 @@ export const ICON_LOCK = `<svg viewBox="0 0 24 24" width="16" height="16" fill="
 export function renderJournalismAvatar() {
   return `
     <svg viewBox="0 0 48 48" width="48" height="48" fill="none" class="community-avatar-svg">
-      <rect width="48" height="48" rx="12" fill="#0F172A"/>
-      <rect x="9" y="10" width="30" height="28" rx="4" fill="#1E293B" stroke="#DC2626" stroke-width="2"/>
-      <rect x="13" y="15" width="9" height="9" rx="2" fill="#EF4444"/>
-      <line x1="25" y1="16" x2="35" y2="16" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round"/>
-      <line x1="25" y1="21" x2="35" y2="21" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round"/>
-      <line x1="13" y1="28" x2="35" y2="28" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round"/>
-      <line x1="13" y1="32" x2="28" y2="32" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round"/>
-      <circle cx="37" cy="11" r="3.5" fill="#DC2626"/>
-      <circle cx="37" cy="11" r="1.5" fill="#FFFFFF"/>
+      <rect width="48" height="48" rx="12" fill="var(--WDS-accent-deemphasized, #D9FDD3)"/>
+      <g stroke="var(--WDS-accent, #008069)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="10" y="11" width="28" height="26" rx="3"/>
+        <rect x="14" y="16" width="8" height="8" rx="1"/>
+        <path d="M27 17h7m-7 6h7M14 29h20m-20 4h13"/>
+      </g>
     </svg>
   `;
 }
 
-export function renderGossipAvatar() {
+export function renderDiscussionAvatar() {
   return `
     <svg viewBox="0 0 48 48" width="48" height="48" fill="none" class="community-avatar-svg">
-      <defs>
-        <linearGradient id="gossipGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#EC4899"/>
-          <stop offset="1" stop-color="#8B5CF6"/>
-        </linearGradient>
-      </defs>
-      <rect width="48" height="48" rx="12" fill="url(#gossipGrad)"/>
-      <path d="M24 8c1 4-2 7-4 10-2.5 3.5-3 6.5-1 10.5 1.5 3 4.5 5.5 8 5.5s7-3 7-8c0-5-3-9-6-12-1 2-2 4-4 4.5z" fill="#FDF2F8"/>
-      <path d="M24 23c-1 2-2 3.5-.5 5.5 1 1.5 2.5 2.5 4.5 2.5s3.5-1.5 3.5-4c0-2-1.5-3.5-3.5-5-.5 1-1.5 1.5-2.5 1.5z" fill="#EC4899"/>
+      <rect width="48" height="48" rx="12" fill="var(--WDS-emerald-75, #E1FEF2)"/>
+      <g stroke="var(--WDS-accent, #008069)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 11h19a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H19l-7 5v-5a3 3 0 0 1-3-3V14a3 3 0 0 1 3-3Z"/>
+        <path d="M19 33h10l7 5v-5a3 3 0 0 0 3-3V19m-24-1h13m-13 5h8"/>
+      </g>
     </svg>
   `;
 }
@@ -93,121 +88,27 @@ export function getBuiltinCommunities() {
   return [
     {
       id: 'plantao-caso-vorcaro',
-      name: '🔴 Plantão Brasília · Caso Vorcaro',
-      description: 'Cobertura jornalística e factual em tempo real sobre a Operação Compliance Zero, relatórios periciais da Polícia Federal (IPJ-A 3298613/2026), despachos do STF e desdobramentos do Banco Master.',
-      membersCount: '24.810 membros',
+      name: 'Caso Vorcaro · Notícias e Documentos',
+      description: 'Entenda o caso Banco Master com notícias, documentos públicos e uma cronologia dos acontecimentos. Informações com fontes, datas e respostas dos envolvidos.',
+      tagline: 'Notícias e fontes públicas',
       avatarSvg: renderJournalismAvatar(),
-      groups: [
-        {
-          id: 'plantao-avisos',
-          name: 'Avisos',
-          isAnnouncement: true,
-          avatarType: 'pink',
-          snippet: '~Plantão Notícias: 🚨 🚨 URGENTE: PF...',
-          date: 'domingo',
-          isUnread: true,
-          unreadCount: 4,
-          isMuted: true,
-          messages: [
-            {
-              id: 'p-m1',
-              sender: '~Plantão Notícias',
-              senderColor: '#E53935',
-              text: '🚨 🚨 URGENTE: POLÍCIA FEDERAL FINALIZA RELATÓRIO DO INQUÉRITO DO BANCO MASTER!\n\nDocumento IPJ-A nº 3298613/2026, com 218 páginas, detalha perícia telemática realizada no aparelho celular apreendido de Daniel Vorcaro.',
-              time: '18:42',
-              date: 'Domingo',
-            },
-            {
-              id: 'p-m2',
-              sender: '~Plantão Notícias',
-              senderColor: '#E53935',
-              text: '📄 Perícia recuperou 52 notas do aplicativo do iPhone enviadas em visualização única, abordando pedidos de intervenção e contatos de cúpula.',
-              time: '18:45',
-              date: 'Domingo',
-            },
-            {
-              id: 'p-m3',
-              sender: '~Plantão Notícias',
-              senderColor: '#E53935',
-              text: '⚖️ Ministro André Mendonça formaliza despacho de levantamento do sigilo da ação para deliberação pública no plenário do STF.',
-              time: '19:10',
-              date: 'Domingo',
-            },
-            {
-              id: 'p-m4',
-              sender: '~Plantão Notícias',
-              senderColor: '#E53935',
-              text: '🚨 🚨 ATUALIZAÇÃO: Relatório contabiliza R$ 208 milhões em contratos e tratativas institucionais para evento internacional em Londres.',
-              time: '19:30',
-              date: 'Domingo',
-            },
-          ],
-        },
-        {
-          id: 'plantao-compliance-zero',
-          name: 'Operação Compliance Zero',
-          isAnnouncement: false,
-          avatarType: 'default',
-          snippet: 'Repórter Investigativo: Apuração sobre carteiras de crédito...',
-          date: 'ontem',
-          isUnread: false,
-          unreadCount: 0,
-          isMuted: false,
-          messages: [
-            {
-              id: 'p-cz1',
-              sender: 'Repórter Investigativo',
-              senderColor: '#0063CB',
-              text: 'A investigação apura a estrutura de aquisição do antigo Banco Máxima e movimentações financeiras com agentes reguladores.',
-              time: '14:20',
-              date: 'Ontem',
-            },
-            {
-              id: 'p-cz2',
-              sender: 'Redação Brasília',
-              senderColor: '#1FAF38',
-              text: 'Defesas técnicas protocolaram pedidos preliminares questionando as extrações de dados do aparelho apreendido.',
-              time: '14:28',
-              date: 'Ontem',
-            },
-          ],
-        },
-        {
-          id: 'plantao-bastidores-brasilia',
-          name: 'Bastidores de Brasília',
-          isAnnouncement: false,
-          avatarType: 'default',
-          snippet: 'Giro Político: Repercussão no Congresso e Tribunais...',
-          date: 'sexta-feira',
-          isUnread: false,
-          unreadCount: 0,
-          isMuted: true,
-          messages: [
-            {
-              id: 'p-bb1',
-              sender: 'Giro Político',
-              senderColor: '#8257E5',
-              text: 'Lideranças no Congresso acompanham os desdobramentos dos relatórios periciais divulgados pela imprensa.',
-              time: '11:15',
-              date: 'Sexta-feira',
-            },
-          ],
-        },
-      ],
+      editorial: true,
+      reviewedAt: NEWS_REVIEWED_AT,
+      groups: getJournalisticGroups(),
     },
     {
       id: 'fofocas-caso-vorcaro',
-      name: '🔥 Choquei no Acervo · Babados do Vorcaro',
-      description: 'Os bastidores mais comentados das 65 mil mensagens vazadas do casal Vorcaro e Martha Graeff: apelidos íntimos ("peleleca" e "colação"), memes do Cebolinha, jantares em Miami e encontros com celebridades!',
-      membersCount: '58.420 membros',
-      avatarSvg: renderGossipAvatar(),
+      name: 'Caso Vorcaro · Memes e Resenha',
+      description: 'Memes, comentários e reações sobre o caso. Um espaço informal para acompanhar a repercussão, compartilhar humor e conversar.',
+      tagline: 'Humor e comentários',
+      avatarSvg: renderDiscussionAvatar(),
       groups: [
         {
           id: 'fofocas-avisos',
           name: 'Avisos',
           isAnnouncement: true,
           avatarType: 'teal',
-          snippet: '~Gossip VIP: 💣 BABADO: Vazam 65 mil msgs...',
+          snippet: 'Equipe da Resenha: Memes, apelidos e comentários do caso.',
           date: '06/07/2026',
           isUnread: false,
           unreadCount: 0,
@@ -216,21 +117,21 @@ export function getBuiltinCommunities() {
             {
               id: 'f-m1',
               system: true,
-              text: 'Você entrou na comunidade oficial de fofocas e bastidores do caso Vorcaro.',
+              text: 'Boas-vindas ao Caso Vorcaro · Memes e Resenha. Por aqui, o assunto é humor e comentários sobre o caso.',
               time: '10:00',
               date: '06/07/2026',
             },
             {
               id: 'f-m2',
-              sender: 'Gossip VIP',
+              sender: 'Equipe da Resenha',
               senderColor: '#E1306C',
-              text: '💣 BABADO EXCLUSIVO: Vaza o acervo de 65.772 mensagens íntimas de Daniel Vorcaro com a então noiva Martha Graeff!\n\nA internet não fala em outra coisa: os apelidos "peleleca" e "colação" tomaram conta do X (antigo Twitter) com milhares de memes!',
+              text: 'Os apelidos "peleleca" e "colação" estão nas conversas do acervo e dão o tom desta resenha.\n\nEste espaço reúne humor, memes e comentários. Para acompanhar documentos, notícias e respostas dos envolvidos, veja a comunidade Caso Vorcaro · Notícias e Documentos.',
               time: '10:05',
               date: '06/07/2026',
             },
             {
               id: 'f-m3',
-              sender: 'Gossip VIP',
+              sender: 'Equipe da Resenha',
               senderColor: '#E1306C',
               text: '🛥️ Proposta de US$ 100 milhões por um barco em Miami, jantares privados em São Paulo com Luciano Huck e encontros com Anitta e celebridades na mansão!',
               time: '10:15',
@@ -240,10 +141,10 @@ export function getBuiltinCommunities() {
         },
         {
           id: 'fofocas-memes',
-          name: 'Peleleca, Colação & Memes',
+          name: 'Peleleca, Memes & Colação',
           isAnnouncement: false,
           avatarType: 'default',
-          snippet: 'Admin Choquei: O diálogo do "PALAAAAAAA AGOLAAAA"...',
+          snippet: 'Equipe da Resenha: O diálogo do "PALAAAAAAA AGOLAAAA"...',
           date: '05/07/2026',
           isUnread: false,
           unreadCount: 0,
@@ -251,7 +152,7 @@ export function getBuiltinCommunities() {
           messages: [
             {
               id: 'f-mm1',
-              sender: 'Admin Choquei',
+              sender: 'Equipe da Resenha',
               senderColor: '#E1306C',
               text: 'O diálogo imitando o Cebolinha — "PALAAAAAAA AGOLAAAA" — já virou figurinha no WhatsApp de 10 em cada 10 brasileiros kkkkk',
               time: '17:40',

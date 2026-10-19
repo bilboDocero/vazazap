@@ -1,0 +1,185 @@
+import { communityNewsCovers } from './community-news-covers.js';
+
+/** Editorial summaries of public records, not transcripts or a live news feed. */
+export const NEWS_REVIEWED_AT = '2026-10-19';
+
+const source = (publisher, title, url, publishedAt) => ({ publisher, title, url, publishedAt });
+const sources = {
+  toffoliNote: source('STF', 'Nota oficial dos dez ministros do STF', 'https://noticias.stf.jus.br/postsnoticias/nota-oficial-dos-dez-ministros-do-stf/', '2026-02-12'),
+  toffoliResponse: source('Agência Brasil', 'Toffoli nega que teve acesso à quebra de sigilo do celular de Vorcaro', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-03/toffoli-nega-que-teve-acesso-quebra-de-sigilo-do-celular-de-vorcaro', '2026-03-06'),
+  detention: source('Agência Brasil', 'Supremo tem maioria para manter prisão preventiva de Daniel Vorcaro', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-03/supremo-tem-maioria-para-manter-prisao-preventiva-de-daniel-vorcaro', '2026-03-13'),
+  defense: source('Agência Brasil', 'Defesa de Vorcaro pede ao STF provas objetivas de prisão do banqueiro', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-03/defesa-de-vorcaro-pede-ao-stf-provas-objetivas-de-prisao-do-banqueiro', '2026-03-05'),
+  operation: source('Polícia Federal', 'PF deflagra 10ª fase da Operação Compliance Zero', 'https://www.gov.br/pf/pt-br/assuntos/noticias/2026/07/policia-federal-deflagra-10a-fase-da-operacao-compliance-zero', '2026-07-09'),
+  report: source('Agência Brasil', 'PGR deve se manifestar sobre supostas conversas entre Vorcaro e Moraes', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-09/pgr-deve-se-manifestar-sobre-supostas-conversas-entre-vorcaro-e-moraes', '2026-09-01'),
+  pgr: source('Agência Brasil', 'PGR pede anulação de investigação sobre conversas de Moraes e Vorcaro', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-09/pgr-pede-anulacao-de-investigacao-sobre-conversas-de-moraes-e-vorcaro', '2026-09-01'),
+  contract: source('Agência Brasil', 'Contrato de Vorcaro com Barci previa atuação jurídica e consultorias', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-09/contrato-de-vorcaro-com-barci-previa-atuacao-juridica-e-consultorias', '2026-09-11'),
+  jurisdiction: source('STF', 'Presidente do STF assume relatoria de petição e determina envio de casos Master e INSS à Presidência', 'https://noticias.stf.jus.br/postsnoticias/presidente-do-stf-assume-relatoria-de-peticao-e-determina-envio-de-casos-master-e-inss-a-presidencia/', '2026-09-12'),
+  moraesResponse: source('Radioagência Nacional', 'Moraes chama relatório de Mendonça de ilegal e inconstitucional', 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/geral/audio/2026-09/moraes-chama-relatorio-de-mendonca-de-ilegal-e-inconstitucional', '2026-09-15'),
+  mendoncaResponse: source('Radioagência Nacional', 'André Mendonça rebate Moraes e nega ilegalidade em relatório', 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/justica/audio/2026-09/andre-mendonca-rebate-moraes-e-nega-ilegalidade-em-relatorio', '2026-09-15'),
+  hearing: source('STF', 'Pedido de vista suspende discussão sobre julgamento conjunto de duas petições do caso Master', 'https://noticias.stf.jus.br/postsnoticias/pedido-de-vista-suspende-discussao-sobre-julgamento-conjunto-de-duas-peticoes-do-caso-master/', '2026-09-15'),
+  releaseRequest: source('Agência Brasil', 'Defesa quer que Mendonça analise soltura de Daniel Vorcaro', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-10/defesa-quer-que-mendonca-analise-soltura-de-daniel-vorcaro', '2026-10-08'),
+  meeting: source('STF e Polícia Federal', 'Informe à Imprensa: reunião de Fachin com o diretor-geral da PF', 'https://noticias.stf.jus.br/postsnoticias/informe-a-imprensa/', '2026-10-13'),
+  mentions: source('Agência Brasil', 'Master: Fachin se reúne com PF para tratar de citações a ministros', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-10/master-fachin-se-reune-com-pf-para-tratar-de-citacoes-ministros', '2026-10-13'),
+  senate: source('Agência Senado', 'Banco Master: CAE apresenta grupo que vai acompanhar investigações', 'https://www12.senado.leg.br/noticias/materias/2026/02/04/banco-master-cae-apresenta-grupo-que-vai-acompanhar-investigacoes', '2026-02-04'),
+  audits: source('Agência Senado', 'CAE ouvirá auditorias independentes sobre Master', 'https://www12.senado.leg.br/noticias/materias/2026/03/03/cae-ouvira-auditorias-independentes-sobre-master', '2026-03-03'),
+  transparency: source('Agência Senado', 'CAE derruba sigilo do TCU sobre auditoria envolvendo o Banco Master', 'https://www12.senado.leg.br/noticias/materias/2026/03/24/cae-derruba-sigilo-do-tcu-sobre-auditoria-envolvendo-o-banco-master', '2026-03-24'),
+  liquidation: source('Radioagência Nacional', 'Banco Central decreta liquidação extrajudicial do Master', 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/seguranca/audio/2025-11/banco-central-decreta-liquidacao-do-banco-master', '2025-11-18'),
+  fraudAlerts: source('Agência Brasil', 'Especialistas alertam para golpes em ressarcimentos do Banco Master', 'https://agenciabrasil.ebc.com.br/economia/noticia/2025-11/especialistas-alertam-para-golpes-em-ressarcimentos-do-banco-master', '2025-11-19'),
+  usAssets: source('Agência Brasil', 'Justiça dos EUA reconhece liquidação do Banco Master e bloqueia ativos', 'https://agenciabrasil.ebc.com.br/economia/noticia/2026-01/justica-dos-eua-reconhece-liquidacao-do-banco-master-e-bloqueia-ativos', '2026-01-09'),
+  pfLeadership: source('Agência Brasil', 'PGR se manifesta contra afastamento de diretor-geral da PF', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-10/pgr-se-manifesta-contra-afastamento-de-diretor-geral-da-pf', '2026-10-14'),
+  firstOperation: source('Agência Brasil', 'Banco Central oficializa liquidação da Master Corretora', 'https://agenciabrasil.ebc.com.br/economia/noticia/2025-11/banco-central-oficializa-liquidacao-da-master-corretora', '2025-11-18'),
+  custody: source('Agência Brasil', 'Justiça mantém prisão de Vorcaro e cunhado em audiência de custódia', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-03/justica-mantem-prisao-de-vorcaro-e-cunhado-em-audiencia-de-custodia', '2026-03-04'),
+  sixMonths: source('Agência Brasil', 'Master: operação da PF contra fraude bilionária completa seis meses', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-05/master-operacao-da-pf-contra-fraude-bilionaria-completa-seis-meses', '2026-05-18'),
+  aircraft: source('Polícia Federal', 'PF localiza aeronave vinculada a um dos investigados na Compliance Zero', 'https://www.gov.br/pf/pt-br/assuntos/noticias/2026/08/pf-localiza-no-paraguai-aeronave-vinculada-a-um-dos-investigados-na-compliance-zero', '2026-08-16'),
+  recusal: source('Agência Brasil', 'Moraes se declara impedido em ação sobre ida de sua esposa ao Senado', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-09/moraes-se-declara-impedido-em-acao-sobre-ida-de-sua-esposa-ao-senado', '2026-09-21'),
+  senateCreation: source('Agência Senado', 'CAE cria grupo para acompanhar investigações sobre o Banco Master', 'https://www12.senado.leg.br/noticias/materias/2026/01/15/cae-cria-grupo-para-acompanhar-investigacoes-sobre-o-banco-master', '2026-01-15'),
+  auditorHearing: source('Agência Senado', 'Para auditores ouvidos pela CAE, mercado ignorou alertas no caso Master', 'https://www12.senado.leg.br/noticias/audios/2026/03/para-auditores-ouvidos-pela-cae-mercado-ignorou-alertas-no-caso-master', '2026-03-17'),
+  bcSecrecy: source('Agência Brasil', 'Sigilo de oito anos para liquidação do Master é regra, diz Galípolo', 'https://agenciabrasil.ebc.com.br/economia/noticia/2026-04/sigilo-de-oito-anos-para-liquidacao-do-master-e-regra-diz-galipolo', '2026-04-08'),
+  dataSharing: source('Agência Senado', 'Grupo da CAE sobre Caso Master vai pedir dados à CPI do Crime Organizado', 'https://www12.senado.leg.br/noticias/audios/2026/04/grupo-da-cae-sobre-caso-master-vai-pedir-dados-a-cpi-do-crime-organizado', '2026-04-14'),
+  creditPortfolios: source('Agência Brasil', 'Galípolo descreve ação do Master que chamou atenção do Banco Central', 'https://agenciabrasil.ebc.com.br/economia/noticia/2026-05/galipolo-descreve-acao-do-master-que-chamou-atencao-do-banco-central', '2026-05-19'),
+};
+
+function dateLabel(date) {
+  return date.split('-').reverse().join('/');
+}
+
+function post(id, title, text, references, { label = 'Fato documentado', image } = {}) {
+  const publishedAt = references[0].publishedAt;
+  return {
+    id, title, text, label,
+    image: image || communityNewsCovers[references[0].url],
+    sender: 'Curadoria do Acervo',
+    senderColor: '#008069',
+    date: dateLabel(publishedAt),
+    publishedAt,
+    sources: references,
+  };
+}
+
+function group(id, name, messages, { announcement = false, avatarType = 'default' } = {}) {
+  const latest = messages.at(-1);
+  return {
+    id, name, messages, avatarType,
+    isAnnouncement: announcement,
+    snippet: latest.title,
+    date: latest.date,
+    isUnread: false,
+    unreadCount: 0,
+    isMuted: true,
+  };
+}
+
+export function getJournalisticGroups() {
+  return [
+    group('plantao-avisos', 'Avisos', [
+      post('news-liquidation-november', 'Ponto de partida: intervenção do BC no conglomerado Master',
+        'Em 18 de novembro de 2025, a Rádio Nacional noticiou a decretação de liquidação extrajudicial e de regime especial de administração para instituições do conglomerado Master. A medida ocorreu no mesmo dia da operação que prendeu Daniel Vorcaro. A notícia marca o início desta cronologia: os regimes aplicados às diferentes empresas devem ser distinguidos das decisões criminais sobre seus administradores.',
+        [sources.liquidation]),
+      post('news-fraud-alerts', 'Após a liquidação, reportagem registra golpes contra investidores',
+        'A Agência Brasil relatou, em novembro de 2025, anúncios que prometiam antecipar ressarcimentos do FGC mediante facilidades ou intermediação. A reportagem reuniu alertas de especialistas sobre o uso da ansiedade dos investidores para obter dinheiro e dados pessoais. O registro mostra uma consequência do caso para o público; prazos e etapas de pagamentos citados naquela notícia pertencem àquele momento.',
+        [sources.fraudAlerts], { label: 'Repercussão para investidores' }),
+      post('news-us-assets', 'Liquidação brasileira tem reconhecimento nos Estados Unidos',
+        'Em notícia de 9 de janeiro, a Agência Brasil informou que uma corte de falências da Flórida reconheceu a liquidação brasileira e restringiu movimentações de ativos do Master nos EUA fora do controle do liquidante. O reconhecimento ocorreu no âmbito do Chapter 15, mecanismo de cooperação em insolvência. A medida trata da administração patrimonial no exterior, não de condenação criminal de Vorcaro.',
+        [sources.usAssets]),
+      post('news-overview-jurisdiction', 'Entenda: os processos do Master chegaram à Presidência do STF',
+        'Em 12 de setembro, Edson Fachin determinou o envio à Presidência dos processos ligados às Pets 15041 e 15556 e assumiu a relatoria da Pet 16662, relativa às supostas conversas envolvendo Alexandre de Moraes e Daniel Vorcaro. O despacho é um ato processual; não representa conclusão sobre a responsabilidade dos citados.',
+        [sources.jurisdiction]),
+      post('news-overview-hearing', 'STF discutiu o rito; o mérito não foi examinado naquela sessão',
+        'A notícia oficial de 15 de setembro registra que um pedido de vista de Flávio Dino suspendeu a discussão sobre reunir as Pets 16662 e 16704. A primeira se refere ao relatório da PF com supostos diálogos ligados a Moraes; a segunda trata de alegadas irregularidades na condução do caso por André Mendonça. A Corte informou que não houve exame do mérito.',
+        [sources.hearing]),
+      post('news-overview-meeting', 'Fachin pede todas as menções a ministros, com contexto',
+        'Em informe conjunto de 13 de outubro, STF e PF registraram reunião de Fachin com Andrei Rodrigues. A orientação é encaminhar todas as menções a ministros, sem exceção, de forma descritiva e contextualizada. Eventuais atos de investigação de integrante do STF dependem de autorização do Plenário, após manifestação da PGR. Veja os detalhes no grupo “STF: documentos e respostas”.',
+        [sources.meeting]),
+      post('news-pgr-pf-leadership', 'PGR se posiciona contra afastamento da direção da PF',
+        'Em 14 de outubro, a Agência Brasil noticiou parecer da PGR contrário ao afastamento de Andrei Rodrigues e Leandro Almada. Para a procuradoria, faltavam elementos que justificassem a medida e a posição hierárquica não bastava para responsabilizá-los. A reportagem explica o conflito de decisões de setembro. A manifestação é um parecer submetido ao STF, não uma sentença sobre o conjunto do caso Master.',
+        [sources.pfLeadership], { label: 'Manifestação da PGR' }),
+    ], { announcement: true, avatarType: 'pink' }),
+
+    group('plantao-compliance-zero', 'Operação Compliance Zero', [
+      post('news-operation-first-phase', 'Novembro de 2025: títulos de crédito entram no centro da apuração',
+        'Na cobertura de 18 de novembro de 2025, a Agência Brasil informou que a Compliance Zero investigava a emissão de títulos de crédito falsos por instituições financeiras. A notícia registrou a prisão de Vorcaro e buscas em cinco unidades da Federação, além da liquidação da Master Corretora. Esses registros descrevem a primeira etapa pública da operação e as suspeitas então apuradas.',
+        [sources.firstOperation], { label: 'Investigação · registro de 2025' }),
+      post('news-custody-march', 'Audiência de custódia mantém prisão após nova operação',
+        'Em 4 de março, a Justiça Federal em São Paulo manteve a prisão de Daniel Vorcaro depois de audiência de custódia. Segundo a Agência Brasil, ele e Fabiano Zettel haviam sido levados à sede da PF pela manhã e passaram pela análise judicial da legalidade e necessidade da custódia. A notícia registra uma decisão cautelar daquela data, anterior ao exame da prisão pelo STF.',
+        [sources.custody]),
+      post('news-defense-march', 'Defesa de Vorcaro pede acesso aos elementos da prisão',
+        'Em 5 de março, os advogados de Daniel Vorcaro pediram ao STF informações que fundamentaram a prisão preventiva executada no dia anterior. Segundo a Agência Brasil, a defesa questionou a falta de acesso prévio a elementos sobre supostas ameaças, invasões de sistemas e pagamentos. Trata-se da posição da defesa, não de uma decisão que invalide a investigação.',
+        [sources.defense], { label: 'Manifestação da defesa' }),
+      post('news-detention-march', 'Segunda Turma forma maioria para manter prisão preventiva',
+        'A Agência Brasil noticiou, em 13 de março, votos de André Mendonça, Luiz Fux e Nunes Marques pela manutenção da prisão preventiva de Vorcaro, detido na terceira fase da Compliance Zero. A decisão cautelar foi fundamentada em indícios de uma estrutura de monitoramento e intimidação. Prisão preventiva não equivale a condenação; o registro descreve aquela etapa do processo.',
+        [sources.detention]),
+      post('news-operation-six-months', 'Seis meses de operação: balanço das medidas judiciais',
+        'Em balanço publicado em 18 de maio, a Agência Brasil reuniu as seis fases realizadas até 14 de maio. A reportagem contabilizou 21 ordens de prisão, 116 mandados de busca e apreensão e bloqueios próximos de R$ 27,71 bilhões. As cifras se referem a medidas investigativas e patrimoniais daquele balanço; não representam, por si, valores definitivamente recuperados nem condenações.',
+        [sources.sixMonths], { label: 'Balanço da investigação · maio de 2026' }),
+      post('news-operation-july', '10ª fase apura atuação em redes sociais e intimidação',
+        'A PF informou ter cumprido dois mandados de busca e apreensão em Brasília em 9 de julho, por ordem do STF. A apuração examina suspeitas de atuação coordenada para desacreditar o Banco Central, além de intimidação de jornalistas, monitoramento ilícito e obtenção indevida de informações. A nota descreve hipóteses investigativas, sem anunciar condenações.',
+        [sources.operation], { label: 'Investigação · versão da PF' }),
+      post('news-aircraft-paraguay', 'PF localiza no Paraguai aeronave ligada a investigado',
+        'A PF informou em 16 de agosto que, com apoio de sua adidância e da SENAD paraguaia, localizou em Assunção uma aeronave vinculada a um dos investigados da Compliance Zero. O avião retornou ao Brasil pelo Aeroporto de Brasília para as medidas judiciais cabíveis. A nota estima seu valor em R$ 120 milhões e não identifica o investigado como proprietário definitivo do bem.',
+        [sources.aircraft], { label: 'Nota oficial da PF' }),
+      post('news-release-october', 'Defesa pede análise de solicitação de liberdade',
+        'Em 8 de outubro, a defesa pediu a Fachin que André Mendonça fosse autorizado a examinar um pedido de soltura. A Agência Brasil informou que os processos estavam temporariamente na Presidência do STF. Esta publicação registra o pedido dos advogados; a fonte não noticia concessão de liberdade.',
+        [sources.releaseRequest], { label: 'Manifestação da defesa' }),
+    ]),
+
+    group('plantao-stf-documentos', 'STF: documentos e respostas', [
+      post('news-toffoli-february', 'Toffoli: redistribuição do caso e nota dos ministros',
+        'Em nota de 12 de fevereiro, os dez ministros do STF reconheceram a validade dos atos de Dias Toffoli e afirmaram não haver suspeição ou impedimento naquela deliberação. O texto também registrou que, a pedido de Toffoli, os processos seriam encaminhados para livre redistribuição. Essa é a posição institucional divulgada naquela data.',
+        [sources.toffoliNote]),
+      post('news-toffoli-march', 'Menções a Toffoli e a resposta do ministro',
+        'A Agência Brasil informou que Toffoli deixou a relatoria em fevereiro após a PF comunicar menções a ele no celular de Vorcaro. Em 6 de março, o gabinete afirmou que o ministro não teve acesso às quebras de sigilo durante sua relatoria, pois o material chegou depois de sua saída. Disse também ter autorizado os pedidos cautelares da PF e da PGR. Menção em mensagens não comprova favorecimento.',
+        [sources.toffoliResponse], { label: 'Alegação e resposta' }),
+      post('news-moraes-report', 'Moraes: o que a PF atribui ao material do celular',
+        'Segundo notícia da Agência Brasil de 1º de setembro, a PF atribuiu a um contato salvo em nome de Alexandre de Moraes supostas conversas recuperadas do celular de Vorcaro. O sigilo de parte do relatório foi retirado e Mendonça pediu manifestação da PGR. A atribuição do interlocutor é uma alegação da apuração e é contestada por Moraes; não deve ser apresentada como fato definitivamente comprovado.',
+        [sources.report], { label: 'Alegação em apuração' }),
+      post('news-pgr-nullity', 'PGR contesta a legalidade do aprofundamento da apuração',
+        'Em parecer noticiado em 1º de setembro, Paulo Gonet pediu a nulidade da investigação sobre as supostas conversas. Para a PGR, atos de investigação de ministro exigiam autorização do Plenário e deveriam passar pela Presidência do STF. O parecer é uma manifestação do Ministério Público; não equivale, por si, a decisão final da Corte.',
+        [sources.pgr], { label: 'Manifestação da PGR' }),
+      post('news-barci-contract', 'Contrato com o escritório Barci: documento e limites',
+        'A Agência Brasil noticiou em 11 de setembro a divulgação, pelo STF, de contrato do Banco Master com a Barci de Moraes Sociedade de Advogados. O objeto incluía serviços jurídicos e consultoria estratégica. Viviane Barci de Moraes, esposa do ministro, e dois filhos do casal integram a sociedade. A existência do contrato é distinta da alegação de favorecimento pelo magistrado e não a comprova por si só.',
+        [sources.contract]),
+      post('news-moraes-response', 'Moraes nega os diálogos; Mendonça defende as diligências',
+        'A Radioagência Nacional relatou em 15 de setembro que Moraes negou a existência das conversas atribuídas a ele e afirmou que o material reúne notas de Vorcaro sem respostas suas. Também contestou a legalidade do relatório. Na mesma data, Mendonça afirmou que a condução das diligências respeitou as normas judiciais. As duas posições estão vinculadas abaixo para leitura integral.',
+        [sources.moraesResponse, sources.mendoncaResponse], { label: 'Respostas dos envolvidos' }),
+      post('news-stf-procedural-stage', 'O que estava em julgamento em 15 de setembro',
+        'O STF informou que se discutia o rito de análise das duas petições, incluindo o pedido de nulidade formulado pela PGR. Fachin destacou que não se julgava responsabilidade penal naquele momento. Toffoli declarou suspeição por foro íntimo. Esse registro deve ser lido com a atualização de outubro: não permite concluir culpa ou absolvição de qualquer citado.',
+        [sources.hearing]),
+      post('news-moraes-recusal-senate', 'Moraes se declara impedido em pedido sobre registros do Senado',
+        'A Agência Brasil noticiou em 21 de setembro que Moraes se declarou impedido em ação que pede acesso a registros de entrada e saída de Viviane Barci e de Vorcaro no Senado. A decisão mencionou a regra do CPC aplicável quando há parente como parte. O processo deveria ser redistribuído. O impedimento processual não confirma que os encontros sugeridos no pedido efetivamente ocorreram.',
+        [sources.recusal]),
+      post('news-all-ministers-context', 'Outros ministros citados: o alcance da notícia',
+        'A Agência Brasil registrou, em 13 de outubro, que Nunes Marques, Dias Toffoli, Luiz Fux e André Mendonça foram mencionados por pessoas vinculadas a Vorcaro. A reportagem descreve a cobrança por encaminhamento de todas as referências ao STF. Ser citado por terceiros não demonstra encontro, recebimento de valores ou participação em crime; cada informação exige contexto e apuração próprios.',
+        [sources.mentions], { label: 'Contexto das menções' }),
+      post('news-october-official-procedure', 'Atualização oficial: autorização para investigar cabe ao Plenário',
+        'No informe conjunto de 13 de outubro, STF e PF esclareceram que todas as menções encontradas devem ser encaminhadas com seu contexto, em caráter descritivo. Reunidos os elementos e ouvida a PGR, o Plenário poderá deliberar sobre os encaminhamentos. O comunicado não anuncia condenação nem conclui a autenticidade das supostas conversas.',
+        [sources.meeting]),
+    ]),
+
+    group('plantao-bastidores-brasilia', 'Brasília: fiscalização e documentos', [
+      post('news-senate-creation', 'CAE formaliza grupo de acompanhamento das investigações',
+        'Em 15 de janeiro, a Comissão de Assuntos Econômicos instituiu grupo de trabalho para acompanhar as investigações sobre o Master, por meio da Instrução Normativa 1/2026. A Agência Senado descreveu a possibilidade de requerer informações oficiais, propor convocações e elaborar medidas legislativas. O registro ajuda a distinguir a fiscalização parlamentar das competências da PF, do Ministério Público e dos tribunais.',
+        [sources.senateCreation]),
+      post('news-senate-working-group', 'Senado apresenta plano para acompanhar o Master',
+        'A CAE apresentou em 4 de fevereiro o grupo de acompanhamento e seu plano de trabalho, com audiências, diligências e visitas a órgãos de controle. A Agência Senado registra a articulação com Banco Central, TCU, STF e PF. A fiscalização parlamentar e os pronunciamentos políticos têm natureza diferente das conclusões de uma investigação criminal.',
+        [sources.senate]),
+      post('news-senate-auditors', 'CAE aprova convites a auditorias independentes',
+        'Em 3 de março, o grupo da CAE aprovou requerimentos de convite à PwC e à KPMG para esclarecer os procedimentos de auditoria do Master. Os pedidos tratam da avaliação de ativos e de alertas prévios. O registro oficial também informa o recebimento de documentos do BRB relativos à aquisição planejada do banco. Convite para esclarecimentos não constitui imputação de crime.',
+        [sources.audits]),
+      post('news-auditor-hearing', 'Auditores discutem limites da detecção de fraudes',
+        'Em audiência noticiada em 17 de março pela Rádio Senado, auditores discutiram as dificuldades de identificar fraudes estruturadas fora das empresas. Segundo a cobertura, foram apontados alertas nos relatórios do Master e a baixa leitura desses documentos pelo mercado. Senadores cobraram integração entre reguladores e critérios mais rigorosos para avaliação de ativos. São manifestações em audiência, que devem ser atribuídas aos participantes.',
+        [sources.auditorHearing], { label: 'Audiência pública' }),
+      post('news-senate-transparency', 'Documentos do TCU: publicidade com proteção de dados',
+        'A Agência Senado informou que, em 24 de março, a CAE decidiu tornar públicos documentos de auditorias do TCU sobre o Master, preservando informações pessoais e outros dados protegidos por lei. A reunião também tratou de propostas legislativas para aperfeiçoar a fiscalização financeira. A divulgação de documentos não substitui a análise de seu conteúdo e de seus limites.',
+        [sources.transparency]),
+      post('news-bc-secrecy', 'Galípolo explica sigilo dos documentos da liquidação',
+        'Na CPI do Crime Organizado, em 8 de abril, Gabriel Galípolo afirmou que o sigilo de oito anos aplicado aos documentos da liquidação seguia regra interna vigente desde 2018. Segundo a Agência Brasil, o presidente do BC relacionou a observância do rito à prevenção de questionamentos judiciais. A declaração responde à controvérsia sobre transparência e representa a posição apresentada pelo Banco Central naquela audiência.',
+        [sources.bcSecrecy], { label: 'Manifestação do Banco Central' }),
+      post('news-senate-data-sharing', 'Grupo da CAE pede compartilhamento de dados da CPI',
+        'A Rádio Senado informou em 14 de abril que o grupo de acompanhamento do Master aprovou pedido para compartilhar informações reunidas pela CPI do Crime Organizado. O objetivo declarado era dar continuidade à análise dos dados com o encerramento da comissão parlamentar de inquérito. A reunião também aprovou convites a representantes do BRB e ao ministro da Fazenda para esclarecimentos.',
+        [sources.dataSharing]),
+      post('news-credit-portfolios', 'Carteiras de crédito e liquidez: a explicação do BC',
+        'Em audiência de 19 de maio, Galípolo afirmou que a criação de novas carteiras pelo Master, mesmo em meio a dificuldades de liquidez, levou o BC a aprofundar a fiscalização. A Agência Brasil explicou a diferença entre possuir ativos e ter recursos disponíveis para cumprir obrigações de curto prazo. A venda de carteiras ao BRB integra a apuração da PF; a suspeita de fraude exige análise própria dos documentos.',
+        [sources.creditPortfolios], { label: 'Manifestação do Banco Central' }),
+    ]),
+  ];
+}
