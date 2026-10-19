@@ -871,11 +871,17 @@
   gap: 8px;
 }
 
-.search-result-sender {
+.search-result-contact {
   font-size: 13.5px;
   font-weight: 500;
   color: var(--WDS-content-default);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+.search-result-sender { font-weight: 500; }
 
 .search-result-date {
   font-size: 12px;

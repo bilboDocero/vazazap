@@ -18,9 +18,11 @@ const DEBOUNCE_MS = 200;
  * @param {HTMLElement} sidebar - the sidebar element
  * @param {string} conversationId - id of the conversation to search
  * @param {function} onResultClick - (messageId, date) => void
+ * @param {object} [options]
+ * @param {string} [options.contactName] - conversation contact shown above the message
  * @returns {{ destroy: function }}
  */
-export function attachSearch(sidebar, conversationId, onResultClick) {
+export function attachSearch(sidebar, conversationId, onResultClick, { contactName = '' } = {}) {
   const input = sidebar.querySelector('.sidebar-search-input');
   const listContainer = sidebar.querySelector('.conversation-list');
 
@@ -50,7 +52,13 @@ export function attachSearch(sidebar, conversationId, onResultClick) {
 
         const senderEl = document.createElement('span');
         senderEl.className = 'search-result-sender';
-        senderEl.textContent = result.sender;
+        const senderName = result.sender === 'DV' ? 'Daniel Vorcaro' : result.sender;
+        senderEl.textContent = `${senderName}: `;
+
+        const contactEl = document.createElement('span');
+        contactEl.className = 'search-result-contact';
+        contactEl.textContent = contactName || senderName;
+        contactEl.title = contactEl.textContent;
 
         const dateEl = document.createElement('span');
         dateEl.className = 'search-result-date';
@@ -58,13 +66,14 @@ export function attachSearch(sidebar, conversationId, onResultClick) {
 
         const topRow = document.createElement('div');
         topRow.className = 'search-result-top';
-        topRow.appendChild(senderEl);
+        topRow.appendChild(contactEl);
         topRow.appendChild(dateEl);
 
         const contentEl = document.createElement('div');
         contentEl.className = 'search-result-content';
         // All segments are escaped individually, <mark> is a static literal
         contentEl.innerHTML = highlightMatch(result.content, result.matchStart, result.matchEnd);
+        contentEl.prepend(senderEl);
 
         item.appendChild(topRow);
         item.appendChild(contentEl);

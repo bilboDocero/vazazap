@@ -5,6 +5,7 @@
  * bundled JSON files (not user input), so XSS risk does not apply here.
  */
 import { formatTime, escapeHtml, formatNumber, formatRelativeDate } from '../lib/utils.js';
+import { highlightNavigationShortcut } from '../lib/navigation-highlights.js';
 
 import { ICON_SEARCH as SEARCH_ICON, ICON_MEETBALL } from '../lib/icons.js';
 import { defaultAvatarSvg } from '../lib/avatar.js';
@@ -255,6 +256,8 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
       <span class="sidebar-bottom-tab-icon">${icon}</span>
       <span class="sidebar-bottom-tab-label">${label}</span>
     `;
+    tab.querySelector('svg').setAttribute('aria-hidden', 'true');
+    highlightNavigationShortcut(tab, key, { mobile: true });
     tab.addEventListener('click', () => action?.());
     bottomNav.appendChild(tab);
   }

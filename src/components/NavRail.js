@@ -8,6 +8,7 @@ const ICON_ADD = `<svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12
 const ICON_LIBRARY = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="15" height="15" rx="1.5"/><path d="M3 7v14h14M9 14l3-4 2 2 2-3 3 5H9Z"/><circle cx="10" cy="7" r="1" fill="currentColor" stroke="none"/></svg>`;
 
 import { ICON_STORE, ICON_ADVERTISE } from '../lib/commercial-content.js';
+import { highlightNavigationShortcut } from '../lib/navigation-highlights.js';
 
 export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCalls, onStatus, onChannels, onCommunities, onVitrine, onAnunciar, onFind, onProfile, unreadCount = 0 } = {}) {
   const rail = document.createElement('nav');
@@ -39,12 +40,11 @@ export function renderNavRail(container, { avatarSrc, onSettings, onChat, onCall
   const status = button(ICON_STATUS, 'Atualizações', onStatus);
   const communities = button(ICON_COMMUNITIES, 'Comunidades', onCommunities);
   const vitrine = button(ICON_STORE, 'Vitrine', onVitrine);
-  const vitrineDot = document.createElement('span');
-  vitrineDot.className = 'nav-rail-dot';
-  vitrineDot.setAttribute('aria-hidden', 'true');
-  vitrine.appendChild(vitrineDot);
 
   const anunciar = button(ICON_ADVERTISE, 'Anunciar', onAnunciar);
+  for (const [shortcut, key] of [[status, 'status'], [vitrine, 'vitrine'], [anunciar, 'anunciar']]) {
+    highlightNavigationShortcut(shortcut, key);
+  }
 
   const badge = document.createElement('span');
   badge.className = 'nav-rail-badge';

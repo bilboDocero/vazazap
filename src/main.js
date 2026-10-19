@@ -550,7 +550,7 @@ async function init() {
         pendingScrollTarget = { messageId, date };
         router.navigate('chat', conversations[0].id);
       }
-    });
+    }, { contactName: conversations[0].contact });
   }
 
   // ── Router ─────────────────────────────────────────

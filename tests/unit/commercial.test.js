@@ -16,29 +16,21 @@ describe('Commercial Content, Products & Routing', () => {
   });
 
   describe('PLATFORM_PRODUCTS', () => {
-    it('has exactly 4 products with the specified tabs', () => {
-      expect(PLATFORM_PRODUCTS).toHaveLength(4);
+    it('offers only Status and Vitrine, matching the available purchase flows', () => {
+      expect(PLATFORM_PRODUCTS).toHaveLength(2);
 
-      const [statusProd, channelProd, communityProd, vitrineProd] = PLATFORM_PRODUCTS;
+      const [statusProd, vitrineProd] = PLATFORM_PRODUCTS;
 
       expect(statusProd.name).toBe('Meu status');
       expect(statusProd.targetRoute).toBe('status');
       expect(statusProd.tabName).toBe('Status');
-
-      expect(channelProd.name).toBe('Meu canal');
-      expect(channelProd.targetRoute).toBe('channels');
-      expect(channelProd.tabName).toBe('Canais');
-
-      expect(communityProd.name).toBe('Minha comunidade');
-      expect(communityProd.targetRoute).toBe('communities');
-      expect(communityProd.tabName).toBe('Comunidade');
 
       expect(vitrineProd.name).toBe('Minha vitrine');
       expect(vitrineProd.targetRoute).toBe('vitrine');
       expect(vitrineProd.tabName).toBe('Vitrine');
     });
 
-    it('all 4 products have features, pricing, and primary/secondary CTAs', () => {
+    it('both products have features, pricing, and primary/secondary CTAs', () => {
       PLATFORM_PRODUCTS.forEach((product) => {
         expect(product.id).toBeDefined();
         expect(product.description).toContain(product.tabName);
@@ -51,18 +43,18 @@ describe('Commercial Content, Products & Routing', () => {
   });
 
   describe('COMMERCIAL_TOOLS_SECTIONS', () => {
-    it('matches the WhatsApp Business reference image sections and items', () => {
+    it('links to the format overview and the two available products', () => {
       expect(COMMERCIAL_TOOLS_SECTIONS).toHaveLength(2);
 
       const sec1 = COMMERCIAL_TOOLS_SECTIONS[0];
-      expect(sec1.title).toBe('Ferramentas comerciais');
+      expect(sec1.title).toBe('Comece por aqui');
       const itemNames1 = sec1.items.map(i => i.name);
-      expect(itemNames1).toEqual(['Perfil comercial', 'Catálogo', 'Cobranças', 'Pagamentos']);
+      expect(itemNames1).toEqual(['Escolher formato']);
 
       const sec2 = COMMERCIAL_TOOLS_SECTIONS[1];
-      expect(sec2.title).toBe('Conecte-se com mais clientes');
+      expect(sec2.title).toBe('Formatos disponíveis');
       const itemNames2 = sec2.items.map(i => i.name);
-      expect(itemNames2).toEqual(['Anunciar', 'Transmissão comercial']);
+      expect(itemNames2).toEqual(['Meu status', 'Minha vitrine']);
     });
   });
 

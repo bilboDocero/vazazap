@@ -1,215 +1,81 @@
-/**
- * CommercialDetail component — renders the 4 product cards inside class="main-area"
- * and handles interactions, tab redirection, and product acquisition flow.
- */
-
-import { PLATFORM_PRODUCTS, saveCommercialPurchase, loadCommercialPurchases } from '../lib/commercial-content.js';
+/** Available advertising formats and their server-confirmed purchase flows. */
+import { PLATFORM_PRODUCTS } from '../lib/commercial-content.js';
 import { openStatusPurchaseModal } from './StatusPurchaseModal.js';
 import { openVitrinePurchaseModal } from './VitrinePurchaseModal.js';
 import { escapeHtml } from '../lib/utils.js';
 
 const ICON_BACK = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 5-7 7 7 7"/></svg>';
-const ICON_CHECK = '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>';
+const ICON_CHECK = '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>';
 
-export function renderCommercialDetail(container, { activeSection = 'catalogo', onBack, onNavigateTab, onShowToast }) {
+export function renderCommercialDetail(container, { activeSection = 'anunciar', onBack, onNavigateTab, onShowToast }) {
   const el = document.createElement('section');
   el.className = 'commercial-detail';
-
+  el.setAttribute('aria-label', 'Anunciar no vorcarozap');
   el.innerHTML = `
     <header class="commercial-detail-header">
-      <button class="commercial-back-btn" aria-label="Voltar às ferramentas">
-        ${ICON_BACK}
-      </button>
+      <button type="button" class="commercial-back-btn" aria-label="Voltar às conversas">${ICON_BACK}</button>
       <div class="commercial-detail-header-info">
-        <h1 class="commercial-detail-title">Vitrine & Anúncios Comerciais</h1>
-        <p class="commercial-detail-subtitle">Comercialize e impulsione seus produtos nas abas estratégicas da plataforma</p>
+        <h1 class="commercial-detail-title">Anuncie no vorcarozap</h1>
+        <p class="commercial-detail-subtitle">Escolha seu espaço. Prepare seu anúncio. Apareça.</p>
       </div>
     </header>
-
     <div class="commercial-detail-body">
       <div class="commercial-hero-banner">
-        <div class="commercial-hero-tag">Produtos da Plataforma</div>
-        <h2 class="commercial-hero-title">Espaços Comerciais Disponíveis</h2>
-        <p class="commercial-hero-text">
-          Selecione abaixo os produtos para ativação imediata nas respectivas abas do vorcarozap (Status, Canais, Comunidades e Vitrine).
-        </p>
+        <div class="commercial-hero-tag">Status + Vitrine</div>
+        <h2 class="commercial-hero-title">Faça sua marca aparecer.</h2>
+        <p class="commercial-hero-text">Uma oferta, uma novidade ou seu próximo lançamento. Escolha entre os dois formatos disponíveis e mostre o que você faz para quem explora o vorcarozap.</p>
+        <div class="commercial-hero-note">Você monta e revisa seu anúncio antes de pagar.</div>
       </div>
-
+      <div class="commercial-products-heading">
+        <h2>Onde você quer aparecer?</h2>
+        <span>2 formatos disponíveis</span>
+      </div>
       <div class="commercial-products-grid"></div>
+      <ol class="commercial-how" aria-label="Como anunciar">
+        <li><span class="commercial-how-number" aria-hidden="true">1</span><div><strong>Escolha o formato</strong><span>Status ou Vitrine, com plano normal ou impulsionado.</span></div></li>
+        <li><span class="commercial-how-number" aria-hidden="true">2</span><div><strong>Monte seu anúncio</strong><span>Adicione suas imagens, legenda e perfil social.</span></div></li>
+        <li><span class="commercial-how-number" aria-hidden="true">3</span><div><strong>Revise e pague</strong><span>A publicação acontece após a confirmação do pagamento.</span></div></li>
+      </ol>
     </div>
   `;
-
-  el.querySelector('.commercial-back-btn').addEventListener('click', onBack);
-
+  el.querySelector('.commercial-back-btn').addEventListener('click', () => onBack?.());
   const grid = el.querySelector('.commercial-products-grid');
-  const purchasedIds = new Set(loadCommercialPurchases());
-
-  PLATFORM_PRODUCTS.forEach((product) => {
+  for (const product of PLATFORM_PRODUCTS) {
     const card = document.createElement('article');
     card.className = `product-card ${product.tagClass}`;
     card.dataset.productId = product.id;
-
-    const isPurchased = purchasedIds.has(product.id);
-
-    const featuresHtml = product.features
-      .map(feat => `<li><span class="product-feat-icon">${ICON_CHECK}</span><span>${escapeHtml(feat)}</span></li>`)
-      .join('');
-
+    card.classList.toggle('product-card--selected', activeSection === product.targetRoute);
     card.innerHTML = `
-      <div class="product-card-top">
-        <div class="product-card-badge">
-          <span>${product.number}. Comercializado na ${escapeHtml(product.tag)}</span>
-        </div>
-        ${isPurchased ? '<span class="product-purchased-badge">Ativo</span>' : ''}
-      </div>
-
+      <div class="product-card-top"><div class="product-card-badge">${escapeHtml(product.tag)}</div><span class="product-format-number">0${product.number}</span></div>
       <div class="product-card-header">
-        <div class="product-card-icon" style="background: ${product.iconBg}; color: ${product.iconColor};">
-          ${product.iconSvg}
-        </div>
-        <div class="product-card-titles">
-          <h3 class="product-card-name">${escapeHtml(product.name)}</h3>
-          <span class="product-card-slogan">${escapeHtml(product.slogan)}</span>
-        </div>
+        <div class="product-card-icon" style="background: ${product.iconBg}; color: ${product.iconColor};">${product.iconSvg}</div>
+        <div class="product-card-titles"><h3 class="product-card-name">${escapeHtml(product.name)}</h3><span class="product-card-slogan">${escapeHtml(product.slogan)}</span></div>
       </div>
-
-      <p class="product-card-desc">
-        ${escapeHtml(product.description)}
-      </p>
-
-      <ul class="product-card-features">
-        ${featuresHtml}
-      </ul>
-
+      <p class="product-card-desc">${escapeHtml(product.description)}</p>
+      <ul class="product-card-features">${product.features.map(feature => `<li><span class="product-feat-icon">${ICON_CHECK}</span><span>${escapeHtml(feature)}</span></li>`).join('')}</ul>
       <div class="product-card-footer">
-        <div class="product-card-price">
-          <span class="product-price-label">Preço comercial</span>
-          <span class="product-price-val">${escapeHtml(product.price)}</span>
-        </div>
-
+        <div class="product-card-price"><span class="product-price-label">Plano normal · 1 imagem</span><span class="product-price-val">${escapeHtml(product.price)}</span></div>
         <div class="product-card-actions">
-          <button type="button" class="product-btn-primary" aria-label="${escapeHtml(product.ctaPrimary)}">
-            ${escapeHtml(product.ctaPrimary)}
-          </button>
-          <button type="button" class="product-btn-secondary" aria-label="${escapeHtml(product.ctaSecondary)}">
-            ${escapeHtml(product.ctaSecondary)}
-          </button>
+          <button type="button" class="product-btn-primary">${escapeHtml(product.ctaPrimary)}</button>
+          <button type="button" class="product-btn-secondary">${escapeHtml(product.ctaSecondary)}</button>
         </div>
       </div>
     `;
-
-    // Action 1: Navigate to the target tab
     card.querySelector('.product-btn-primary').addEventListener('click', () => {
-      if (onNavigateTab) onNavigateTab(product.targetRoute);
+      const openPurchase = product.id === 'product-status' ? openStatusPurchaseModal : openVitrinePurchaseModal;
+      openPurchase({
+        initialPlan: `${product.targetRoute}_normal`,
+        onPublished: purchase => {
+          onShowToast?.(`Anúncio de ${purchase.user_handle} publicado com sucesso!`);
+          onNavigateTab?.(product.targetRoute, purchase.id);
+        },
+      });
     });
-
-    // Action 2: Open acquisition / contract modal
-    card.querySelector('.product-btn-secondary').addEventListener('click', () => {
-      if (product.id === 'product-status') {
-        openStatusPurchaseModal({
-          initialPlan: 'status_normal',
-          onPublished: (pub) => {
-            if (onShowToast) onShowToast(`Status de ${pub.user_handle} publicado com sucesso!`);
-            if (onNavigateTab) onNavigateTab('status', pub.id);
-          },
-        });
-      } else if (product.id === 'product-vitrine') {
-        openVitrinePurchaseModal({
-          initialPlan: 'vitrine_normal',
-          onPublished: (pub) => {
-            if (onShowToast) onShowToast(`Vitrine de ${pub.user_handle} publicada com sucesso!`);
-            if (onNavigateTab) onNavigateTab('vitrine', pub.id);
-          },
-        });
-      } else {
-        openAcquisitionModal(product);
-      }
-    });
-
+    card.querySelector('.product-btn-secondary').addEventListener('click', () => onNavigateTab?.(product.targetRoute));
     grid.appendChild(card);
-  });
-
-  function openAcquisitionModal(product) {
-    let modalEl = document.querySelector('.commercial-modal-overlay');
-    if (modalEl) modalEl.remove();
-
-    modalEl = document.createElement('div');
-    modalEl.className = 'commercial-modal-overlay';
-    modalEl.setAttribute('role', 'dialog');
-    modalEl.setAttribute('aria-modal', 'true');
-    modalEl.setAttribute('aria-label', `Contratar ${product.name}`);
-
-    modalEl.innerHTML = `
-      <div class="commercial-modal">
-        <div class="commercial-modal-header">
-          <h2>Contratar: ${escapeHtml(product.name)}</h2>
-          <button class="commercial-modal-close" aria-label="Fechar">&times;</button>
-        </div>
-        <div class="commercial-modal-body">
-          <div class="commercial-modal-product-summary">
-            <div class="commercial-modal-icon" style="background: ${product.iconBg}; color: ${product.iconColor};">
-              ${product.iconSvg}
-            </div>
-            <div>
-              <div class="commercial-modal-pname">${escapeHtml(product.name)}</div>
-              <div class="commercial-modal-ptag">Comercializado na ${escapeHtml(product.tag)}</div>
-              <div class="commercial-modal-pprice">${escapeHtml(product.price)}</div>
-            </div>
-          </div>
-
-          <form class="commercial-modal-form">
-            <label class="commercial-form-label">
-              <span>Nome do anunciante ou empresa</span>
-              <input type="text" class="commercial-input-name" placeholder="Ex: Master Investimentos ou Daniel Vorcaro" required autofocus />
-            </label>
-            <label class="commercial-form-label">
-              <span>Contato / WhatsApp comercial</span>
-              <input type="text" class="commercial-input-contact" placeholder="+55 11 99999-9999" required />
-            </label>
-            <label class="commercial-form-label">
-              <span>Instruções ou link da campanha</span>
-              <textarea class="commercial-input-notes" rows="2" placeholder="Descreva os materiais a veicular ou deixe instruções adicionais..."></textarea>
-            </label>
-
-            <div class="commercial-modal-actions">
-              <button type="button" class="commercial-btn-cancel">Cancelar</button>
-              <button type="submit" class="commercial-btn-submit">Confirmar ativação</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    `;
-
-    function closeModal() {
-      modalEl.classList.remove('open');
-      setTimeout(() => modalEl.remove(), 200);
-      document.removeEventListener('keydown', handleKey);
-    }
-
-    function handleKey(e) {
-      if (e.key === 'Escape') closeModal();
-    }
-
-    modalEl.querySelector('.commercial-modal-close').addEventListener('click', closeModal);
-    modalEl.querySelector('.commercial-btn-cancel').addEventListener('click', closeModal);
-    modalEl.addEventListener('click', (e) => {
-      if (e.target === modalEl) closeModal();
-    });
-
-    const form = modalEl.querySelector('.commercial-modal-form');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      saveCommercialPurchase(product.id);
-      closeModal();
-      if (onShowToast) onShowToast(`Produto "${product.name}" ativado com sucesso!`);
-      if (onNavigateTab) onNavigateTab(product.targetRoute);
-    });
-
-    document.body.appendChild(modalEl);
-    document.addEventListener('keydown', handleKey);
-    requestAnimationFrame(() => modalEl.classList.add('open'));
   }
-
   container.replaceChildren(el);
+  const selected = grid.querySelector('.product-card--selected');
+  if (selected) requestAnimationFrame(() => { if (selected.isConnected) selected.scrollIntoView?.({ block: 'nearest' }); });
   return el;
 }

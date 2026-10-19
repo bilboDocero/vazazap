@@ -6,14 +6,15 @@
 import { COMMERCIAL_TOOLS_SECTIONS } from '../lib/commercial-content.js';
 import { escapeHtml } from '../lib/utils.js';
 
-export function renderCommercialPanel({ selectedId = 'catalogo', onSelect }) {
+export function renderCommercialPanel({ selectedId = 'anunciar', onSelect }) {
   const panel = document.createElement('section');
   panel.className = 'commercial-panel';
-  panel.setAttribute('aria-label', 'Ferramentas comerciais');
+  panel.setAttribute('aria-label', 'Anunciar');
 
   panel.innerHTML = `
     <header class="commercial-header">
-      <h1 class="commercial-title">Ferramentas comerciais</h1>
+      <h1 class="commercial-title">Anunciar</h1>
+      <p class="commercial-panel-intro">Dê visibilidade ao que você faz.</p>
     </header>
     <div class="commercial-scroll-area"></div>
   `;

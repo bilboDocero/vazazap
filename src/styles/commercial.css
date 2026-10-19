@@ -10,11 +10,14 @@
 
 .commercial-header {
   display: flex;
-  align-items: center;
-  height: 64px;
-  padding: 12px 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 20px;
   flex-shrink: 0;
 }
+
+.commercial-panel-intro { margin: 0; font-size: 13px; color: #667781; }
 
 .commercial-title {
   font-size: 22px;
@@ -121,9 +124,10 @@
   border: 1.5px solid #FFFFFF;
 }
 
-/* Commercial Detail & 4 Product Cards (main-area) */
+/* Available advertising formats (main-area). */
 .commercial-detail {
   display: flex;
+  container-type: inline-size;
   flex-direction: column;
   width: 100%;
   min-width: 0;
@@ -185,9 +189,9 @@
 }
 
 .commercial-hero-banner {
-  background: linear-gradient(135deg, #008069 0%, #005C4B 100%);
+  background: radial-gradient(ellipse at top right, #199776 0%, transparent 60%), linear-gradient(135deg, #075e4d 0%, #073c33 100%);
   border-radius: 16px;
-  padding: 24px 28px;
+  padding: 32px;
   color: #FFFFFF;
   margin-bottom: 28px;
   box-shadow: 0 4px 14px rgba(0, 128, 105, 0.16);
@@ -206,8 +210,9 @@
 }
 
 .commercial-hero-title {
-  font-size: 22px;
-  font-weight: 600;
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 700;
+  letter-spacing: -1px;
   margin: 0 0 8px;
 }
 
@@ -219,16 +224,37 @@
   max-width: 680px;
 }
 
-/* 4 Product Cards Grid */
+.commercial-hero-note {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #ffffff30;
+  font-size: 12px;
+  color: #d4f5e5;
+}
+
+.commercial-products-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.commercial-products-heading h2 { margin: 0; font-size: 19px; color: #111b21; }
+.commercial-products-heading > span { font-size: 12px; color: #667781; }
+
+/* Status and Vitrine. */
 .commercial-products-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
 }
 
 .product-card {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   background: #FFFFFF;
   border: 1px solid var(--WDS-lines-divider, #E9EDEF);
   border-radius: 16px;
@@ -242,6 +268,9 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
+
+.product-card--selected { border-color: #008069; box-shadow: 0 0 0 2px #00806920; }
+.product-format-number { font-size: 23px; font-weight: 700; color: #d5ddda; font-variant-numeric: tabular-nums; }
 
 .product-card-top {
   display: flex;
@@ -375,6 +404,8 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .product-price-label {
@@ -397,7 +428,7 @@
   flex: 1;
   border: 0;
   border-radius: 20px;
-  background: #00A884;
+  background: #008069;
   color: #FFFFFF;
   font-size: 13.5px;
   font-weight: 600;
@@ -428,6 +459,26 @@
 .product-btn-secondary:hover {
   background: #E8F5E9;
   border-color: #008069;
+}
+
+.commercial-how {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  list-style: none;
+  margin: 28px 0 0;
+  padding: 24px 0 0;
+  border-top: 1px solid #dfe6e3;
+}
+
+.commercial-how li { display: flex; align-items: flex-start; gap: 10px; }
+.commercial-how-number { display: grid; place-items: center; flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: #e3efe9; color: #006b50; font-size: 12px; font-weight: 700; }
+.commercial-how strong { display: block; font-size: 13px; color: #243b32; margin-bottom: 5px; }
+.commercial-how li div > span { display: block; font-size: 12px; line-height: 1.5; color: #667781; }
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card { transition: none; }
+  .product-card:hover { transform: none; }
 }
 
 /* Modal for Contratar Produto */
@@ -601,10 +652,15 @@
 }
 
 /* Responsive */
+@container (max-width: 680px) {
+  .commercial-products-grid, .commercial-how { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 900px) {
   .commercial-products-grid {
     grid-template-columns: 1fr;
   }
+  .commercial-how { grid-template-columns: 1fr; gap: 16px; }
 }
 
 @media (max-width: 600px) {
@@ -616,6 +672,7 @@
   .commercial-detail-body {
     padding: 16px 16px 32px;
   }
+  .commercial-hero-banner { padding: 24px; }
   .product-card-actions {
     flex-direction: column;
   }

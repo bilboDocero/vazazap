@@ -22,11 +22,7 @@ export const ICON_CHANNELS_SYMBOL = `<svg viewBox="0 0 24 24" height="24" width=
 export const ICON_COMMUNITY_SYMBOL = `<svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" fill-rule="evenodd" d="M6.37 18.67a1.81 1.81 0 0 1-.58-1.24c-.01-.5-.03-1.5.03-1.94a2.7 2.7 0 0 1 .4-1.1 2.84 2.84 0 0 1 .9-.82c.46-.28.98-.46 1.4-.58A12.2 12.2 0 0 1 12 12.5a12.69 12.69 0 0 1 3.47.49 5.76 5.76 0 0 1 1.52.65c.28.19.56.44.78.76a2.41 2.41 0 0 1 .41 1.1c.06.43.04 1.43.03 1.93a1.9 1.9 0 0 1-.58 1.24c-.22.2-.48.33-.75.33H7.12c-.27 0-.53-.13-.75-.33Zm13.6-3.27c.04.6.03.86.02 1.6v.49a4.58 4.58 0 0 1-.3 1.51h2.97c.72 0 1.31-1.85 1.33-2.58.01-.4.02-.13-.02-.46a2.34 2.34 0 0 0-.95-1.6 4.27 4.27 0 0 0-1.41-.68h-.02v-.01a7.72 7.72 0 0 0-2.35-.27 4.18 4.18 0 0 1 .72 2Zm-2.04-3.95a2.65 2.65 0 0 0 3.16.06 2.67 2.67 0 1 0-3.16-.06ZM14.9 9.62A3.54 3.54 0 0 0 15.5 7a3.56 3.56 0 1 0-.61 2.62Zm-7.88.4a2.67 2.67 0 1 0-5.16-1.38 2.67 2.67 0 0 0 5.16 1.38Zm-4.42 3.6-.18.05h-.03a4.3 4.3 0 0 0-1.41.69 2.3 2.3 0 0 0-.95 1.6c-.04.33-.03 1.06-.02 1.46.02.73.61 1.58 1.33 1.58H4.3a4.58 4.58 0 0 1-.3-1.51V17c-.01-.74-.02-1 .03-1.6 0-.05 0-.1.02-.15a4.48 4.48 0 0 1 .7-1.85 7.22 7.22 0 0 0-2.16.22Zm9.4.88c-1.21 0-2.22.2-2.92.4-.37.12-.68.23-.91.38-.23.13-.3.25-.34.34a.7.7 0 0 0-.03.14s0-.01 0 0L7.79 17h8.42v-1.24c-.01-.01 0 .01 0 0a.7.7 0 0 0-.04-.14c-.03-.09-.11-.2-.34-.34a3.84 3.84 0 0 0-.91-.37c-.7-.2-1.7-.41-2.92-.41ZM12 6a1.55 1.55 0 1 0 0 3.11c.86 0 1.56-.7 1.56-1.55C13.56 6.7 12.86 6 12 6Z" clip-rule="evenodd"></path></svg>`;
 
 /**
- * 4 initial products to be commercialized across platform tabs:
- * 1. Meu status - comercializado na aba Status
- * 2. Meu canal - comercializado na aba Canais
- * 3. Minha comunidade - comercializado na aba Comunidades
- * 4. Minha vitrine - comercializado na aba Vitrine
+ * Available advertising formats, matching the existing purchase flows.
  */
 export const PLATFORM_PRODUCTS = [
   {
@@ -40,67 +36,21 @@ export const PLATFORM_PRODUCTS = [
     iconSvg: ICON_STATUS_RING,
     iconBg: '#E6F3EC',
     iconColor: '#008069',
-    slogan: 'Destaque e visibilidade temporária de 24 horas',
-    description: 'Comercializado na aba Status. Publique histórias corporativas, novidades e comunicados exclusivos no topo da lista com anel de status verde de alta taxa de engajamento.',
+    slogan: 'Sua mensagem entre as atualizações',
+    description: 'Divulgue sua marca, uma novidade ou uma oferta na aba Status, com imagens, legenda e um link para seu perfil.',
     features: [
-      'Exibição privilegiada no topo da aba de Status por 24 horas',
-      'Suporte para imagens de alta resolução, textos e chamadas externas',
-      'Anel verde chamativo indicando nova atualização para todos os contatos',
-      'Métricas de visualização em tempo real',
+      'De 1 a 4 imagens com legenda',
+      'Link para Instagram, TikTok, Facebook ou Telegram',
+      'Planos Normal e Impulsionado',
+      'Prévia do anúncio antes do pagamento',
     ],
-    price: 'R$ 149,00 / publicação',
-    ctaPrimary: 'Ir para aba Status',
-    ctaSecondary: 'Contratar Meu Status',
-  },
-  {
-    id: 'product-channel',
-    number: 2,
-    name: 'Meu canal',
-    tabName: 'Canais',
-    targetRoute: 'channels',
-    tag: 'Aba Canais',
-    tagClass: 'badge-channel',
-    iconSvg: ICON_CHANNELS_SYMBOL,
-    iconBg: '#E0F7F6',
-    iconColor: '#00897B',
-    slogan: 'Transmissão unidirecional para audiências ilimitadas',
-    description: 'Comercializado na aba Canais. Tenha um canal oficial verificado de transmissão para distribuição de boletins informativos, anúncios de mercado e comunicados aos seguidores.',
-    features: [
-      'Canal exclusivo com nome personalizado e foto de perfil',
-      'Transmissões ilimitadas de mensagens, áudios e anexos',
-      'Botão nativo de Seguir para os membros da plataforma',
-      'Privacidade total dos administradores e inscritos',
-    ],
-    price: 'R$ 399,00 / mês',
-    ctaPrimary: 'Ir para aba Canais',
-    ctaSecondary: 'Contratar Meu Canal',
-  },
-  {
-    id: 'product-community',
-    number: 3,
-    name: 'Minha comunidade',
-    tabName: 'Comunidade',
-    targetRoute: 'communities',
-    tag: 'Aba Comunidade',
-    tagClass: 'badge-community',
-    iconSvg: ICON_COMMUNITY_SYMBOL,
-    iconBg: '#F3E8FF',
-    iconColor: '#7C3AED',
-    slogan: 'Hub colaborativo com subgrupos e canal de avisos',
-    description: 'Comercializado na aba Comunidades. Estruture seu próprio ecossistema com múltiplos grupos temáticos e um canal de Avisos centralizado exclusivo para administradores.',
-    features: [
-      'Canal de Avisos exclusivo com trava de escrita para membros',
-      'Suporte para até 50 grupos segmentados sob a mesma comunidade',
-      'Squircle personalizado de identificação da comunidade',
-      'Painel de controle com lista de membros e ferramentas de moderação',
-    ],
-    price: 'R$ 699,00 / ativação',
-    ctaPrimary: 'Ir para aba Comunidade',
-    ctaSecondary: 'Criar Comunidade',
+    price: 'R$ 4,90 / imagem',
+    ctaPrimary: 'Criar meu status',
+    ctaSecondary: 'Explorar Status',
   },
   {
     id: 'product-vitrine',
-    number: 4,
+    number: 2,
     name: 'Minha vitrine',
     tabName: 'Vitrine',
     targetRoute: 'vitrine',
@@ -109,69 +59,51 @@ export const PLATFORM_PRODUCTS = [
     iconSvg: ICON_STORE,
     iconBg: '#FEF3C7',
     iconColor: '#D97706',
-    slogan: 'Espaço comercial completo com catálogo e checkout',
-    description: 'Comercializado na aba Vitrine. Exiba seus produtos, serviços e ofertas em um catálogo digital interativo, com suporte a cobranças e gestão de pagamentos integrados.',
+    slogan: 'Um espaço para sua marca ser descoberta',
+    description: 'Apresente seus produtos, serviços ou seu trabalho na aba Vitrine, com fotos e acesso direto ao seu perfil nas redes sociais.',
     features: [
-      'Vitrine digital com fotos, valores e descrições detalhadas',
-      'Atalhos diretos para cobranças e checkout comercial',
-      'Painel de Ferramentas Comerciais na barra de navegação',
-      'Pronto para receber pedidos e direcionar para conversas',
+      'De 1 a 4 fotos para apresentar sua oferta',
+      'Nome, legenda e link para sua rede social',
+      'Planos Padrão e Impulsionado',
+      'Prévia da vitrine antes do pagamento',
     ],
-    price: 'R$ 899,00 / licença',
-    ctaPrimary: 'Explorar Vitrine',
-    ctaSecondary: 'Configurar Vitrine',
+    price: 'R$ 4,90 / imagem',
+    ctaPrimary: 'Criar minha vitrine',
+    ctaSecondary: 'Explorar Vitrine',
   },
 ];
 
 /**
- * Commercial sidebar tools list (matching WhatsApp Business reference image)
+ * Navigation for available advertising formats.
  */
 export const COMMERCIAL_TOOLS_SECTIONS = [
   {
-    title: 'Ferramentas comerciais',
+    title: 'Comece por aqui',
     items: [
       {
-        id: 'perfil-comercial',
-        name: 'Perfil comercial',
-        description: 'Gerencie o endereço, horário de atendimento e site da empresa',
-        iconSvg: ICON_STORE,
-      },
-      {
-        id: 'catalogo',
-        name: 'Catálogo',
-        description: 'Exiba produtos e serviços',
-        iconSvg: ICON_CATALOG,
+        id: 'anunciar',
+        name: 'Escolher formato',
+        description: 'Compare Status e Vitrine e crie seu anúncio',
+        iconSvg: ICON_ADVERTISE,
         isHighlight: true,
-      },
-      {
-        id: 'cobrancas',
-        name: 'Cobranças',
-        description: 'Mostrar cobranças',
-        iconSvg: ICON_RECEIPT,
-      },
-      {
-        id: 'pagamentos',
-        name: 'Pagamentos',
-        description: 'Gerencie suas informações de pagamento',
-        iconSvg: ICON_PAYMENTS,
       },
     ],
   },
   {
-    title: 'Conecte-se com mais clientes',
+    title: 'Formatos disponíveis',
     items: [
       {
-        id: 'anunciar',
-        name: 'Anunciar',
-        description: 'Crie anúncios que levam ao WhatsApp',
-        iconSvg: ICON_ADVERTISE,
+        id: 'status',
+        name: 'Meu status',
+        description: 'Sua marca entre as atualizações',
+        iconSvg: ICON_STATUS_RING,
         isHighlight: true,
       },
       {
-        id: 'transmissao-comercial',
-        name: 'Transmissão comercial',
-        description: 'Veja todas as transmissões e todos os públicos',
-        iconSvg: ICON_BROADCAST,
+        id: 'vitrine',
+        name: 'Minha vitrine',
+        description: 'Apresente seus produtos e serviços',
+        iconSvg: ICON_STORE,
       },
     ],
   },
