@@ -9,7 +9,7 @@ export function normalize(value) {
 export function unpackSearchIndex(data) {
   if (Array.isArray(data)) return data;
   if (!data?.messages || !data.dates || !data.senders) return [];
-  return data.messages.map(([id, date, sender, content]) => ({ id, date: data.dates[date], sender: data.senders[sender], content }));
+  return data.messages.map(([id, date, sender, content, contentFormat]) => ({ id, date: data.dates[date], sender: data.senders[sender], content, ...(contentFormat ? { content_format: contentFormat } : {}) }));
 }
 
 function excerpt(content, normalized, start, length) {
@@ -71,7 +71,7 @@ export class SearchEngine {
         await yieldSearch();
         if (cancelled()) throw new DOMException('Search cancelled', 'AbortError');
       }
-      const [conversationIndex, id, dateIndex, senderIndex, content] = messages[i];
+      const [conversationIndex, id, dateIndex, senderIndex, content, contentFormat] = messages[i];
       if (scope !== null && conversationIndex !== scope) continue;
       if (sender && senders[senderIndex] !== sender) continue;
       const matchStart = this.normalized[i].indexOf(needle);
@@ -82,6 +82,7 @@ export class SearchEngine {
       results.push({
         id, conversationId: conversation.id, contactName: conversation.contact,
         date: dates[dateIndex], sender: senders[senderIndex], ...(conversation.excerpt ? { excerpt: true } : {}),
+        ...(contentFormat ? { content_format: contentFormat } : {}),
         ...excerpt(content, this.normalized[i], matchStart, needle.length),
       });
     }

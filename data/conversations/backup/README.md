@@ -80,3 +80,7 @@ locais, use `npm run split-data`. Fontes com documentos ou carimbos adicionais
 permitem ampliar esta seleção sem inventar metadados.
 
 Validação: `npx vitest run tests/unit/standby-conversations.test.js`.
+
+## Nota sobre a ampliação das cópias publicadas
+
+Os arquivos desta pasta preservam a seleção anterior. As cópias na pasta acima receberam resumos editoriais e contexto adicional de mensagens publicadas, mantendo os IDs e os trechos literais originais. Um horário antes desconhecido foi confirmado em captura. Consulte [a revisão de fontes](../PUBLIC-SOURCES.md) para os totais atuais e as lacunas restantes.

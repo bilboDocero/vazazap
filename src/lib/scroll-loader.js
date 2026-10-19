@@ -47,19 +47,12 @@ export class ScrollLoader {
   async _loadBatch(count) {
     if (this._destroyed || this._loading || this._nextIndex < 0) return;
     this._loading = true;
-    const heightBefore = this._container.scrollHeight;
-    const topBefore = this._container.scrollTop;
-    const navigationVersion = this._navigationVersion;
     let loaded = 0;
     try {
       while (!this._destroyed && loaded < count && this._nextIndex >= 0) {
         const entry = this._dateIndex[this._nextIndex--];
         if (this._loadedDates.has(entry.date)) continue;
         if (await this.loadDate(entry.date)) loaded++;
-      }
-      // A background prepend must not overwrite a newer message selection.
-      if (!this._destroyed && navigationVersion === this._navigationVersion && loaded && topBefore > 0) {
-        this._container.scrollTop = topBefore + this._container.scrollHeight - heightBefore;
       }
     } finally {
       this._loading = false;
@@ -89,9 +82,17 @@ export class ScrollLoader {
         const messages = await this._loadMessages(date);
         if (this._destroyed) return null;
         const day = this._renderDay(date, messages);
+        // Preserve the visible day at insertion time, including scrollTop=0.
+        // A whole-batch height delta also counts days inserted below the view
+        // and can override a search jump or a scroll made while fetching.
+        const viewportTop = this._container.getBoundingClientRect().top;
+        const anchor = [...this._container.querySelectorAll('.chat-day')]
+          .find(section => section.getBoundingClientRect().bottom > viewportTop);
+        const anchorTop = anchor?.getBoundingClientRect().top;
         const nextDay = [...this._container.querySelectorAll('.chat-day')].find(section => section.dataset.date > date);
         if (nextDay) this._container.insertBefore(day, nextDay);
         else this._container.appendChild(day);
+        if (anchor) this._container.scrollTop += anchor.getBoundingClientRect().top - anchorTop;
         this._loadedDates.add(date);
         return day;
       } catch (error) {

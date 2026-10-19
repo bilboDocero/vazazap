@@ -2,13 +2,17 @@ import { normalize } from './search-engine.js';
 
 /** Mark the matched text without replacing links or other message markup. */
 export function highlightMessageText(message, query) {
-  const content = message.querySelector('.chat-msg-content-text');
-  if (!content || !query) return null;
-  const walker = document.createTreeWalker(content, 4, {
-    acceptNode: node => node.parentElement.closest('.chat-view-once-tag') ? 2 : 1,
-  });
+  const contents = message.querySelectorAll('.chat-msg-content-text, .chat-editorial-text');
+  if (!contents.length || !query) return null;
   const nodes = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode);
+  for (const content of contents) {
+    const walker = document.createTreeWalker(content, 4, {
+      acceptNode: node => node.parentElement.closest('.chat-view-once-tag') ? 2 : 1,
+    });
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    // The build separates the quotation and its context with a newline.
+    if (content !== contents[contents.length - 1]) nodes.push(document.createTextNode('\n'));
+  }
   const original = nodes.map(node => node.data).join('');
   const normalized = normalize(original);
   const needle = normalize(query);
@@ -34,6 +38,7 @@ export function highlightMessageText(message, query) {
     const length = node.data.length;
     const from = Math.max(0, start - offset), to = Math.min(length, end - offset);
     if (from < to) {
+      if (!node.parentNode) { offset += length; continue; }
       const range = document.createRange();
       range.setStart(node, from);
       range.setEnd(node, to);

@@ -15,13 +15,14 @@
       "start": "2025-03-03",
       "end": "2025-05-23"
     },
-    "date_range_complete": true,
-    "total_messages": 3,
+    "date_range_complete": false,
+    "total_messages": 11,
     "source": "Recortes de fontes públicas; referências por mensagem.",
-    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "note": "Histórico parcial. Trechos literais e resumos editoriais estão identificados. Dados desconhecidos permanecem nulos; a conferência das publicações não equivale a validação forense.",
     "context": "Pedidos de entradas no Carnaval e recortes do episódio de Mônaco. A frase sobre Mônaco é de Vorcaro, não de Motta. À Folha, Motta negou ilícitos e atribuiu os contatos à sua interlocução com setores da sociedade.",
     "limitations": [
-      "Há mensagens e uma ligação omitidas entre os recortes de 23 de maio."
+      "Não há transcrição das ligações ou acesso aos anexos mencionados.",
+      "O convite de agosto não comprova a realização do encontro nem identifica com certeza o anfitrião."
     ],
     "sources": [
       {
@@ -33,7 +34,17 @@
         "description": "Apuração de José Marques e Constança Rezende sobre os contatos entre Motta e Vorcaro.",
         "kind": "news_report"
       }
-    ]
+    ],
+    "public_review": {
+      "reviewed_at": "2026-10-19",
+      "scope": "expanded_published_material",
+      "original_records": 3,
+      "added_records": 8,
+      "source_ids": [
+        "folha-2026-09-29"
+      ],
+      "complete_history": false
+    }
   },
   "messages": [
     {
@@ -53,6 +64,74 @@
       "excerpt": true
     },
     {
+      "id": 4,
+      "timestamp": null,
+      "date": "2025-03-03",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-29",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-03-03",
+      "content": "Aceita fornecer entradas e pede dados dos convidados.",
+      "source_locator": "Resposta ao pedido de camarote; dados pessoais não reproduzidos."
+    },
+    {
+      "id": 5,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-29",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Hugo Motta",
+      "reported_date": "2025-03",
+      "content": "Encaminha pergunta recebida sobre a negociação com o BRB.",
+      "source_locator": "Mensagem encaminhada após uma ligação em março; dia não informado."
+    },
+    {
+      "id": 6,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-29",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-03",
+      "content": "Pergunta de qual veículo veio a pergunta.",
+      "source_locator": "Resposta à mensagem encaminhada."
+    },
+    {
+      "id": 7,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-29",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Hugo Motta",
+      "reported_date": "2025-03",
+      "content": "Diz não saber e envia imagem para identificação.",
+      "source_locator": "Resposta sobre o remetente; imagem indisponível."
+    },
+    {
       "id": 2,
       "timestamp": null,
       "date": "2025-05-23",
@@ -66,7 +145,25 @@
       "source_id": "folha-2026-09-29",
       "source_locator": "Conversa datada de 23 de maio de 2025 no corpo da reportagem.",
       "reported_date": "2025-05-23",
-      "excerpt": true
+      "excerpt": true,
+      "editorial_context": "Informa passagem por São Paulo e Belo Horizonte."
+    },
+    {
+      "id": 8,
+      "timestamp": null,
+      "date": "2025-05-23",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-29",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-05-23",
+      "content": "Encaminha motorista e pergunta sobre atendimento na casa.",
+      "source_locator": "Depois da chamada de quase oito minutos, antes do agradecimento; contato pessoal omitido."
     },
     {
       "id": 3,
@@ -83,23 +180,90 @@
       "source_locator": "Agradecimento após a ligação e o envio de contato de motorista.",
       "reported_date": "2025-05-23",
       "excerpt": true
+    },
+    {
+      "id": 9,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-29",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Hugo Motta",
+      "reported_date": "2025-08",
+      "content": "Convida Vorcaro à casa de Davi.",
+      "source_locator": "Convite de agosto; identificação de Davi tratada como hipótese pela fonte."
+    },
+    {
+      "id": 10,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-29",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-08",
+      "content": "Pergunta se sua presença já foi anunciada.",
+      "source_locator": "Resposta ao convite."
+    },
+    {
+      "id": 11,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-29",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Hugo Motta",
+      "reported_date": "2025-08",
+      "content": "Confirma ter avisado sobre a visita.",
+      "source_locator": "Resposta à dúvida de Vorcaro."
     }
   ],
   "index": {
     "dates": [
       {
         "date": "2025-03-03",
-        "message_count": 1,
+        "message_count": 2,
         "first_message_id": 1,
-        "last_message_id": 1
+        "last_message_id": 4,
+        "message_ids": [
+          1,
+          4
+        ]
       },
       {
         "date": "2025-05-23",
-        "message_count": 2,
+        "message_count": 3,
         "first_message_id": 2,
-        "last_message_id": 3
+        "last_message_id": 8,
+        "message_ids": [
+          2,
+          8,
+          3
+        ]
       }
     ],
-    "undated_message_ids": []
+    "undated_message_ids": [
+      5,
+      6,
+      7,
+      9,
+      10,
+      11
+    ]
   }
 }

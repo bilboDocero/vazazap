@@ -16,13 +16,13 @@
       "end": "2024-04-29"
     },
     "date_range_complete": true,
-    "total_messages": 3,
+    "total_messages": 4,
     "source": "Recortes de fontes públicas; referências por mensagem.",
-    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "note": "Histórico parcial. Trechos literais e resumos editoriais estão identificados. Dados desconhecidos permanecem nulos; a conferência das publicações não equivale a validação forense.",
     "context": "Recortes publicados pelo ICL Notícias sobre a intermediação de Valadão após uma crítica de Nikolas ao evento patrocinado pelo Master em Londres. Em nota reproduzida na reportagem, o pastor disse que apenas promoveu diálogo entre conhecidos, negou envolvimento nos negócios do banco e afirmou desconhecer irregularidades.",
     "limitations": [
-      "A fala do pastor sobre Nikolas é um relato ao banqueiro, não uma mensagem escrita por Nikolas neste chat.",
-      "O áudio tem somente um trecho de transcrição; o arquivo original não integra o acervo."
+      "As falas atribuídas a Nikolas neste episódio são relatos de Valadão.",
+      "Não há arquivo original dos áudios no acervo; a íntegra da conversa não foi publicada."
     ],
     "sources": [
       {
@@ -34,7 +34,17 @@
         "description": "Reportagem de Juliana Dal Piva e Cleber Lourenço, atualizada em 4 de setembro com nota do pastor.",
         "kind": "news_report"
       }
-    ]
+    ],
+    "public_review": {
+      "reviewed_at": "2026-10-19",
+      "scope": "expanded_published_material",
+      "original_records": 3,
+      "added_records": 1,
+      "source_ids": [
+        "icl-2026-09-03-valadao"
+      ],
+      "complete_history": false
+    }
   },
   "messages": [
     {
@@ -51,7 +61,25 @@
       "source_id": "icl-2026-09-03-valadao",
       "source_locator": "Início do pedido encaminhado no dia da publicação de Nikolas.",
       "reported_date": "2024-04-27",
-      "excerpt": true
+      "excerpt": true,
+      "editorial_context": "Relaciona o pedido às críticas ao patrocínio em Londres."
+    },
+    {
+      "id": 4,
+      "timestamp": null,
+      "date": "2024-04-27",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "icl-2026-09-03-valadao",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "André Valadão",
+      "reported_date": "2024-04-27",
+      "content": "Diz que procurará Nikolas.",
+      "source_locator": "Resposta descrita após o pedido inicial."
     },
     {
       "id": 2,
@@ -67,7 +95,8 @@
       "source_id": "icl-2026-09-03-valadao",
       "source_locator": "Trecho do áudio em que Valadão relata o pedido que fez a Nikolas.",
       "reported_date": "2024-04-29",
-      "excerpt": true
+      "excerpt": true,
+      "editorial_context": "Relata apreço por Vorcaro e pede entendimento antes de críticas."
     },
     {
       "id": 3,
@@ -83,22 +112,31 @@
       "source_id": "icl-2026-09-03-valadao",
       "source_locator": "Trecho da mensagem escrita enviada horas depois, segundo a sequência descrita no texto.",
       "reported_date": "2024-04-29",
-      "excerpt": true
+      "excerpt": true,
+      "editorial_context": "Segundo Valadão, Nikolas desconhecia a ligação do banco com Vorcaro."
     }
   ],
   "index": {
     "dates": [
       {
         "date": "2024-04-27",
-        "message_count": 1,
+        "message_count": 2,
         "first_message_id": 1,
-        "last_message_id": 1
+        "last_message_id": 4,
+        "message_ids": [
+          1,
+          4
+        ]
       },
       {
         "date": "2024-04-29",
         "message_count": 2,
         "first_message_id": 2,
-        "last_message_id": 3
+        "last_message_id": 3,
+        "message_ids": [
+          2,
+          3
+        ]
       }
     ],
     "undated_message_ids": []

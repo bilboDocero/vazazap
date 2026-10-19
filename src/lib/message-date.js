@@ -21,3 +21,10 @@ export const archivePeriod = range => range?.start && range?.end
   ? `${archiveDate(range.start)} a ${archiveDate(range.end)}` : 'Período não determinado';
 
 export const publicSourceFor = (message, conversation) => conversation?.sources?.find(source => source.id === message.source_id);
+
+/** Preserve the quotation while making its editorial context searchable. */
+export const messageSearchText = message => [message.content, message.editorial_context].filter(Boolean).map(text => text.trim()).filter(Boolean).join('\n');
+export const publicMessageLabel = message => message.content_format === 'editorial_summary'
+  ? 'Resumo editorial' : message.content_format === 'excerpt_with_context' ? 'Trecho e contexto editorial' : 'Recorte publicado';
+export const dateBasisLabel = message => message.date_basis === 'year_context_in_report'
+  ? 'Ano contextualizado no episódio descrito na fonte' : 'Data deduzida da sequência descrita na fonte';

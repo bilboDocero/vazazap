@@ -1014,3 +1014,8 @@
   color: var(--WDS-content-deemphasized);
 }
 .chat-excerpt-source a { color: var(--WDS-accent); }
+.chat-excerpt-context a { color: var(--WDS-accent); overflow-wrap: anywhere; }
+.chat-editorial-context { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--WDS-lines-outline-deemphasized); }
+.chat-editorial-label { margin-bottom: 4px; font-size: 11px; color: var(--WDS-content-deemphasized); }
+.chat-editorial-text { font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat-excerpt-source:first-child { margin: 0 0 6px; }

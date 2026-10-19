@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { SearchEngine } from '../../src/lib/search-engine.js';
-import { messageDateKey } from '../../src/lib/message-date.js';
+import { messageDateKey, messageSearchText } from '../../src/lib/message-date.js';
 
 const read = path => JSON.parse(readFileSync(new URL('../../' + path, import.meta.url), 'utf8'));
 const manifest = read('public/data/search-manifest.json');
@@ -24,7 +24,7 @@ describe('generated full-text corpus', () => {
     let count = 0;
     for (const [conversationId, source] of sources) {
       for (const message of source.messages) {
-        const content = (message.content || '').trim();
+        const content = messageSearchText(message);
         if (message.type === 'system' || !content) continue;
         expect(records.get(conversationId + ':' + message.id), conversationId + ':' + message.id).toEqual({ content, date: messageDateKey(message), sender: message.sender });
         count++;

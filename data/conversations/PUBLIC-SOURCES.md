@@ -14,7 +14,38 @@ Esta revisão compara os contatos do acervo com publicações que reproduzem men
 | [André Valadão](andre-valadao.json) | 3 | [ICL Notícias, 03/09/2026, atualizado em 04/09](https://iclnoticias.com.br/pr-valadao-pediu-nikolas-nao-atacar-vorcaro/), com nota do pastor. |
 | [Chiquinho Feitosa](chiquinho-feitosa.json) | 2 | [Poder360, 25/09/2026](https://www.poder360.com.br/poder-justica/lobista-diz-ter-tratado-de-master-com-zanin-que-nega-contato/), incluindo as negativas de Gilmar Mendes e Cristiano Zanin. |
 
-São **23 recortes em sete novos chats**. Com os nove contatos publicados anteriormente, a seleção pública passa a ter **51 recortes em 16 chats**. As capturas de Justus permitem preservar quatro horários completos; os demais horários continuam nulos. O Globo situa a cobrança citada pelo usuário em 21/12/2024. O ano da mensagem sobre a Fictor é contextualizado no episódio da primeira prisão, e essa inferência está identificada nos dados.
+Na primeira revisão foram acrescentados **23 recortes em sete novos chats**, chegando a 51 recortes em 16 chats. A ampliação abaixo preserva esses registros. O Globo situa a cobrança citada pelo usuário em 21/12/2024. O ano da mensagem sobre a Fictor é contextualizado no episódio da primeira prisão, e essa inferência está identificada nos dados.
+
+## Ampliação das sequências publicadas — 19/10/2026
+
+As 16 conversas foram revistas nas fontes citadas em seus JSONs. Há agora **255 registros: 51 trechos literais preservados e 204 resumos editoriais de outras mensagens publicadas**. Dezesseis trechos receberam contexto separado. Resumo editorial não é transcrição: essa distinção aparece no chat, na busca, no compartilhamento e nos exports. A ampliação não recupera conteúdo privado, apagado ou de áudio indisponível.
+
+| Conversa | Antes | Agora | Material acrescentado |
+| --- | ---: | ---: | --- |
+| Roberto Justus | 6 | 40 | Cobranças, propostas financeiras, condições de recompra e contratos; seis capturas conferidas. |
+| Luciano Huck | 1 | 49 | Oito capturas conferidas, incluindo respostas e carimbos de envio; convites, aeronaves, publicidade e distrato. |
+| Frederic Kachar | 4 | 23 | Pedidos comerciais e respostas em defesa da cobertura jornalística. |
+| Yasmin Brunet | 3 | 22 | Transporte, pedido de auxílio digital, pós-BBB, reparos e prazo no apartamento. |
+| Luiz Phillipi Mourão | 5 | 17 | Blocos citados nas páginas 11 a 13 da decisão, mantendo os episódios não datados separados. |
+| Irajá Abreu | 4 | 16 | Grupo de amigos, combinações de encontro e pedidos posteriores de orientação. |
+| Flávio Carneiro | 3 | 15 | Discussões societárias e interlocução sobre publicações. |
+| Paulo Henrique Costa | 3 | 14 | Visitas a imóveis, operações, liquidez e pedidos de aprovação. |
+| Flávio Bolsonaro | 3 | 13 | Cobrança em áudio, respostas, combinações de encontros e convite para jantar. |
+| Hugo Motta | 3 | 11 | Resposta sobre entradas, pergunta de imprensa e combinações de visita. |
+| Davi Alcolumbre | 3 | 8 | Cobranças de retorno em janeiro e felicitação pela eleição. |
+| Benedito Gonçalves | 3 | 7 | Respostas intermediárias, convite e descrição de figurinha. |
+| Nikolas Ferreira | 3 | 6 | Encaminhamento de contato, aviso sobre Brasília e outro áudio. |
+| Chiquinho Feitosa | 2 | 6 | Aproximações relatadas e resposta de Vorcaro; negativas dos envolvidos preservadas. |
+| André Valadão | 3 | 4 | Resposta ao pedido de intermediação e contexto dos áudios. |
+| João Doria | 2 | 4 | Pergunta intermediária e proposta de telefonema. |
+
+Os IDs anteriores foram preservados. Registros novos receberam IDs próprios, inseridos na sequência descrita pela fonte; o índice carrega a lista explícita de IDs de cada data. As cópias de `backup/` mantêm a seleção antiga. O relógio de um registro de Huck foi preenchido após conferência da captura, sem alterar seu ID ou trecho literal.
+
+### Alcance e lacunas
+
+As fontes jornalísticas disponibilizam seleções. Mesmo quando uma reportagem afirma que consultou o acervo completo, isso não significa que publicou o histórico integral. Os resumos respeitam a extensão das fontes consultadas; as redações completas nas capturas têm links por registro ou no contexto do chat. As 14 capturas são referências externas, sem carregar imagens na abertura da conversa.
+
+Arquivos não publicados, áudios sem transcrição, mensagens apagadas e reações sem autoria identificável permanecem indisponíveis. Nomes citados em chats de terceiros não foram transformados em participantes, e endereços e números particulares não foram reproduzidos. Os meses e anos incompletos continuam explícitos. A ordem dos blocos não datados acompanha a publicação, sem inventar uma cronologia.
 
 ## Outras lacunas localizadas, ainda sem chat nesta revisão
 

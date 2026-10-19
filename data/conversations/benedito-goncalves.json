@@ -16,13 +16,13 @@
       "end": "2024-07-02"
     },
     "date_range_complete": true,
-    "total_messages": 3,
+    "total_messages": 7,
     "source": "Recortes de fontes públicas; referências por mensagem.",
-    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "note": "Histórico parcial. Trechos literais e resumos editoriais estão identificados. Dados desconhecidos permanecem nulos; a conferência das publicações não equivale a validação forense.",
     "context": "A Folha publicou mensagens cordiais e convites para encontros entre Vorcaro e Benedito Gonçalves, ministro do STJ. O jornal informou que o ministro não havia respondido até a publicação e que, no primeiro semestre de 2026, se declarou impedido de julgar causas relacionadas ao Master.",
     "limitations": [
-      "Os recortes não constituem uma sequência contínua nem demonstram, por si, interferência em processos.",
-      "Figurinhas, arquivos e mensagens intermediárias não foram reconstruídos."
+      "A figurinha é descrita editorialmente; seu arquivo não integra o acervo.",
+      "A disponibilidade declarada não comprova interferência em processos."
     ],
     "sources": [
       {
@@ -34,7 +34,17 @@
         "description": "Recortes dos contatos de maio e julho de 2024 e contexto da apuração.",
         "kind": "news_report"
       }
-    ]
+    ],
+    "public_review": {
+      "reviewed_at": "2026-10-19",
+      "scope": "expanded_published_material",
+      "original_records": 3,
+      "added_records": 4,
+      "source_ids": [
+        "folha-2026-09-18"
+      ],
+      "complete_history": false
+    }
   },
   "messages": [
     {
@@ -54,6 +64,40 @@
       "excerpt": true
     },
     {
+      "id": 4,
+      "timestamp": null,
+      "date": "2024-05-17",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-18",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2024-05-17",
+      "content": "Cumprimenta o ministro como amigo.",
+      "source_locator": "Primeira resposta após a mensagem de 17/05."
+    },
+    {
+      "id": 5,
+      "timestamp": null,
+      "date": "2024-05-17",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-18",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2024-05-17",
+      "content": "Agradece a atenção recebida.",
+      "source_locator": "Segunda resposta de Vorcaro, antes do convite."
+    },
+    {
       "id": 2,
       "timestamp": null,
       "date": "2024-05-17",
@@ -70,6 +114,23 @@
       "excerpt": true
     },
     {
+      "id": 6,
+      "timestamp": null,
+      "date": "2024-07-02",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-18",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2024-07-02",
+      "content": "Propõe encontro após o retorno do Rio.",
+      "source_locator": "Convite de 02/07, antes da resposta do ministro."
+    },
+    {
       "id": 3,
       "timestamp": null,
       "date": "2024-07-02",
@@ -83,22 +144,52 @@
       "source_id": "folha-2026-09-18",
       "source_locator": "Trecho da resposta na troca de 2 de julho de 2024.",
       "reported_date": "2024-07-02",
-      "excerpt": true
+      "excerpt": true,
+      "editorial_context": "Informa chegada no dia 29 e intenção de telefonar."
+    },
+    {
+      "id": 7,
+      "timestamp": null,
+      "date": "2024-07-02",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-18",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Benedito Gonçalves",
+      "reported_date": "2024-07-02",
+      "content": "Envia figurinha de aperto de mãos e parceria.",
+      "source_locator": "Descrição da figurinha, sem inventar ou reproduzir o arquivo.",
+      "reported_type": "sticker"
     }
   ],
   "index": {
     "dates": [
       {
         "date": "2024-05-17",
-        "message_count": 2,
+        "message_count": 4,
         "first_message_id": 1,
-        "last_message_id": 2
+        "last_message_id": 5,
+        "message_ids": [
+          1,
+          4,
+          5,
+          2
+        ]
       },
       {
         "date": "2024-07-02",
-        "message_count": 1,
+        "message_count": 3,
         "first_message_id": 3,
-        "last_message_id": 3
+        "last_message_id": 7,
+        "message_ids": [
+          6,
+          3,
+          7
+        ]
       }
     ],
     "undated_message_ids": []

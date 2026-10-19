@@ -111,6 +111,14 @@ def group_messages_by_month(messages):
     return by_month
 
 
+def search_text(message):
+    return "\n".join(value.strip() for value in (message.get("content"), message.get("editorial_context")) if value and value.strip())
+
+
+def search_format(message):
+    return message.get("content_format") or ("excerpt_with_context" if message.get("editorial_context") else None)
+
+
 def build_search_index(messages):
     """Build a full-text columnar index; only empty/system messages are omitted."""
     dates_list = []
@@ -122,7 +130,7 @@ def build_search_index(messages):
     for msg in messages:
         if msg["type"] == "system":
             continue
-        content = (msg.get("content", "") or "").strip()
+        content = search_text(msg)
         if not content:
             continue
         d = date_key(msg)
@@ -135,7 +143,10 @@ def build_search_index(messages):
             sender_to_idx[s] = len(senders_list)
             senders_list.append(s)
 
-        tuples.append([msg["id"], date_to_idx[d], sender_to_idx[s], content])
+        row = [msg["id"], date_to_idx[d], sender_to_idx[s], content]
+        if search_format(msg):
+            row.append(search_format(msg))
+        tuples.append(row)
 
     return {
         "dates": dates_list,
@@ -162,7 +173,7 @@ def write_global_search_index(sources):
         contact = metadata.get("group_name") or (others[0] if others else metadata["participants"][0])
         conversations.append({"id": conv_id, "contact": contact, **({"excerpt": True} if metadata.get("coverage") == "selected_public_excerpts" else {})})
         for message in data["messages"]:
-            if message["type"] != "system" and (message.get("content") or "").strip():
+            if message["type"] != "system" and search_text(message):
                 ordered.append((sort_time(message), conversation_index, message))
 
     # Newest results first, with a stable cursor across pages and conversations.
@@ -175,7 +186,10 @@ def write_global_search_index(sources):
         if sender not in sender_ids:
             sender_ids[sender] = len(senders)
             senders.append(sender)
-        messages.append([conversation_index, message["id"], date_ids[date], sender_ids[sender], message["content"].strip()])
+        row = [conversation_index, message["id"], date_ids[date], sender_ids[sender], search_text(message)]
+        if search_format(message):
+            row.append(search_format(message))
+        messages.append(row)
 
     payload = {"version": 1, "conversations": conversations, "dates": dates, "senders": senders, "messages": messages}
     encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -348,7 +362,7 @@ def split_conversation(conv_id, data, index):
             "sender": last_msg["sender"],
         } if last_msg else None,
     }
-    for key in ("phone", "saved_as", "source", "note", "is_group", "group_name", "sources", "context", "limitations", "coverage", "status", "publication_ready", "date_range_complete"):
+    for key in ("phone", "saved_as", "source", "note", "is_group", "group_name", "sources", "context", "limitations", "coverage", "status", "publication_ready", "date_range_complete", "source_captures", "public_review"):
         if metadata.get(key) is not None:
             entry[key] = metadata[key]
     if metadata.get("schema_version") == 2:

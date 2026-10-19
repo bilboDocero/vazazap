@@ -8,6 +8,7 @@
 import { escapeHtml, formatDateLong, formatTime } from '../lib/utils.js';
 import { showToast } from './Toast.js';
 import { ICON_COPY, ICON_SEND, ICON_INFO } from '../lib/icons.js';
+import { publicMessageLabel } from '../lib/message-date.js';
 
 /**
  * Create and manage a context menu for the chat area.
@@ -88,8 +89,9 @@ export function attachContextMenu(chatContainer, { senderNames = {}, incomingSen
         label: 'Copiar texto',
         icon: ICON_COPY,
         action: () => {
-          navigator.clipboard.writeText(msg.content).catch(() => {
-            fallbackCopy(msg.content);
+          const text = msg.content_format === 'editorial_summary' ? `${publicMessageLabel(msg)}: ${msg.content}` : msg.content;
+          navigator.clipboard.writeText(text).catch(() => {
+            fallbackCopy(text);
           });
         },
       });
@@ -104,7 +106,7 @@ export function attachContextMenu(chatContainer, { senderNames = {}, incomingSen
           const baseUrl = window.location.origin;
           const shareUrl = `${baseUrl}/#/chat/${conversationId}/msg/${msg.id}`;
           const senderDisplay = senderNames[msg.sender] || msg.sender || '';
-          const shareText = msg.content ? `"${msg.content}" — ${senderDisplay}` : '';
+          const shareText = msg.content ? (msg.content_format === 'editorial_summary' ? `Resumo editorial da mensagem de ${senderDisplay}: ${msg.content}` : `"${msg.content}" — ${senderDisplay}`) : '';
 
           if (navigator.share) {
             navigator.share({

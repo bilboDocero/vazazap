@@ -16,9 +16,9 @@
       "end": null
     },
     "date_range_complete": false,
-    "total_messages": 3,
+    "total_messages": 14,
     "source": "Recortes de fontes públicas; referências por mensagem.",
-    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "note": "Histórico parcial. Trechos literais e resumos editoriais estão identificados. Dados desconhecidos permanecem nulos; a conferência das publicações não equivale a validação forense.",
     "context": "Recortes das mensagens entre o então presidente do BRB e Vorcaro citadas em decisão do STF e publicados pela Folha. A investigação aborda transações bancárias e imóveis que, segundo a suspeita investigada, seriam destinados a Costa. A defesa afirmou ao jornal que ele não cometeu crime.",
     "limitations": [
       "A reportagem consultada não informa as datas e os horários destes recortes.",
@@ -35,9 +35,53 @@
         "description": "Mensagens citadas na decisão judicial, com resposta da defesa de Costa.",
         "kind": "news_report"
       }
-    ]
+    ],
+    "public_review": {
+      "reviewed_at": "2026-10-19",
+      "scope": "expanded_published_material",
+      "original_records": 3,
+      "added_records": 11,
+      "source_ids": [
+        "folha-2026-04-16"
+      ],
+      "complete_history": false
+    }
   },
   "messages": [
+    {
+      "id": 4,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Paulo Henrique Costa",
+      "reported_date": null,
+      "content": "Relata visita a imóvel e pede outra opção para comparar.",
+      "source_locator": "Seção sobre visitas a imóveis; inclui referência à esposa, sem identificá-la."
+    },
+    {
+      "id": 5,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": null,
+      "content": "Descreve outra opção como cobertura.",
+      "source_locator": "Resposta no episódio das visitas."
+    },
     {
       "id": 1,
       "timestamp": null,
@@ -53,6 +97,23 @@
       "source_locator": "Seção sobre visitas a imóveis; resposta de Costa.",
       "reported_date": null,
       "excerpt": true
+    },
+    {
+      "id": 6,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": null,
+      "content": "Questiona interesse na continuidade do negócio.",
+      "source_locator": "Seção sobre empenho de Costa."
     },
     {
       "id": 2,
@@ -71,6 +132,40 @@
       "excerpt": true
     },
     {
+      "id": 7,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Paulo Henrique Costa",
+      "reported_date": null,
+      "content": "Demonstra entusiasmo e sugere estrutura de holding financeira.",
+      "source_locator": "Seção sobre operações no BRB."
+    },
+    {
+      "id": 8,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Paulo Henrique Costa",
+      "reported_date": null,
+      "content": "Relata preparação da operação e de argumentos para críticas.",
+      "source_locator": "Mensagem sobre lançamento da operação."
+    },
+    {
       "id": 3,
       "timestamp": null,
       "date": null,
@@ -85,14 +180,127 @@
       "source_locator": "Resposta de Vorcaro na seção sobre operações no BRB.",
       "reported_date": null,
       "excerpt": true
+    },
+    {
+      "id": 9,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": null,
+      "content": "Cita necessidade de R$300 milhões e pede alternativas.",
+      "source_locator": "Seção sobre ajustes de carteiras."
+    },
+    {
+      "id": 10,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Paulo Henrique Costa",
+      "reported_date": null,
+      "content": "Propõe organizar equipe e equilibrar carteiras de varejo e empresas.",
+      "source_locator": "Resposta à demanda de liquidez."
+    },
+    {
+      "id": 11,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Paulo Henrique Costa",
+      "reported_date": null,
+      "content": "Diz tratar de outra carteira.",
+      "source_locator": "Complemento da resposta sobre carteiras."
+    },
+    {
+      "id": 12,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Paulo Henrique Costa",
+      "reported_date": null,
+      "content": "Faz cálculo de imóveis para atingir valor combinado.",
+      "source_locator": "Seção sobre valor do acordo."
+    },
+    {
+      "id": 13,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Paulo Henrique Costa",
+      "reported_date": null,
+      "content": "Pede aprovação dos imóveis de São Paulo.",
+      "source_locator": "Pedido de concordância."
+    },
+    {
+      "id": 14,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-04-16",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": null,
+      "content": "Diz ter autorizado e pergunta onde está o entrave.",
+      "source_locator": "Resposta ao pedido sobre imóveis."
     }
   ],
   "index": {
     "dates": [],
     "undated_message_ids": [
+      4,
+      5,
       1,
+      6,
       2,
-      3
+      7,
+      8,
+      3,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
     ]
   }
 }

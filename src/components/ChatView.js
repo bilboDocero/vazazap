@@ -9,7 +9,7 @@
  *    because the input to linkify is already fully escaped.
  */
 import { escapeHtml, formatTime, formatDateLong, linkify } from '../lib/utils.js';
-import { publicSourceFor } from '../lib/message-date.js';
+import { publicSourceFor, publicMessageLabel, dateBasisLabel } from '../lib/message-date.js';
 import { ScrollLoader } from '../lib/scroll-loader.js';
 import { ICON_INFO, ICON_SEARCH, ICON_CHECKEMPTY, ICON_BELL, ICON_TIMER, ICON_DOWNLOAD, ICON_CLOSE_CIRCULAR, ICON_vorcarozap_LOGO, ICON_MEETBALL, ICON_CHEVRON_DW, ICON_SCREENSHOT } from '../lib/icons.js';
 
@@ -177,13 +177,13 @@ function renderAudioMessage(msg, isOutgoing) {
 
   const foot = document.createElement('div');
   foot.className = 'chat-audio-foot';
-  foot.textContent = msg.excerpt ? 'Áudio não disponível · transcrição parcial publicada' : 'Áudio não recuperado · transcrição da perícia';
+  foot.textContent = msg.content_format === 'editorial_summary' ? 'Áudio não disponível · resumo editorial' : msg.excerpt ? 'Áudio não disponível · transcrição parcial publicada' : 'Áudio não recuperado · transcrição da perícia';
   el.appendChild(foot);
 
   if (transcript) {
     const t = document.createElement('div');
-    t.className = 'chat-audio-transcript';
-    t.textContent = `\u201C${transcript}\u201D`;
+    t.className = 'chat-audio-transcript chat-msg-content-text';
+    t.textContent = msg.content_format === 'editorial_summary' ? transcript : `\u201C${transcript}\u201D`;
     el.appendChild(t);
   }
   return el;
@@ -511,11 +511,24 @@ function renderMessage(msg, isGroup = false, conversation = null) {
 
   bubble.appendChild(content);
 
+  if (msg.editorial_context) {
+    const context = document.createElement('aside');
+    context.className = 'chat-editorial-context';
+    const heading = document.createElement('div');
+    heading.className = 'chat-editorial-label';
+    heading.textContent = 'Contexto da mensagem · resumo editorial';
+    const text = document.createElement('div');
+    text.className = 'chat-editorial-text';
+    text.textContent = msg.editorial_context;
+    context.append(heading, text);
+    bubble.appendChild(context);
+  }
+
   if (msg.excerpt) {
     const provenance = document.createElement('div');
     provenance.className = 'chat-excerpt-source';
     const label = document.createElement('span');
-    label.textContent = 'Recorte publicado';
+    label.textContent = publicMessageLabel(msg);
     provenance.appendChild(label);
     const source = publicSourceFor(msg, conversation);
     if (source && /^https?:\/\//i.test(source.url)) {
@@ -529,10 +542,19 @@ function renderMessage(msg, isGroup = false, conversation = null) {
     }
     if (msg.date_basis) {
       const basis = document.createElement('span');
-      basis.textContent = 'Data deduzida da sequência descrita na fonte';
+      basis.textContent = dateBasisLabel(msg);
       provenance.appendChild(basis);
     }
-    bubble.appendChild(provenance);
+    if (msg.source_image && /^https:\/\//i.test(msg.source_image)) {
+      const capture = document.createElement('a');
+      capture.href = msg.source_image;
+      capture.target = '_blank';
+      capture.rel = 'noopener noreferrer';
+      capture.textContent = 'Captura original';
+      provenance.appendChild(capture);
+    }
+    if (msg.content_format === 'editorial_summary') bubble.insertBefore(provenance, content);
+    else bubble.appendChild(provenance);
   }
 
   // Metadata row (time + edited flag)
@@ -761,10 +783,21 @@ export function renderChatView(container, { conversation, dateIndex, loadMessage
     const context = document.createElement('p');
     context.textContent = conversation.context;
     details.appendChild(context);
-    for (const limitation of ['Há mensagens omitidas entre os recortes.', ...(conversation.limitations || [])]) {
+    for (const limitation of ['O histórico integral não está disponível. Resumos editoriais estão identificados e não são transcrições literais.', ...(conversation.limitations || [])]) {
       const note = document.createElement('p');
       note.textContent = limitation;
       details.appendChild(note);
+    }
+    for (const capture of conversation.source_captures || []) {
+      if (!/^https:\/\//i.test(capture.url)) continue;
+      const item = document.createElement('p');
+      const link = document.createElement('a');
+      link.href = capture.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = `Captura na fonte: ${capture.label}`;
+      item.appendChild(link);
+      details.appendChild(item);
     }
     el.appendChild(details);
   }

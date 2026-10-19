@@ -1,6 +1,7 @@
 /** Global message search with cancellable requests and small result pages. */
 import { escapeHtml, formatDateShort } from '../lib/utils.js';
 import { searchPage } from '../lib/search.js';
+import { publicMessageLabel } from '../lib/message-date.js';
 
 const DEBOUNCE_MS = 200;
 const PAGE_SIZE = 50;
@@ -110,7 +111,7 @@ export function attachSearch(sidebar, onResultClick) {
     contact.title = result.contactName;
     const date = document.createElement('span');
     date.className = 'search-result-date';
-    date.textContent = `${formatDateShort(result.date)}${result.excerpt ? ' · Recorte publicado' : ''}`;
+    date.textContent = `${formatDateShort(result.date)}${result.excerpt ? ' · ' + publicMessageLabel(result) : ''}`;
     const top = document.createElement('div');
     top.className = 'search-result-top';
     top.append(contact, date);

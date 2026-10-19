@@ -12,17 +12,18 @@
     "coverage": "selected_public_excerpts",
     "reviewed_at": "2026-10-19",
     "date_range": {
-      "start": "2025-02-01",
+      "start": "2025-01-03",
       "end": "2025-02-01"
     },
     "date_range_complete": false,
-    "total_messages": 3,
+    "total_messages": 8,
     "source": "Recortes de fontes públicas; referências por mensagem.",
-    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "note": "Histórico parcial. Trechos literais e resumos editoriais estão identificados. Dados desconhecidos permanecem nulos; a conferência das publicações não equivale a validação forense.",
     "context": "Recortes de felicitações e declarações de amizade entre Vorcaro e Davi Alcolumbre, divulgados pela Veja e confirmados pela Folha. Alcolumbre contestou as acusações, classificou as mensagens como pessoais e afirmou que elas não indicam ilegalidade.",
     "limitations": [
-      "O fim de março de 2025 é mantido como mês, sem atribuição de um dia específico.",
-      "Declarações de amizade não demonstram, por si, favorecimento ou conduta ilícita."
+      "As duas cobranças de janeiro não têm correspondência individual confirmada com os dias 4 e 6.",
+      "Arquivos enviados não têm conteúdo acessível na reportagem.",
+      "Menções no grupo Macallan não foram convertidas em mensagens diretas de Alcolumbre."
     ],
     "sources": [
       {
@@ -34,9 +35,104 @@
         "description": "Mensagens de fevereiro e março de 2025 e manifestação do senador.",
         "kind": "news_report"
       }
-    ]
+    ],
+    "public_review": {
+      "reviewed_at": "2026-10-19",
+      "scope": "expanded_published_material",
+      "original_records": 3,
+      "added_records": 5,
+      "source_ids": [
+        "folha-2026-09-24"
+      ],
+      "complete_history": false
+    }
   },
   "messages": [
+    {
+      "id": 4,
+      "timestamp": null,
+      "date": "2025-01-03",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-24",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-01-03",
+      "content": "Promete identificar a origem de uma notícia.",
+      "source_locator": "Episódio de janeiro, mensagem do dia 3."
+    },
+    {
+      "id": 5,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-24",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Davi Alcolumbre",
+      "reported_date": "2025-01",
+      "content": "Cobra retorno sobre a apuração.",
+      "source_locator": "Primeira cobrança situada entre 4 e 6 de janeiro; dia individual não confirmado."
+    },
+    {
+      "id": 6,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-24",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Davi Alcolumbre",
+      "reported_date": "2025-01",
+      "content": "Volta a perguntar pelo resultado.",
+      "source_locator": "Segunda cobrança situada entre 4 e 6 de janeiro; dia individual não confirmado."
+    },
+    {
+      "id": 7,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-24",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-01",
+      "content": "Diz que a direção do portal resiste a revelar a fonte.",
+      "source_locator": "Resposta descrita no episódio de janeiro; não se identifica a fonte jornalística."
+    },
+    {
+      "id": 8,
+      "timestamp": null,
+      "date": "2025-02-01",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-09-24",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-02-01",
+      "content": "Parabeniza Alcolumbre pela eleição no Senado.",
+      "source_locator": "Cumprimentos que precedem a resposta do senador."
+    },
     {
       "id": 1,
       "timestamp": null,
@@ -51,7 +147,8 @@
       "source_id": "folha-2026-09-24",
       "source_locator": "Início da resposta aos cumprimentos pela eleição à presidência do Senado.",
       "reported_date": "2025-02-01",
-      "excerpt": true
+      "excerpt": true,
+      "editorial_context": "Agradece também a amizade e o carinho recebidos."
     },
     {
       "id": 2,
@@ -89,13 +186,29 @@
   "index": {
     "dates": [
       {
-        "date": "2025-02-01",
+        "date": "2025-01-03",
         "message_count": 1,
+        "first_message_id": 4,
+        "last_message_id": 4,
+        "message_ids": [
+          4
+        ]
+      },
+      {
+        "date": "2025-02-01",
+        "message_count": 2,
         "first_message_id": 1,
-        "last_message_id": 1
+        "last_message_id": 8,
+        "message_ids": [
+          8,
+          1
+        ]
       }
     ],
     "undated_message_ids": [
+      5,
+      6,
+      7,
       2,
       3
     ]

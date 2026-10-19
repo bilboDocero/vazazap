@@ -244,6 +244,29 @@ describe('ScrollLoader message navigation', () => {
     expect(container.querySelector('.msg-search-selected')).toBeNull();
   });
 
+  it('preserves a search result at the top when an older day is inserted above it', async () => {
+    await loader.init();
+    container.scrollTop = 0;
+    const anchor = container.querySelector('[data-date="2024-02-14"]');
+    anchor.getBoundingClientRect = () => {
+      const before = [...container.querySelectorAll('.chat-day')].filter(section => section.dataset.date < day(14)).length;
+      return { top: before * 100 - container.scrollTop, bottom: before * 100 - container.scrollTop + 100 };
+    };
+    const before = anchor.getBoundingClientRect().top;
+    await loader.loadDate(day(10));
+    expect(container.scrollTop).toBe(100);
+    expect(anchor.getBoundingClientRect().top).toBe(before);
+  });
+
+  it('does not shift the visible day for content inserted below it', async () => {
+    await loader.init();
+    container.scrollTop = 0;
+    const anchor = container.querySelector('[data-date="2024-02-12"]');
+    anchor.getBoundingClientRect = () => ({ top: 0, bottom: 100 });
+    await loader.loadDate(day(20));
+    expect(container.scrollTop).toBe(0);
+  });
+
   it('retains the selection after the flash and removes the old marking on another selection', async () => {
     await loader.init();
     vi.useFakeTimers();

@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { DataStore } from '../../src/lib/data-store.js';
 import { SearchEngine } from '../../src/lib/search-engine.js';
-import { archiveDate, archiveTime, messageDateKey, publicSourceFor } from '../../src/lib/message-date.js';
+import { archiveDate, archiveTime, messageDateKey, publicSourceFor, publicMessageLabel } from '../../src/lib/message-date.js';
 import { renderDaySection, renderMessage } from '../../src/components/ChatView.js';
 
 const location = path => new URL('../../' + path, import.meta.url);
@@ -13,6 +13,13 @@ const originals = readdirSync(location('data/conversations/'))
   .map(name => [name.slice(0, -5), read('data/conversations/' + name)])
   .filter(([, data]) => data.metadata.coverage === 'selected_public_excerpts' && data.metadata.publication_ready);
 const fetcher = async url => read('public' + url);
+let engine, store;
+beforeAll(async () => {
+  const manifest = read('public/data/search-manifest.json');
+  engine = await new SearchEngine(read('public/data/' + manifest.file)).prepare();
+  store = new DataStore({ fetcher });
+  await store.init();
+});
 
 describe('Published public-source excerpts', () => {
   it('keeps exact dates, month/year, year and missing dates distinct', () => {
@@ -25,14 +32,10 @@ describe('Published public-source excerpts', () => {
     expect(archiveTime(null)).toBe('Horário não informado');
   });
 
-  it('indexes every published excerpt and resolves it to its original message with the documented date and time', async () => {
+  it('includes every published public-source conversation', () => {
     expect(entries.map(entry => entry.id).sort()).toEqual(originals.map(([id]) => id).sort());
-    const manifest = read('public/data/search-manifest.json');
-    const engine = await new SearchEngine(read('public/data/' + manifest.file)).prepare();
-    const store = new DataStore({ fetcher });
-    await store.init();
-    let count = 0;
-    for (const entry of entries) {
+  });
+  it.each(entries.map(entry => [entry.id, entry]))('%s resolves every record to its original source, date and time', async (_id, entry) => {
       const original = read('data/conversations/' + entry.id + '.json');
       const index = await store.getConversationIndex(entry.id);
       const loaded = await store.getMessagesForDates(entry.id, index.map(day => day.date));
@@ -48,16 +51,13 @@ describe('Published public-source excerpts', () => {
         const row = renderMessage(loadedMessage, false, entry);
         expect(row.querySelector('.chat-msg-meta').textContent).toBe(archiveTime(message.time));
         expect(row.querySelector('.chat-excerpt-source a').getAttribute('href')).toBe(publicSourceFor(message, entry).url);
-        expect(row.textContent).toContain('Recorte publicado');
+        expect(row.textContent).toContain(publicMessageLabel(message));
         if (message.type === 'audio') {
-          expect(row.textContent).toContain('transcrição parcial publicada');
+          expect(row.textContent).toContain(message.content_format === 'editorial_summary' ? 'resumo editorial' : 'transcrição parcial publicada');
           expect(row.textContent).not.toContain('transcrição da perícia');
         }
-        count++;
       }
-    }
-    expect(count).toBe(originals.reduce((sum, [, data]) => sum + data.messages.length, 0));
-  }, 30000);
+  }, 20000);
 
   it('does not group excerpts with unknown timestamps as a continuous exchange', () => {
     const message = { id: 1, sender: 'DV', type: 'text', content: 'Trecho', timestamp: null, time: null, date: null, excerpt: true };

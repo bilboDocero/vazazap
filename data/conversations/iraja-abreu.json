@@ -12,16 +12,17 @@
     "coverage": "selected_public_excerpts",
     "reviewed_at": "2026-10-19",
     "date_range": {
-      "start": null,
-      "end": null
+      "start": "2024-10-18",
+      "end": "2025-04-17"
     },
     "date_range_complete": false,
-    "total_messages": 4,
+    "total_messages": 16,
     "source": "Recortes de fontes públicas; referências por mensagem.",
-    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "note": "Histórico parcial. Trechos literais e resumos editoriais estão identificados. Dados desconhecidos permanecem nulos; a conferência das publicações não equivale a validação forense.",
     "context": "Recortes de brincadeiras e convite de viagem divulgados por O Globo e confirmados pelo UOL. Na resposta publicada, o gabinete de Irajá relacionou os contatos à articulação do PL 2.234/2022, sobre jogos e cassinos.",
     "limitations": [
-      "O texto situa o início dos contatos em 11 de outubro de 2024, mas não exibe o carimbo de cada mensagem; os dias foram mantidos em aberto."
+      "Há anexos e contatos sem conteúdo reproduzido; não foram reconstruídos.",
+      "O encontro citado em julho não teve uma fala direta transcrita na reportagem consultada."
     ],
     "sources": [
       {
@@ -33,7 +34,17 @@
         "description": "Reportagem sobre as conversas de Irajá com Vorcaro e a resposta do gabinete.",
         "kind": "news_report"
       }
-    ]
+    ],
+    "public_review": {
+      "reviewed_at": "2026-10-19",
+      "scope": "expanded_published_material",
+      "original_records": 4,
+      "added_records": 12,
+      "source_ids": [
+        "uol-2026-09-30"
+      ],
+      "complete_history": false
+    }
   },
   "messages": [
     {
@@ -69,6 +80,23 @@
       "excerpt": true
     },
     {
+      "id": 5,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Irajá Abreu",
+      "reported_date": "2024-10",
+      "content": "Oferece-se para buscar as mulheres e pede contato.",
+      "source_locator": "Continuação da primeira brincadeira; dia individual mantido em aberto."
+    },
+    {
       "id": 3,
       "timestamp": null,
       "date": null,
@@ -99,15 +127,239 @@
       "source_locator": "Resposta no bloco do convite de viagem.",
       "reported_date": "2024-10",
       "excerpt": true
+    },
+    {
+      "id": 6,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Irajá Abreu",
+      "reported_date": "2024-10",
+      "content": "Agradece o convite, mas diz precisar voltar.",
+      "source_locator": "Resposta ao convite para Dubai; anexo posterior não disponível."
+    },
+    {
+      "id": 7,
+      "timestamp": null,
+      "date": "2024-10-18",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Irajá Abreu",
+      "reported_date": "2024-10-18",
+      "content": "Pede autorização para incluí-lo em grupo de amigos.",
+      "source_locator": "Mensagem explicitamente datada de 18/10/2024."
+    },
+    {
+      "id": 8,
+      "timestamp": null,
+      "date": "2024-10-18",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2024-10-18",
+      "content": "Aceita a inclusão no grupo.",
+      "source_locator": "Resposta ao pedido de inclusão."
+    },
+    {
+      "id": 9,
+      "timestamp": null,
+      "date": "2025-03-13",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Irajá Abreu",
+      "reported_date": "2025-03-13",
+      "content": "Retoma o contato com uma saudação.",
+      "source_locator": "Retomada de 13/03/2025."
+    },
+    {
+      "id": 10,
+      "timestamp": null,
+      "date": "2025-03-13",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-03-13",
+      "content": "Sugere encontro.",
+      "source_locator": "Primeira resposta na retomada."
+    },
+    {
+      "id": 11,
+      "timestamp": null,
+      "date": "2025-03-13",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Irajá Abreu",
+      "reported_date": "2025-03-13",
+      "content": "Pergunta o horário.",
+      "source_locator": "Resposta ao convite."
+    },
+    {
+      "id": 12,
+      "timestamp": null,
+      "date": "2025-03-13",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-03-13",
+      "content": "Pede visita em casa devido à agenda.",
+      "source_locator": "Convite em Brasília; endereço particular não reproduzido."
+    },
+    {
+      "id": 13,
+      "timestamp": null,
+      "date": "2025-03-13",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Irajá Abreu",
+      "reported_date": "2025-03-13",
+      "content": "Oferece o gabinete, mas aceita ir à casa.",
+      "source_locator": "Resposta ao convite; contato encaminhado depois não reproduzido."
+    },
+    {
+      "id": 14,
+      "timestamp": null,
+      "date": "2025-04-17",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-04-17",
+      "content": "Descreve dificuldades no momento.",
+      "source_locator": "Mensagem datada de 17/04/2025."
+    },
+    {
+      "id": 15,
+      "timestamp": null,
+      "date": "2025-04-17",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Irajá Abreu",
+      "reported_date": "2025-04-17",
+      "content": "Oferece ajuda.",
+      "source_locator": "Resposta ao relato de dificuldades."
+    },
+    {
+      "id": 16,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-30",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Irajá Abreu",
+      "reported_date": "2025-04",
+      "content": "Pede orientação sobre agenda que estaria suspensa.",
+      "source_locator": "Pedido posterior ao envio de link sobre jogos; dia não atribuído sem carimbo."
     }
   ],
   "index": {
-    "dates": [],
+    "dates": [
+      {
+        "date": "2024-10-18",
+        "message_count": 2,
+        "first_message_id": 7,
+        "last_message_id": 8,
+        "message_ids": [
+          7,
+          8
+        ]
+      },
+      {
+        "date": "2025-03-13",
+        "message_count": 5,
+        "first_message_id": 9,
+        "last_message_id": 13,
+        "message_ids": [
+          9,
+          10,
+          11,
+          12,
+          13
+        ]
+      },
+      {
+        "date": "2025-04-17",
+        "message_count": 2,
+        "first_message_id": 14,
+        "last_message_id": 15,
+        "message_ids": [
+          14,
+          15
+        ]
+      }
+    ],
     "undated_message_ids": [
       1,
       2,
+      5,
       3,
-      4
+      4,
+      6,
+      16
     ]
   }
 }

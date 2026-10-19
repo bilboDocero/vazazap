@@ -99,7 +99,17 @@ describe('Public-source excerpts in standby', () => {
       const backup = conversations.find(([name]) => name === file)[1];
       expect(live.metadata.status).toBe('published');
       expect(live.metadata.publication_ready).toBe(true);
-      expect(live.messages).toEqual(backup.messages);
+      for (const message of backup.messages) {
+        const current = live.messages.find(candidate => candidate.id === message.id);
+        const preserved = { ...message };
+        if (message.timestamp === null && current.timestamp) {
+          delete preserved.timestamp;
+          delete preserved.time;
+          expect(current.timestamp).toBe(current.date + 'T' + current.time);
+          expect(current.source_image).toMatch(/^https:\/\//);
+        }
+        expect(current).toMatchObject(preserved);
+      }
       expect(publishedIds.filter(id => id === file.slice(0, -5))).toHaveLength(2);
     }
   });

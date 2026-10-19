@@ -12,16 +12,18 @@
     "coverage": "selected_public_excerpts",
     "reviewed_at": "2026-10-19",
     "date_range": {
-      "start": "2025-11-07",
+      "start": "2025-09-08",
       "end": "2025-11-16"
     },
-    "date_range_complete": true,
-    "total_messages": 3,
+    "date_range_complete": false,
+    "total_messages": 13,
     "source": "Recortes de fontes públicas; referências por mensagem.",
-    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
-    "context": "Recortes das tratativas sobre o filme Dark Horse. As respostas de 7 de novembro aparecem após um vídeo enviado por Flávio; a mensagem de apoio é de 16 de novembro de 2025.",
+    "note": "Histórico parcial. Trechos literais e resumos editoriais estão identificados. Dados desconhecidos permanecem nulos; a conferência das publicações não equivale a validação forense.",
+    "context": "Registros das cobranças para Dark Horse. O Intercept descreveu pagamentos parciais; os recortes não comprovam quitação integral. Flávio negou o financiamento quando questionado inicialmente pela reportagem.",
     "limitations": [
-      "Seleção parcial: não inclui o áudio de cobrança nem comprova a conclusão dos pagamentos."
+      "Conteúdo do vídeo temporário e das ligações não foi reconstruído.",
+      "Mensagens a Zettel ou Thiago Miranda não foram atribuídas ao chat com Flávio.",
+      "O jantar proposto não tem realização comprovada nos registros consultados."
     ],
     "sources": [
       {
@@ -33,9 +35,189 @@
         "description": "Apuração sobre o financiamento de Dark Horse e os contatos com Flávio Bolsonaro.",
         "kind": "news_report"
       }
-    ]
+    ],
+    "public_review": {
+      "reviewed_at": "2026-10-19",
+      "scope": "expanded_published_material",
+      "original_records": 3,
+      "added_records": 10,
+      "source_ids": [
+        "intercept-2026-05-13"
+      ],
+      "complete_history": false
+    }
   },
   "messages": [
+    {
+      "id": 4,
+      "timestamp": null,
+      "date": "2025-09-08",
+      "time": null,
+      "type": "audio",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "intercept-2026-05-13",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Flávio Bolsonaro",
+      "reported_date": "2025-09-08",
+      "content": "Cobra saldo do filme; alerta para atrasos com elenco e direção.",
+      "source_locator": "Áudio de 08/09/2025 sobre risco de interrupção de Dark Horse."
+    },
+    {
+      "id": 5,
+      "timestamp": null,
+      "date": "2025-09-08",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "intercept-2026-05-13",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-09-08",
+      "content": "Pede desculpas e promete solucionar os atrasos até o dia seguinte.",
+      "source_locator": "Resposta após o áudio; ligação posterior não tem transcrição."
+    },
+    {
+      "id": 6,
+      "timestamp": null,
+      "date": "2025-09-17",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "intercept-2026-05-13",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-09-17",
+      "content": "Sugere horário para encontro.",
+      "source_locator": "A hora proposta é de agenda, não o carimbo de envio."
+    },
+    {
+      "id": 7,
+      "timestamp": null,
+      "date": "2025-09-17",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "intercept-2026-05-13",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Flávio Bolsonaro",
+      "reported_date": "2025-09-17",
+      "content": "Aceita o horário proposto.",
+      "source_locator": "Resposta à combinação de encontro."
+    },
+    {
+      "id": 8,
+      "timestamp": null,
+      "date": "2025-10-22",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "intercept-2026-05-13",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Flávio Bolsonaro",
+      "reported_date": "2025-10-22",
+      "content": "Relata limite financeiro da produção e cogita buscar alternativa.",
+      "source_locator": "Cobrança no terceiro dia de filmagem."
+    },
+    {
+      "id": 9,
+      "timestamp": null,
+      "date": "2025-10-22",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "intercept-2026-05-13",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-10-22",
+      "content": "Assume que cuidará do assunto.",
+      "source_locator": "Resposta à cobrança."
+    },
+    {
+      "id": 10,
+      "timestamp": null,
+      "date": "2025-10-22",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "intercept-2026-05-13",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Flávio Bolsonaro",
+      "reported_date": "2025-10-22",
+      "content": "Convida para jantar com Caviezel e Nowrasteh.",
+      "source_locator": "Sugestão de jantar para 02/11; não confundir com a data de envio."
+    },
+    {
+      "id": 11,
+      "timestamp": null,
+      "date": "2025-10-22",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "intercept-2026-05-13",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-10-22",
+      "content": "Oferece sua casa e cogita reorganizar uma viagem.",
+      "source_locator": "Resposta ao convite."
+    },
+    {
+      "id": 12,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "intercept-2026-05-13",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Flávio Bolsonaro",
+      "reported_date": "2025-10",
+      "content": "Sugere transferir o jantar para 6 de novembro.",
+      "source_locator": "Alteração posterior da proposta; dia de envio não confirmado."
+    },
+    {
+      "id": 13,
+      "timestamp": null,
+      "date": "2025-11-07",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "intercept-2026-05-13",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Flávio Bolsonaro",
+      "reported_date": "2025-11-07",
+      "content": "Agradece apoio ao filme após encaminhar vídeo temporário.",
+      "source_locator": "Mensagem que antecede os dois elogios de Vorcaro."
+    },
     {
       "id": 1,
       "timestamp": null,
@@ -88,18 +270,60 @@
   "index": {
     "dates": [
       {
-        "date": "2025-11-07",
+        "date": "2025-09-08",
         "message_count": 2,
+        "first_message_id": 4,
+        "last_message_id": 5,
+        "message_ids": [
+          4,
+          5
+        ]
+      },
+      {
+        "date": "2025-09-17",
+        "message_count": 2,
+        "first_message_id": 6,
+        "last_message_id": 7,
+        "message_ids": [
+          6,
+          7
+        ]
+      },
+      {
+        "date": "2025-10-22",
+        "message_count": 4,
+        "first_message_id": 8,
+        "last_message_id": 11,
+        "message_ids": [
+          8,
+          9,
+          10,
+          11
+        ]
+      },
+      {
+        "date": "2025-11-07",
+        "message_count": 3,
         "first_message_id": 1,
-        "last_message_id": 2
+        "last_message_id": 13,
+        "message_ids": [
+          13,
+          1,
+          2
+        ]
       },
       {
         "date": "2025-11-16",
         "message_count": 1,
         "first_message_id": 3,
-        "last_message_id": 3
+        "last_message_id": 3,
+        "message_ids": [
+          3
+        ]
       }
     ],
-    "undated_message_ids": []
+    "undated_message_ids": [
+      12
+    ]
   }
 }

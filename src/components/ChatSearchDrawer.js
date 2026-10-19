@@ -8,6 +8,7 @@
  * the match in a static <mark> tag — safe by construction.
  */
 import { escapeHtml, formatDateShort } from '../lib/utils.js';
+import { publicMessageLabel } from '../lib/message-date.js';
 import { searchAsync } from '../lib/search.js';
 
 import { ICON_SEARCH } from '../lib/icons.js';
@@ -146,7 +147,7 @@ export function showChatSearchDrawer(mainArea, conversationId, { dateIndex, onRe
 
       const meta = document.createElement('div');
       meta.className = 'chat-search-result-meta';
-      meta.textContent = `${formatDateShort(r.date)}${r.excerpt ? ' · Recorte publicado' : `  ${r.sender === 'DV' ? '✓✓' : ''}`}`;
+      meta.textContent = `${formatDateShort(r.date)}${r.excerpt ? ' · ' + publicMessageLabel(r) : `  ${r.sender === 'DV' ? '✓✓' : ''}`}`;
 
       const content = document.createElement('div');
       content.className = 'chat-search-result-content';

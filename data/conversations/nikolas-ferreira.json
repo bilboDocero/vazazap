@@ -15,15 +15,16 @@
       "start": "2025-03-30",
       "end": "2025-04-01"
     },
-    "date_range_complete": true,
-    "total_messages": 3,
+    "date_range_complete": false,
+    "total_messages": 6,
     "source": "Recortes de fontes públicas; referências por mensagem.",
-    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "note": "Histórico parcial. Trechos literais e resumos editoriais estão identificados. Dados desconhecidos permanecem nulos; a conferência das publicações não equivale a validação forense.",
     "context": "Recortes do áudio em que Nikolas intermedeia uma demanda de Thiago Rodrigues de Faria e das respostas do banqueiro. Nikolas admitiu os contatos, negou irregularidades e afirmou não ter recebido dinheiro.",
     "limitations": [
-      "O áudio de visualização única enviado por Vorcaro não foi reconstruído.",
-      "A fonte corrigiu a referência a lindão por ambiguidade na escuta; esse termo não foi adotado na transcrição.",
-      "O dia da última resposta é derivado da sequência relativa descrita na reportagem, não de um carimbo visível."
+      "O áudio de reprodução única de Vorcaro não tem conteúdo acessível.",
+      "O dia do último áudio não está confirmado e não foi igualado ao do pedido sobre mineração.",
+      "A expressão ambígua anteriormente corrigida pela fonte não foi incluída como transcrição.",
+      "Não há comprovação de atendimento ao pedido ou realização do encontro."
     ],
     "sources": [
       {
@@ -35,7 +36,17 @@
         "description": "Reportagem atualizada com o áudio do pedido e as respostas de Vorcaro.",
         "kind": "news_report"
       }
-    ]
+    ],
+    "public_review": {
+      "reviewed_at": "2026-10-19",
+      "scope": "expanded_published_material",
+      "original_records": 3,
+      "added_records": 3,
+      "source_ids": [
+        "uol-2026-09-03"
+      ],
+      "complete_history": false
+    }
   },
   "messages": [
     {
@@ -52,7 +63,26 @@
       "source_id": "uol-2026-09-03",
       "source_locator": "Trecho da transcrição do áudio sobre o encaminhamento do contato do advogado.",
       "reported_date": "2025-03-30",
-      "excerpt": true
+      "excerpt": true,
+      "editorial_context": "Pede análise de ativo minerário de Thiago Rodrigues de Faria. Diz desconhecer os detalhes e desejar maior proximidade com Vorcaro."
+    },
+    {
+      "id": 4,
+      "timestamp": null,
+      "date": "2025-03-30",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-03",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Nikolas Ferreira",
+      "reported_date": "2025-03-30",
+      "content": "Encaminha o contato profissional do advogado.",
+      "source_locator": "Após áudio de reprodução única de Vorcaro, cujo conteúdo permanece indisponível.",
+      "reported_type": "contact"
     },
     {
       "id": 2,
@@ -71,6 +101,24 @@
       "excerpt": true
     },
     {
+      "id": 5,
+      "timestamp": null,
+      "date": "2025-03-31",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-03",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Nikolas Ferreira",
+      "reported_date": "2025-03-31",
+      "content": "Avisa que o advogado estará em Brasília.",
+      "source_locator": "Dia seguinte ao áudio de 30/03, conforme a sequência da reportagem.",
+      "date_basis": "relative_sequence_in_report"
+    },
+    {
       "id": 3,
       "timestamp": null,
       "date": "2025-04-01",
@@ -86,23 +134,59 @@
       "date_basis": "relative_sequence_in_report",
       "reported_date": "2025-04-01",
       "excerpt": true
+    },
+    {
+      "id": 6,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "audio",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "uol-2026-09-03",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Nikolas Ferreira",
+      "reported_date": "2025-03",
+      "content": "Retoma críticas ao evento de Londres, pede desculpas e sugere encontro.",
+      "source_locator": "Outro áudio situado em março de 2025, sem dia confirmado."
     }
   ],
   "index": {
     "dates": [
       {
         "date": "2025-03-30",
-        "message_count": 2,
+        "message_count": 3,
         "first_message_id": 1,
-        "last_message_id": 2
+        "last_message_id": 4,
+        "message_ids": [
+          1,
+          4,
+          2
+        ]
+      },
+      {
+        "date": "2025-03-31",
+        "message_count": 1,
+        "first_message_id": 5,
+        "last_message_id": 5,
+        "message_ids": [
+          5
+        ]
       },
       {
         "date": "2025-04-01",
         "message_count": 1,
         "first_message_id": 3,
-        "last_message_id": 3
+        "last_message_id": 3,
+        "message_ids": [
+          3
+        ]
       }
     ],
-    "undated_message_ids": []
+    "undated_message_ids": [
+      6
+    ]
   }
 }

@@ -22,7 +22,7 @@ import {
   ROOT, SITE, REPO, TIMEZONE, UTC_OFFSET,
   loadEntries, loadMessages, sourceOf, contactOf, whoIs, createResolver, createLocator, isPaged,
   urlsIn, linksToMarkdown, longDate, phonePretty, MEDIA,
-  archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor,
+  archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor, publicMessageLabel, dateBasisLabel,
 } from './lib/corpus.mjs';
 
 const targetArg = process.argv[2];
@@ -131,9 +131,10 @@ function conversationMarkdown(entry, messages, { standalone = true, month = null
   if (entry.note) out.push(`| Observação | ${entry.note} |`);
   out.push('');
   if (source.kind === 'public-excerpts') {
-    out.push(entry.context || '', '', 'Seleção parcial; há mensagens omitidas entre os recortes.', '');
+    out.push(entry.context || '', '', 'Histórico parcial. Resumos editoriais identificados não são transcrições literais.', '');
     for (const limitation of entry.limitations || []) out.push(`- ${limitation}`);
     for (const ref of entry.sources || []) out.push(`- Fonte: [${ref.publisher}](${ref.url}) — ${ref.published_at || ref.document_date || 'data de publicação não informada'}`);
+    for (const capture of entry.source_captures || []) out.push(`- Captura na fonte: [${capture.label}](${capture.url})`);
     out.push('');
   }
 
@@ -150,16 +151,18 @@ function conversationMarkdown(entry, messages, { standalone = true, month = null
     }
     // Time to the second and the message id: the key a citation needs.
     const tags = [msg.date && msg.time ? `${msg.date} ${msg.time}` : `${archiveDate(messageDateKey(msg))} ${archiveTime(msg.time)}`, `msg ${msg.id}`];
-    if (msg.excerpt) tags.push('recorte publicado');
-    if (msg.date_basis) tags.push('data deduzida da sequência descrita na fonte');
+    if (msg.excerpt) tags.push(publicMessageLabel(msg).toLowerCase());
+    if (msg.date_basis) tags.push(dateBasisLabel(msg).toLowerCase());
     if (msg.is_edited) tags.push('editada');
     if (msg.view_once) tags.push('visualização única');
     if (msg.source_page) tags.push(`laudo p. ${msg.source_page}${msg.source_figure ? `, fig. ${msg.source_figure}` : ''}`);
     out.push(`**${msg.sender}** · ${tags.join(' · ')}`);
     const body = messageBody(msg);
     if (body) out.push(...body.split('\n').map(escapeLine));
+    if (msg.editorial_context) out.push('', '**Contexto da mensagem · resumo editorial:**', ...msg.editorial_context.split('\n').map(escapeLine));
     const ref = publicSourceFor(msg, entry);
     if (ref) out.push(`Fonte: [${ref.publisher}](${ref.url}) — ${msg.source_locator}`);
+    if (msg.source_image) out.push(`[Captura original](${msg.source_image})`);
     out.push('');
   }
 
@@ -190,7 +193,7 @@ function conversationJson(entry, messages) {
       source: source.label,
       source_detail: source,
       note: entry.note || null,
-      ...(entry.coverage ? { coverage: entry.coverage, sources: entry.sources, context: entry.context, limitations: entry.limitations, date_range_complete: entry.date_range_complete } : {}),
+      ...(entry.coverage ? { coverage: entry.coverage, sources: entry.sources, context: entry.context, limitations: entry.limitations, date_range_complete: entry.date_range_complete, source_captures: entry.source_captures, public_review: entry.public_review } : {}),
     },
     profile: profileJson(getContactProfile(entry.id), entry.id),
     messages: messages.map(m => ({ ...m, timestamp: m.timestamp ? `${m.timestamp}${UTC_OFFSET}` : null })),

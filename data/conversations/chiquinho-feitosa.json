@@ -12,18 +12,18 @@
     "coverage": "selected_public_excerpts",
     "reviewed_at": "2026-10-19",
     "date_range": {
-      "start": "2024-05-28",
-      "end": "2024-05-28"
+      "start": "2024-04-11",
+      "end": "2024-06-01"
     },
     "date_range_complete": true,
-    "total_messages": 2,
+    "total_messages": 6,
     "source": "Recortes de fontes públicas; referências por mensagem.",
-    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
-    "context": "O Poder360 publicou uma mensagem em que Chiquinho Feitosa afirma estar em um jantar com Gilmar Mendes e Cristiano Zanin. Ambos os gabinetes negaram o jantar mencionado; Zanin também negou relação com Feitosa e Vorcaro. O registro documenta a afirmação de Feitosa, não comprova que o encontro tenha ocorrido.",
+    "note": "Histórico parcial. Trechos literais e resumos editoriais estão identificados. Dados desconhecidos permanecem nulos; a conferência das publicações não equivale a validação forense.",
+    "context": "Feitosa relata aproximações com autoridades. Gilmar e Zanin negaram o jantar mencionado; o próprio Feitosa depois negou ter jantado com Zanin. O gabinete de Camilo também negou contato. As mensagens registram afirmações dos remetentes, não confirmação independente dos encontros.",
     "limitations": [
-      "Não há mensagens enviadas por Gilmar Mendes ou Cristiano Zanin neste chat.",
-      "A reportagem indica 20h55 para a mensagem de Feitosa, sem segundos ou carimbo completo; o horário permanece nulo.",
-      "A resposta não comprova a realização do encontro proposto para o dia seguinte."
+      "Não há falas de ministros neste chat.",
+      "Horários incompletos continuam nulos.",
+      "O relato do remetente não comprova encontro ou favorecimento."
     ],
     "sources": [
       {
@@ -35,9 +35,53 @@
         "description": "Reportagem de Nino Guimarães com a troca e as negativas dos ministros.",
         "kind": "news_report"
       }
-    ]
+    ],
+    "public_review": {
+      "reviewed_at": "2026-10-19",
+      "scope": "expanded_published_material",
+      "original_records": 2,
+      "added_records": 4,
+      "source_ids": [
+        "poder360-2026-09-25"
+      ],
+      "complete_history": false
+    }
   },
   "messages": [
+    {
+      "id": 3,
+      "timestamp": null,
+      "date": "2024-04-11",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "poder360-2026-09-25",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Chiquinho Feitosa",
+      "reported_date": "2024-04-11",
+      "content": "Encaminha contato da assessoria de Gilmar para tratar de reunião.",
+      "source_locator": "Mensagem de 11/04; contato pessoal não reproduzido."
+    },
+    {
+      "id": 4,
+      "timestamp": null,
+      "date": "2024-04-19",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "poder360-2026-09-25",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Chiquinho Feitosa",
+      "reported_date": "2024-04-19",
+      "content": "Recomenda aproximação direta com Gilmar.",
+      "source_locator": "Orientação datada de 19/04/2024."
+    },
     {
       "id": 1,
       "timestamp": null,
@@ -52,7 +96,8 @@
       "source_id": "poder360-2026-09-25",
       "source_locator": "Início da mensagem atribuída a Feitosa em 28 de maio, às 20h55; conteúdo contestado pelos ministros.",
       "reported_date": "2024-05-28",
-      "excerpt": true
+      "excerpt": true,
+      "editorial_context": "Afirma ter discutido interesses comuns e repassado informações de Fernando. O jantar foi negado pelos envolvidos."
     },
     {
       "id": 2,
@@ -69,15 +114,81 @@
       "source_locator": "Resposta transcrita na reportagem, sem horário informado.",
       "reported_date": "2024-05-28",
       "excerpt": true
+    },
+    {
+      "id": 5,
+      "timestamp": null,
+      "date": "2024-06-01",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "poder360-2026-09-25",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "Chiquinho Feitosa",
+      "reported_date": "2024-06-01",
+      "content": "Diz estar com Gilmar no aniversário de Camilo e pede ligação.",
+      "source_locator": "Relato de Feitosa às 22h, sem carimbo completo; não comprova contato com Camilo."
+    },
+    {
+      "id": 6,
+      "timestamp": null,
+      "date": "2024-06-01",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "poder360-2026-09-25",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2024-06-01",
+      "content": "Diz estar em voo, sem voz disponível; envia cumprimentos a Camilo.",
+      "source_locator": "Resposta de Vorcaro. O gabinete de Camilo negou relação ou contato."
     }
   ],
   "index": {
     "dates": [
       {
+        "date": "2024-04-11",
+        "message_count": 1,
+        "first_message_id": 3,
+        "last_message_id": 3,
+        "message_ids": [
+          3
+        ]
+      },
+      {
+        "date": "2024-04-19",
+        "message_count": 1,
+        "first_message_id": 4,
+        "last_message_id": 4,
+        "message_ids": [
+          4
+        ]
+      },
+      {
         "date": "2024-05-28",
         "message_count": 2,
         "first_message_id": 1,
-        "last_message_id": 2
+        "last_message_id": 2,
+        "message_ids": [
+          1,
+          2
+        ]
+      },
+      {
+        "date": "2024-06-01",
+        "message_count": 2,
+        "first_message_id": 5,
+        "last_message_id": 6,
+        "message_ids": [
+          5,
+          6
+        ]
       }
     ],
     "undated_message_ids": []

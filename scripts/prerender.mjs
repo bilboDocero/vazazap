@@ -35,7 +35,7 @@ import {
   loadEntries, loadMessages, sourceOf, contactOf, whoIs, createResolver, mentionsOf, createLocator, isPaged, PREVIEW_MESSAGES,
   urlsIn, linksToMarkdown, linksToText, linksToHtml, escapeHtml,
   longDate, phonePretty, messageText, citationOf, messageUrl,
-  archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor,
+  archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor, publicMessageLabel, dateBasisLabel,
 } from './lib/corpus.mjs';
 
 const DIST = join(ROOT, 'dist');
@@ -173,7 +173,7 @@ function messageTimeHtml(msg, text = archiveTime(msg.time)) {
 function excerptHtml(msg, entry) {
   if (!msg.excerpt) return '';
   const source = publicSourceFor(msg, entry);
-  return ` <small>Recorte publicado${msg.date_basis ? ' · data deduzida da sequência descrita na fonte' : ''}${source ? ` · <a href="${escapeHtml(source.url)}" rel="noopener">${escapeHtml(source.publisher)}</a> · ${escapeHtml(msg.source_locator)}` : ''}</small>`;
+  return ` <small>${publicMessageLabel(msg)}${msg.date_basis ? ' · ' + dateBasisLabel(msg).toLowerCase() : ''}${source ? ` · <a href="${escapeHtml(source.url)}" rel="noopener">${escapeHtml(source.publisher)}</a> · ${escapeHtml(msg.source_locator)}` : ''}${msg.source_image ? ` · <a href="${escapeHtml(msg.source_image)}" rel="noopener">Captura original</a>` : ''}</small>`;
 }
 
 function messagesHtml(messages, entry) {
@@ -201,6 +201,7 @@ function provenanceHtml(entry) {
     out.push(`<dt>Contexto</dt><dd>${escapeHtml(entry.context)}</dd>`);
     for (const limitation of entry.limitations || []) out.push(`<dt>Limitação</dt><dd>${escapeHtml(limitation)}</dd>`);
     for (const ref of source.sources) out.push(`<dt>Publicação consultada</dt><dd><a href="${escapeHtml(ref.url)}">${escapeHtml(ref.publisher)}</a> · ${escapeHtml(ref.published_at || ref.document_date || 'data não informada')}</dd>`);
+    for (const capture of entry.source_captures || []) out.push(`<dt>Captura na fonte</dt><dd><a href="${escapeHtml(capture.url)}">${escapeHtml(capture.label)}</a></dd>`);
   }
   if (entry.saved_as) out.push(`<dt>Contato salvo como</dt><dd>${escapeHtml(entry.saved_as)}</dd>`);
   if (entry.phone) out.push(`<dt>Telefone</dt><dd>${escapeHtml(phonePretty(entry.phone))}</dd>`);
@@ -451,6 +452,7 @@ function llmsFull(built, people) {
     if (entry.coverage === 'selected_public_excerpts') {
       out.push(`- Contexto: ${entry.context}`);
       for (const ref of entry.sources) out.push(`- Publicação consultada: [${ref.publisher}](${ref.url})`);
+      for (const capture of entry.source_captures || []) out.push(`- Captura na fonte: [${capture.label}](${capture.url})`);
     }
     if (entry.saved_as) out.push(`- Salvo no celular como: ${entry.saved_as}`);
     if (entry.note) out.push(`- Observação: ${entry.note}`);

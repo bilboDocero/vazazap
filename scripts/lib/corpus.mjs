@@ -6,8 +6,8 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor } from '../../src/lib/message-date.js';
-export { archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor };
+import { archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor, publicMessageLabel, dateBasisLabel } from '../../src/lib/message-date.js';
+export { archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor, publicMessageLabel, dateBasisLabel };
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const DATA_DIR = join(ROOT, 'data');
@@ -156,7 +156,7 @@ const brDate = archiveDate;
 /** "15/11/2025 18:22 · laudo p. 109, fig. 108" — what a quote needs to be checked. */
 export function citationOf(msg) {
   const parts = [`${brDate(messageDateKey(msg))} ${archiveTime(msg.time)}`];
-  if (msg.excerpt) parts.push('recorte publicado');
+  if (msg.excerpt) parts.push(publicMessageLabel(msg).toLowerCase());
   if (msg.source_locator) parts.push(msg.source_locator);
   if (msg.source_page) parts.push(`laudo p. ${msg.source_page}${msg.source_figure ? `, fig. ${msg.source_figure}` : ''}`);
   return parts.join(' · ');
@@ -276,6 +276,7 @@ export const MEDIA = {
 
 /** One message as plain text, media and system events in brackets. */
 export function messageText(msg) {
+  if (msg.editorial_context) return messageText({ ...msg, editorial_context: null }) + '\nContexto da mensagem · resumo editorial: ' + msg.editorial_context;
   const text = (msg.content || '').trim();
   switch (msg.type) {
     case 'text': return text;

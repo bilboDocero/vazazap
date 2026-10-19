@@ -16,13 +16,13 @@
       "end": null
     },
     "date_range_complete": false,
-    "total_messages": 2,
+    "total_messages": 4,
     "source": "Recortes de fontes públicas; referências por mensagem.",
-    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "note": "Histórico parcial. Trechos literais e resumos editoriais estão identificados. Dados desconhecidos permanecem nulos; a conferência das publicações não equivale a validação forense.",
     "context": "Recortes do alerta sobre rumores envolvendo Vorcaro, Maurício Quadrado e o Master. Doria informou à Folha que a conversa ocorreu em maio de 2025 e a descreveu como um contato cordial anterior às investigações públicas.",
     "limitations": [
-      "A fonte informa o mês, não o dia ou o horário.",
-      "O primeiro registro é somente parte da mensagem de Doria; o segundo vem depois de uma pergunta de Vorcaro não reproduzida aqui."
+      "Somente o mês foi informado; horários não foram atribuídos.",
+      "A ligação é mencionada, mas não há transcrição disponível."
     ],
     "sources": [
       {
@@ -34,7 +34,17 @@
         "description": "Apuração de Ana Paula Branco sobre o alerta de Doria e sua resposta à reportagem.",
         "kind": "news_report"
       }
-    ]
+    ],
+    "public_review": {
+      "reviewed_at": "2026-10-19",
+      "scope": "expanded_published_material",
+      "original_records": 2,
+      "added_records": 2,
+      "source_ids": [
+        "folha-2026-03-05"
+      ],
+      "complete_history": false
+    }
   },
   "messages": [
     {
@@ -51,7 +61,25 @@
       "source_id": "folha-2026-03-05",
       "source_locator": "Trecho intermediário da mensagem de alerta.",
       "reported_date": "2025-05",
-      "excerpt": true
+      "excerpt": true,
+      "editorial_context": "Também sugere que conversem pessoalmente."
+    },
+    {
+      "id": 3,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-03-05",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-05",
+      "content": "Pergunta a quais fatos Doria se refere.",
+      "source_locator": "Pergunta que precede a explicação sobre Vorcaro, Maurício e o banco."
     },
     {
       "id": 2,
@@ -68,13 +96,32 @@
       "source_locator": "Resposta à pergunta de Vorcaro sobre a que se referia.",
       "reported_date": "2025-05",
       "excerpt": true
+    },
+    {
+      "id": 4,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "source_id": "folha-2026-03-05",
+      "excerpt": true,
+      "content_format": "editorial_summary",
+      "sender": "DV",
+      "reported_date": "2025-05",
+      "content": "Propõe conversar por telefone.",
+      "source_locator": "A reportagem registra ligação no minuto seguinte, sem publicar seu conteúdo."
     }
   ],
   "index": {
     "dates": [],
     "undated_message_ids": [
       1,
-      2
+      3,
+      2,
+      4
     ]
   }
 }
