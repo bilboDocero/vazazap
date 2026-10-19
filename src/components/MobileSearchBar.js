@@ -5,7 +5,7 @@
  *
  * Security note: innerHTML used only for static SVG icon literals.
  */
-import { search, loadSearchIndex, isIndexLoaded } from '../lib/search.js';
+import { searchAsync } from '../lib/search.js';
 
 const DEBOUNCE_MS = 300;
 
@@ -83,6 +83,7 @@ export function showMobileSearchBar(chatView, conversationId, { onNavigate, onDa
   let results = [];
   let currentIndex = -1;
   let debounceTimer = null;
+  let searchVersion = 0, searchController = null, destroyed = false;
 
   async function doSearch() {
     const query = input.value.trim();
@@ -95,11 +96,16 @@ export function showMobileSearchBar(chatView, conversationId, { onNavigate, onDa
       return;
     }
 
-    if (!isIndexLoaded(conversationId)) {
-      try { await loadSearchIndex(conversationId); } catch { return; }
+    const version = searchVersion;
+    searchController = new AbortController();
+    try {
+      const found = await searchAsync(query, { conversationId, limit: 100, signal: searchController.signal });
+      if (destroyed || version !== searchVersion) return;
+      results = found;
+    } catch (error) {
+      if (!destroyed && version === searchVersion && error.name !== 'AbortError') showToast('Não foi possível pesquisar. Tente novamente.');
+      return;
     }
-
-    results = search(query, { limit: 100 });
 
     if (results.length === 0) {
       showToast();
@@ -137,7 +143,13 @@ export function showMobileSearchBar(chatView, conversationId, { onNavigate, onDa
   });
 
   input.addEventListener('input', () => {
+    searchVersion++;
+    searchController?.abort();
     clearTimeout(debounceTimer);
+    results = [];
+    currentIndex = -1;
+    upBtn.style.display = downBtn.style.display = 'none';
+    calendarBtn.style.display = '';
     debounceTimer = setTimeout(doSearch, DEBOUNCE_MS);
   });
 
@@ -162,7 +174,7 @@ export function showMobileSearchBar(chatView, conversationId, { onNavigate, onDa
 
   requestAnimationFrame(() => input.focus());
 
-  function showToast() {
+  function showToast(message = 'Nenhum resultado encontrado') {
     const existing = chatView.querySelector('.search-toast');
     if (existing) existing.remove();
 
@@ -175,7 +187,7 @@ export function showMobileSearchBar(chatView, conversationId, { onNavigate, onDa
     toast.appendChild(logo);
 
     const text = document.createElement('span');
-    text.textContent = 'Nenhum resultado encontrado';
+    text.textContent = message;
     toast.appendChild(text);
 
     chatView.appendChild(toast);
@@ -187,6 +199,10 @@ export function showMobileSearchBar(chatView, conversationId, { onNavigate, onDa
   }
 
   function destroy() {
+    if (destroyed) return;
+    destroyed = true;
+    searchVersion++;
+    searchController?.abort();
     clearTimeout(debounceTimer);
     window.removeEventListener('popstate', onPopState);
     // Pop the search state if it's still on top

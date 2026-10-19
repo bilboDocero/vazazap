@@ -45,8 +45,8 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
         <input
           type="text"
           class="sidebar-search-input"
-          placeholder="Pesquisar nas favoritas"
-          aria-label="Pesquisar conversas"
+          placeholder="Pesquisar mensagens"
+          aria-label="Pesquisar mensagens em todas as conversas"
         />
         <button class="sidebar-search-clear" aria-label="Limpar pesquisa" style="display:none;">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -140,7 +140,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   // Static content — safe innerHTML
   lockMsg.innerHTML = `
     <svg viewBox="0 0 10 12" width="10" height="12"><path fill="currentColor" d="M5.175 0A2.318 2.318 0 0 0 2.86 2.318v.884H1.5a1 1 0 0 0-1 1V11a1 1 0 0 0 1 1h7.35a1 1 0 0 0 1-1V4.202a1 1 0 0 0-1-1H7.491v-.884A2.317 2.317 0 0 0 5.175 0Zm0 1.05c.7 0 1.267.567 1.267 1.268v.884H3.909v-.884c0-.7.567-1.268 1.266-1.268Z"/></svg>
-    <span>MasterWhats · Acervo de <span class="sidebar-lock-link" data-action="profile-dv"><strong>Daniel Vorcaro</strong></span></span>
+    <span>Acervo de <span class="sidebar-lock-link" data-action="profile-dv"><strong>Daniel Vorcaro</strong></span></span>
   `;
   list.appendChild(lockMsg);
 
@@ -214,15 +214,13 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
       activeFilter = btn.dataset.filter;
       tagButtons.forEach(b => b.classList.toggle('active', b === btn));
       tagButtons.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
-      searchInput.placeholder = activeFilter === 'favoritas'
-        ? 'Pesquisar nas favoritas'
-        : 'Pesquisar';
+      searchInput.placeholder = 'Pesquisar mensagens';
       applyFilter();
       list.scrollTop = 0;
     });
   }
 
-  searchInput.placeholder = 'Pesquisar';
+  searchInput.placeholder = 'Pesquisar mensagens';
   tagButtons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === activeFilter)));
   refreshReadState();
 

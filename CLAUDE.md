@@ -21,6 +21,7 @@ npm run dev           # Start dev server
 - **Pre-render**: `scripts/prerender.mjs` runs after `vite build`; for each conversation writes `dist/chat/<id>/index.html` (built app page retitled, profile + first messages as plain HTML in `<article id="prerender">`, a one-line script sets the hash so the app opens that chat; main.js removes the article at boot). Also `dist/llms-full.txt` and `dist/sitemap.xml`. Shared helpers in `scripts/lib/corpus.mjs`
 - **Export**: `scripts/export.mjs` writes `public/export/` — one `.md` and `.json` per conversation, one of each with everything, and a zip. Reads the conversation list from `public/data/conversations.json`, messages from `data/`, profiles from `src/lib/profile-content.js`
 - **Lazy loading**: Only loads day-chunks as user scrolls, with LRU cache
+- **Search**: `scripts/split_data.py` generates full-text per-conversation indexes plus one compact global `search-index.<hash>.json`, covering `data/messages.json` and every file in `data/conversations/`. `search-manifest.json` is revalidated; the hashed file is immutable. `src/lib/search-worker.js` fetches, parses, normalizes and searches the shared index on demand. Global search returns 50-result cursor pages; chat search filters the same index by conversation. Requests are cancellable and stale responses are ignored. Browsers without workers use the same engine in cooperative batches. Empty/system messages are omitted; message text is never truncated in the index.
 
 ## Directory Structure
 

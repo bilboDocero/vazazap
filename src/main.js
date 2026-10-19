@@ -543,14 +543,14 @@ async function init() {
   // Sidebar search
   const conversations = store.getConversations();
   if (conversations.length > 0) {
-    activeSearch = attachSearch(sidebar, conversations[0].id, (messageId, date) => {
-      if (activeLoader) {
-        activeLoader.scrollToMessage(messageId, date);
+    activeSearch = attachSearch(sidebar, result => {
+      if (activeLoader && currentConversationId === result.conversationId) {
+        activeLoader.scrollToMessage(result.id, result.date);
       } else {
-        pendingScrollTarget = { messageId, date };
-        router.navigate('chat', conversations[0].id);
+        pendingScrollTarget = { messageId: result.id, date: result.date };
+        router.navigate('chat', result.conversationId);
       }
-    }, { contactName: conversations[0].contact });
+    });
   }
 
   // ── Router ─────────────────────────────────────────

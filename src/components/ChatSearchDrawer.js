@@ -8,7 +8,7 @@
  * the match in a static <mark> tag — safe by construction.
  */
 import { escapeHtml, formatDateShort } from '../lib/utils.js';
-import { search, loadSearchIndex, isIndexLoaded } from '../lib/search.js';
+import { searchAsync } from '../lib/search.js';
 
 import { ICON_SEARCH } from '../lib/icons.js';
 const ICON_CALENDAR = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
@@ -71,6 +71,8 @@ export function showChatSearchDrawer(mainArea, conversationId, { dateIndex, onRe
   clearBtn.style.display = 'none';
   clearBtn.innerHTML = ICON_CLEAR; // Static SVG
   clearBtn.addEventListener('click', () => {
+    searchVersion++;
+    searchController?.abort();
     input.value = '';
     clearBtn.style.display = 'none';
     showEmpty();
@@ -106,21 +108,26 @@ export function showChatSearchDrawer(mainArea, conversationId, { dateIndex, onRe
 
   // Search logic
   let debounceTimer = null;
-  let lastQuery = '';
+  let searchVersion = 0, searchController = null, destroyed = false;
 
   async function doSearch() {
     const query = input.value.trim();
     clearBtn.style.display = query.length > 0 ? '' : 'none';
-    if (query.length < 2) { showEmpty(); lastQuery = ''; return; }
-    if (query === lastQuery) return;
-    lastQuery = query;
-
-    if (!isIndexLoaded(conversationId)) {
-      try { await loadSearchIndex(conversationId); } catch { return; }
+    if (query.length < 2) { showEmpty(); return; }
+    const version = searchVersion;
+    searchController = new AbortController();
+    try {
+      const results = await searchAsync(query, { conversationId, limit: 30, signal: searchController.signal });
+      if (!destroyed && version === searchVersion) showResults(results);
+    } catch (error) {
+      if (!destroyed && version === searchVersion && error.name !== 'AbortError') {
+        showEmpty();
+        const message = document.createElement('div');
+        message.className = 'chat-search-empty';
+        message.textContent = 'Não foi possível pesquisar. Tente novamente.';
+        resultsArea.appendChild(message);
+      }
     }
-
-    const results = search(query, { limit: 30 });
-    showResults(results);
   }
 
   function showResults(results) {
@@ -165,7 +172,10 @@ export function showChatSearchDrawer(mainArea, conversationId, { dateIndex, onRe
   }
 
   input.addEventListener('input', () => {
+    searchVersion++;
+    searchController?.abort();
     clearTimeout(debounceTimer);
+    showEmpty();
     debounceTimer = setTimeout(doSearch, DEBOUNCE_MS);
   });
 
@@ -177,6 +187,9 @@ export function showChatSearchDrawer(mainArea, conversationId, { dateIndex, onRe
   requestAnimationFrame(() => { drawer.classList.add('open'); input.focus(); });
 
   function destroy() {
+    destroyed = true;
+    searchVersion++;
+    searchController?.abort();
     clearTimeout(debounceTimer);
     if (calendarEl) { calendarEl.remove(); calendarEl = null; }
     drawer.remove();

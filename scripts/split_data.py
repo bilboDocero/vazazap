@@ -99,18 +99,8 @@ def group_messages_by_month(messages):
     return by_month
 
 
-# Martha's 65k messages need the 80-char cap to keep the index at ~5 MB, and her
-# messages are short enough that it costs nothing. The IPJ conversations are the
-# opposite: a few hundred messages, but each note runs several hundred characters,
-# so truncating would make most of their text unsearchable. Index those in full —
-# 615 messages of full text is a rounding error next to Martha's index.
-FULL_TEXT_INDEX_MAX_MESSAGES = 5000
-
-
-def build_search_index(messages, max_content_len=80):
-    """Build compact columnar search index with dictionary encoding."""
-    if len(messages) <= FULL_TEXT_INDEX_MAX_MESSAGES:
-        max_content_len = None
+def build_search_index(messages):
+    """Build a full-text columnar index; only empty/system messages are omitted."""
     dates_list = []
     date_to_idx = {}
     senders_list = []
@@ -123,7 +113,6 @@ def build_search_index(messages, max_content_len=80):
         content = (msg.get("content", "") or "").strip()
         if not content:
             continue
-        trunc = content if max_content_len is None else content[:max_content_len]
         d = msg["date"]
         s = msg["sender"]
 
@@ -134,7 +123,7 @@ def build_search_index(messages, max_content_len=80):
             sender_to_idx[s] = len(senders_list)
             senders_list.append(s)
 
-        tuples.append([msg["id"], date_to_idx[d], sender_to_idx[s], trunc])
+        tuples.append([msg["id"], date_to_idx[d], sender_to_idx[s], content])
 
     return {
         "dates": dates_list,
@@ -148,6 +137,42 @@ def write_json(path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+
+
+def write_global_search_index(sources):
+    """One immutable, dictionary-encoded index shared by global and chat search."""
+    conversations, dates, senders, messages = [], [], [], []
+    date_ids, sender_ids = {}, {}
+    ordered = []
+    for conversation_index, (conv_id, data, _) in enumerate(sources):
+        metadata = data["metadata"]
+        others = [p for p in metadata["participants"] if p != "DV"]
+        contact = metadata.get("group_name") or (others[0] if others else metadata["participants"][0])
+        conversations.append({"id": conv_id, "contact": contact})
+        for message in data["messages"]:
+            if message["type"] != "system" and (message.get("content") or "").strip():
+                ordered.append((message["timestamp"], conversation_index, message))
+
+    # Newest results first, with a stable cursor across pages and conversations.
+    ordered.sort(key=lambda item: item[0], reverse=True)
+    for _, conversation_index, message in ordered:
+        date, sender = message["date"], message["sender"]
+        if date not in date_ids:
+            date_ids[date] = len(dates)
+            dates.append(date)
+        if sender not in sender_ids:
+            sender_ids[sender] = len(senders)
+            senders.append(sender)
+        messages.append([conversation_index, message["id"], date_ids[date], sender_ids[sender], message["content"].strip()])
+
+    payload = {"version": 1, "conversations": conversations, "dates": dates, "senders": senders, "messages": messages}
+    encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    digest = hashlib.sha256(encoded).hexdigest()[:16]
+    filename = f"search-index.{digest}.json"
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    (OUTPUT_DIR / filename).write_bytes(encoded)
+    write_json(OUTPUT_DIR / "search-manifest.json", {"version": 1, "file": filename, "message_count": len(messages)})
+    print(f"Global search: {len(messages)} messages, {len(encoded) / (1024 * 1024):.2f} MB, {filename}")
 
 
 REPORT_PDF = "data/source/IPJ-A-3298613-2026.pdf"
@@ -338,6 +363,7 @@ def main():
     entries.sort(key=lambda e: e["last_message"]["timestamp"] if e["last_message"] else "",
                  reverse=True)
     write_json(OUTPUT_DIR / "conversations.json", {"conversations": entries})
+    write_global_search_index(sources)
 
     # Every call, newest first — the calls screen reads this one file.
     CALLS.sort(key=lambda c: c["timestamp"], reverse=True)

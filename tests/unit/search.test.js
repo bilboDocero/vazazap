@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { search, normalize, resetSearchIndex } from '../../src/lib/search.js';
-
-// We can't easily load the full search index in unit tests (it's fetched via HTTP),
-// so we'll test the pure functions and mock the internal index.
+import { searchAsync, normalize, resetSearchIndex } from '../../src/lib/search.js';
 
 describe('normalize()', () => {
   it('lowercases text', () => {
@@ -30,20 +27,14 @@ describe('normalize()', () => {
   });
 });
 
-describe('search()', () => {
+describe('searchAsync()', () => {
   beforeEach(() => {
     resetSearchIndex();
-    // Manually inject test data into the module's internal index
-    // We do this by importing the module internals
   });
 
-  it('returns empty array when query is too short', () => {
-    expect(search('a')).toEqual([]);
-    expect(search('')).toEqual([]);
-  });
-
-  it('returns empty array when index is not loaded', () => {
-    // Index hasn't been loaded yet
-    expect(search('hello')).toEqual([]);
+  it('returns empty arrays without loading an index for short queries', async () => {
+    expect(await searchAsync('a')).toEqual([]);
+    expect(await searchAsync('')).toEqual([]);
+    expect(await searchAsync('  ')).toEqual([]);
   });
 });
