@@ -423,12 +423,9 @@
   cursor: default;
 }
 
-.sidebar-tag--calls {
-  display: none;
-}
-
 .sidebar-tag-count {
   font-size: 11px;
+  color: var(--WDS-red-500);
 }
 
 /* Lock message right after the last conversation item */

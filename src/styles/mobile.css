@@ -69,18 +69,6 @@
   .sidebar-tags { gap: 6px; }
   .sidebar-tag { padding: 6px 12px; }
   .sidebar-tag-count { font-size: 10px; }
-  .sidebar-tag--calls {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background-color: var(--WDS-surface-emphasized);
-    color: var(--WDS-content-deemphasized);
-  }
-  .sidebar-tag--calls.active {
-    background-color: var(--WDS-components-filter-surface-selected);
-    color: var(--WDS-accent);
-    font-weight: 500;
-  }
 
   .sidebar-bottom-nav {
     display: flex;

@@ -58,7 +58,6 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
       <button class="sidebar-tag" data-filter="nao-lidas">Não lidas <span class="sidebar-tag-count"></span></button>
       <button class="sidebar-tag" data-filter="favoritas">Favoritas</button>
       <button class="sidebar-tag" data-filter="grupos">Grupos</button>
-      <button class="sidebar-tag sidebar-tag--calls" data-action="calls" data-tab="calls" aria-label="Ver chamadas">Chamadas</button>
     </div>
     <div class="conversation-list" role="list"></div>
   `;
@@ -224,11 +223,6 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   tagButtons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === activeFilter)));
   refreshReadState();
 
-  const callsTag = el.querySelector('.sidebar-tag--calls');
-  callsTag?.addEventListener('click', () => {
-    onCalls?.();
-  });
-
   // main.js marks a conversation read when it opens; this lets it repaint the
   // badges and the tally without rebuilding the whole sidebar.
   el.refreshReadState = refreshReadState;
@@ -280,7 +274,6 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
     el.classList.toggle('sidebar--vitrine', kind === 'vitrine');
     el.classList.toggle('sidebar--anunciar', kind === 'anunciar');
     el.classList.toggle('sidebar--agenda', kind === 'agenda');
-    callsTag?.classList.toggle('active', kind === 'calls');
     selectTab(kind);
   };
   el.showCalls = panel => el.showSection('calls', panel);
@@ -292,7 +285,6 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   el.showChats = () => {
     el.classList.remove('sidebar--calls', 'sidebar--section', 'sidebar--communities', 'sidebar--vitrine', 'sidebar--anunciar', 'sidebar--commercial', 'sidebar--agenda');
     el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel, .commercial-panel, .vitrine-panel, .agenda-panel').forEach(p => p.remove());
-    callsTag?.classList.remove('active');
     selectTab('chats');
   };
 
