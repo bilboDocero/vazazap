@@ -1,5 +1,5 @@
 /**
- * Utility functions for MasterWhats.
+ * Utility functions for vorcarozap.
  */
 
 /**

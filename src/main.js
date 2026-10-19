@@ -1,6 +1,6 @@
 import { inject } from '@vercel/analytics';
 import { handleCheckoutReturn } from './lib/checkout.js';
-// MasterWhats — WhatsApp-like web viewer
+// vorcarozap — WhatsApp-like web viewer
 // Entry point — initializes the app layout
 
 // Initialize Vercel Web Analytics

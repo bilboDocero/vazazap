@@ -11,7 +11,7 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const DATA_DIR = join(ROOT, 'data');
 export const PUBLIC_DATA = join(ROOT, 'public/data');
 
-export const SITE = 'https://www.masterwhats.com.br';
+export const SITE = 'https://www.vorcarozap.com.br';
 export const REPO = 'https://github.com/vorcarozap/vorcarozap';
 
 // The phones were seized in Brazil and every timestamp in the sources is local

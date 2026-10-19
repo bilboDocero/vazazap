@@ -116,7 +116,7 @@ function conversationMarkdown(entry, messages, { standalone = true, month = null
 
   out.push(`${heading} Daniel Vorcaro ↔ ${contact}${month ? ` — ${monthName(month)}` : ''}`, '');
   if (standalone) {
-    out.push(`> Exportado de [vorcarozap](${SITE}/#/chat/${entry.id}) em ${generatedAt.slice(0, 10)}.${month ? ` Só ${monthName(month)} (${messages.length} mensagens); a conversa inteira está em masterwhats-${entry.id}.md.` : ''} Código e dados: ${REPO}.`, '');
+    out.push(`> Exportado de [vorcarozap](${SITE}/#/chat/${entry.id}) em ${generatedAt.slice(0, 10)}.${month ? ` Só ${monthName(month)} (${messages.length} mensagens); a conversa inteira está em vorcarozap-${entry.id}.md.` : ''} Código e dados: ${REPO}.`, '');
   }
 
   out.push(`${sub} Proveniência`, '', '| | |', '|---|---|');
@@ -202,9 +202,9 @@ function readme(conversations) {
     `Gerado em ${generatedAt.slice(0, 10)} a partir de ${SITE}. ${conversations.length} conversas, ${total} mensagens.`, '',
     '## O que tem aqui', '',
     '| Arquivo | Conteúdo |', '|---|---|',
-    '| `masterwhats-<conversa>.md` | Uma conversa legível: proveniência, quem é o contato (com fontes) e as mensagens, dia a dia |',
-    '| `masterwhats-<conversa>.json` | A mesma conversa como dados: metadados, perfil e todas as mensagens com os campos originais |',
-    '| `masterwhats.md` / `masterwhats.json` | Tudo num arquivo só |', '',
+    '| `vorcarozap-<conversa>.md` | Uma conversa legível: proveniência, quem é o contato (com fontes) e as mensagens, dia a dia |',
+    '| `vorcarozap-<conversa>.json` | A mesma conversa como dados: metadados, perfil e todas as mensagens com os campos originais |',
+    '| `vorcarozap.md` / `vorcarozap.json` | Tudo num arquivo só |', '',
     '## Como ler', '',
     `- Horários em ${TIMEZONE} (UTC${UTC_OFFSET}); no JSON, cada \`timestamp\` já carrega o fuso.`,
     '- Mensagens do relatório da PF trazem `laudo p. N, fig. M` — página e figura do PDF de origem, para conferência.',
@@ -240,7 +240,7 @@ function allMarkdown(built) {
 
 mkdirSync(OUT, { recursive: true });
 for (const stale of readdirSync(OUT)) {
-  if (/^masterwhats/.test(stale)) writeFileSync(join(OUT, stale), '');
+  if (/^vorcarozap/.test(stale)) writeFileSync(join(OUT, stale), '');
 }
 
 const zip = new JSZip();
@@ -254,10 +254,10 @@ for (const entry of entries) {
   }
   const mdText = conversationMarkdown(entry, messages);
   const jsonText = JSON.stringify(conversationJson(entry, messages), null, 1);
-  writeFileSync(join(OUT, `masterwhats-${entry.id}.md`), mdText);
-  writeFileSync(join(OUT, `masterwhats-${entry.id}.json`), jsonText);
-  zip.file(`masterwhats-${entry.id}.md`, mdText);
-  zip.file(`masterwhats-${entry.id}.json`, jsonText);
+  writeFileSync(join(OUT, `vorcarozap-${entry.id}.md`), mdText);
+  writeFileSync(join(OUT, `vorcarozap-${entry.id}.json`), jsonText);
+  zip.file(`vorcarozap-${entry.id}.md`, mdText);
+  zip.file(`vorcarozap-${entry.id}.json`, jsonText);
   built.push({ entry, messages });
   console.log(`${entry.id}: ${messages.length} messages, ${(mdText.length / 1024).toFixed(0)} kB md`);
 
@@ -269,9 +269,9 @@ for (const entry of entries) {
     for (const [ym, msgs] of months) {
       const monthMd = conversationMarkdown(entry, msgs, { month: ym });
       const monthJson = JSON.stringify({ ...conversationJson(entry, msgs), month: ym }, null, 1);
-      writeFileSync(join(OUT, `masterwhats-${entry.id}-${ym}.md`), monthMd);
-      writeFileSync(join(OUT, `masterwhats-${entry.id}-${ym}.json`), monthJson);
-      zip.file(`meses/masterwhats-${entry.id}-${ym}.md`, monthMd);
+      writeFileSync(join(OUT, `vorcarozap-${entry.id}-${ym}.md`), monthMd);
+      writeFileSync(join(OUT, `vorcarozap-${entry.id}-${ym}.json`), monthJson);
+      zip.file(`meses/vorcarozap-${entry.id}-${ym}.md`, monthMd);
     }
     console.log(`${entry.id}: ${months.size} monthly files`);
   }
@@ -282,12 +282,12 @@ const allJson = JSON.stringify({
   export: { generated_at: generatedAt, format_version: FORMAT_VERSION, site: SITE, repository: REPO, timezone: TIMEZONE, utc_offset: UTC_OFFSET },
   conversations: built.map(b => conversationJson(b.entry, b.messages)),
 });
-writeFileSync(join(OUT, 'masterwhats.md'), allMd);
-writeFileSync(join(OUT, 'masterwhats.json'), allJson);
+writeFileSync(join(OUT, 'vorcarozap.md'), allMd);
+writeFileSync(join(OUT, 'vorcarozap.json'), allJson);
 zip.file('README.md', readme(entries));
 
 const zipBuf = await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE', compressionOptions: { level: 9 } });
-writeFileSync(join(OUT, 'masterwhats-export.zip'), zipBuf);
+writeFileSync(join(OUT, 'vorcarozap-export.zip'), zipBuf);
 
 console.log(`\nDone! ${built.length} conversations → ${OUT}`);
-console.log(`masterwhats.md ${(allMd.length / 1048576).toFixed(1)} MB, masterwhats.json ${(allJson.length / 1048576).toFixed(1)} MB, zip ${(zipBuf.length / 1048576).toFixed(1)} MB`);
+console.log(`vorcarozap.md ${(allMd.length / 1048576).toFixed(1)} MB, vorcarozap.json ${(allJson.length / 1048576).toFixed(1)} MB, zip ${(zipBuf.length / 1048576).toFixed(1)} MB`);

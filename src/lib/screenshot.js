@@ -167,8 +167,8 @@ function inlineStylesheets(clonedDoc) {
 
 /** Height, in CSS pixels, of the bar with the site's address under every print. */
 export const ATTRIBUTION_BAR_HEIGHT = 44;
-const ATTRIBUTION_URL = 'www.masterwhats.com.br';
-const ATTRIBUTION_NAME = 'MasterWhats';
+const ATTRIBUTION_URL = 'www.vorcarozap.com.br';
+const ATTRIBUTION_NAME = 'vorcarozap';
 const ATTRIBUTION_LOGO = '/assets/vorcarozap-logo.png';
 
 function loadImage(src) {
@@ -269,7 +269,7 @@ export function screenshotFilename(conversationName) {
   const slug = (conversationName || 'conversa')
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  return `masterwhats-${slug || 'conversa'}.png`;
+  return `vorcarozap-${slug || 'conversa'}.png`;
 }
 
 /**

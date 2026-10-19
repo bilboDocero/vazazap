@@ -1,10 +1,10 @@
-![MasterWhats — Conversas Vazadas de Daniel Vorcaro](public/assets/og-image.png)
+![vorcarozap — Conversas Vazadas de Daniel Vorcaro](public/assets/og-image.png)
 
 # vorcarozap
 
 > Visualizador interativo das 66.387 mensagens de WhatsApp extraídas dos celulares apreendidos de Daniel Vorcaro (Banco Master), em 24 conversas — de Martha Graeff a Alexandre de Moraes.
 
-**[Acesse ao vivo: www.masterwhats.com.br](https://www.masterwhats.com.br/)**
+**[Acesse ao vivo: www.vorcarozap.com.br](https://www.vorcarozap.com.br/)**
 
 ---
 
@@ -83,7 +83,7 @@ Tudo que o site mostra sai limpo, sem precisar do site:
 
 - **Por conversa** — no menu `⋮` de cada chat, "Exportar (.md)" ou "Exportar (.json)".
 - **Tudo** — no menu `⋮` da lista de conversas, "Exportar tudo (.zip)": os 24 pares `.md`/`.json` mais um `README.md`.
-- **Por URL** — `/export/masterwhats-<conversa>.md`, `/export/masterwhats-<conversa>.json`, `/export/masterwhats.md`, `/export/masterwhats.json`, `/export/masterwhats-export.zip`.
+- **Por URL** — `/export/vorcarozap-<conversa>.md`, `/export/vorcarozap-<conversa>.json`, `/export/vorcarozap.md`, `/export/vorcarozap.json`, `/export/vorcarozap-export.zip`.
 
 O `.md` se explica sozinho: proveniência (fonte, documento e seu sha256, período, fuso), quem é o contato com fontes, e as mensagens dia a dia — as do relatório da PF citam `laudo p. N, fig. M`. O `.json` traz os mesmos metadados e perfil, mais todas as mensagens com os campos originais e `timestamp` com fuso (`-03:00`). Gerado no build por `scripts/export.mjs`, que importa os perfis do próprio app para não descolar.
 
@@ -132,4 +132,4 @@ As informações compiladas neste projeto são de domínio público, extraídas 
 
 **Contributions welcome** — new leaked conversations, media support, sharing improvements, and bug fixes. See the Roadmap section above. Only text messages are currently available; images, audio, and video were not part of the leaks.
 
-**[Live: www.masterwhats.com.br](https://www.masterwhats.com.br/)**
+**[Live: www.vorcarozap.com.br](https://www.vorcarozap.com.br/)**

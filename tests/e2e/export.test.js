@@ -33,7 +33,7 @@ test.describe('Exporting one conversation', () => {
         page.waitForEvent('download'),
         page.locator('.chat-dropdown-item', { hasText: `Exportar (.${format})` }).click(),
       ]);
-      expect(download.suggestedFilename()).toBe(`masterwhats-ciro-soares.${format}`);
+      expect(download.suggestedFilename()).toBe(`vorcarozap-ciro-soares.${format}`);
       const path = await download.path();
       expect(path).toBeTruthy();
     });
@@ -59,6 +59,6 @@ test.describe('Exporting everything', () => {
     await expect(item).toBeVisible();
 
     const [download] = await Promise.all([page.waitForEvent('download'), item.click()]);
-    expect(download.suggestedFilename()).toBe('masterwhats-export.zip');
+    expect(download.suggestedFilename()).toBe('vorcarozap-export.zip');
   });
 });

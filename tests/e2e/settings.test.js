@@ -18,7 +18,7 @@ test.describe('Settings/About Drawer', () => {
     await expect(drawer).toBeVisible();
   });
 
-  test('about drawer shows MasterWhats title', async ({ page }) => {
+  test('about drawer shows vorcarozap title', async ({ page }) => {
     test.skip(page.viewportSize().width <= 600, 'Nav rail hidden on mobile');
     await page.locator('.nav-rail-btn[title="Sobre"]').click();
     const title = page.locator('.profile-drawer-title');
@@ -101,7 +101,7 @@ test.describe('SEO & Favicons', () => {
     const response = await page.goto('/sitemap.xml');
     expect(response.status()).toBe(200);
     const text = await response.text();
-    expect(text).toContain('masterwhats.com');
+    expect(text).toContain('vorcarozap.com');
   });
 
   test('llms.txt is served', async ({ page }) => {

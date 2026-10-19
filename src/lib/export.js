@@ -12,11 +12,11 @@ export const EXPORT_FORMATS = ['md', 'json'];
 /** URL of one conversation's export in the given format. */
 export function exportUrl(conversationId, format) {
   if (!EXPORT_FORMATS.includes(format)) throw new Error(`formato desconhecido: ${format}`);
-  return `${EXPORT_BASE}/masterwhats-${conversationId}.${format}`;
+  return `${EXPORT_BASE}/vorcarozap-${conversationId}.${format}`;
 }
 
 /** URL of the zip with every conversation in both formats. */
-export const EXPORT_ALL_URL = `${EXPORT_BASE}/masterwhats-export.zip`;
+export const EXPORT_ALL_URL = `${EXPORT_BASE}/vorcarozap-export.zip`;
 
 /** Start a download of a same-origin file, keeping its name. */
 export function downloadFile(url) {

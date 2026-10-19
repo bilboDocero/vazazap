@@ -10,7 +10,7 @@
  * that should break the chat list.
  */
 
-const STORAGE_KEY = 'masterwhats:read-conversations';
+const STORAGE_KEY = 'vorcarozap:read-conversations';
 
 /** @returns {Set<string>} conversation ids already opened */
 export function loadReadConversations() {

@@ -23,7 +23,7 @@
  * as an object URL, assigned through the src property.
  */
 
-const HISTORY_MARK = { masterwhatsImagePreview: true };
+const HISTORY_MARK = { vorcarozapImagePreview: true };
 
 const ICON_CLOSE = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 
@@ -103,7 +103,7 @@ export function showImagePreview(container, blob, { filename, onShare, onClose }
   }
 
   function ownsHistoryEntry() {
-    return typeof history !== 'undefined' && !!history.state?.masterwhatsImagePreview;
+    return typeof history !== 'undefined' && !!history.state?.vorcarozapImagePreview;
   }
 
   function onPopstate() {

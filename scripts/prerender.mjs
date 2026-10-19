@@ -156,8 +156,8 @@ function conversationLd(entry, who, description, { path, month, first, last, par
     ],
     isPartOf: parent ? { '@id': `${SITE}${parent}` } : { '@id': `${SITE}/#dataset` },
     encoding: [
-      { '@type': 'MediaObject', encodingFormat: 'text/markdown', contentUrl: `${SITE}/export/masterwhats-${entry.id}.md` },
-      { '@type': 'MediaObject', encodingFormat: 'application/json', contentUrl: `${SITE}/export/masterwhats-${entry.id}.json` },
+      { '@type': 'MediaObject', encodingFormat: 'text/markdown', contentUrl: `${SITE}/export/vorcarozap-${entry.id}.md` },
+      { '@type': 'MediaObject', encodingFormat: 'application/json', contentUrl: `${SITE}/export/vorcarozap-${entry.id}.json` },
     ],
     dateModified: today,
   };
@@ -228,8 +228,8 @@ function conversationPage(entry, messages, profile, who) {
   out.push(`<h1>Daniel Vorcaro ↔ ${escapeHtml(who)}</h1>`);
   out.push(`<p>${entry.total_messages} mensagens, de ${entry.date_range.start} a ${entry.date_range.end}. `
     + `<a href="/#/chat/${entry.id}">Abrir no vorcarozap</a> · `
-    + `<a href="/export/masterwhats-${entry.id}.md">Markdown completo</a> · `
-    + `<a href="/export/masterwhats-${entry.id}.json">JSON</a></p>`);
+    + `<a href="/export/vorcarozap-${entry.id}.md">Markdown completo</a> · `
+    + `<a href="/export/vorcarozap-${entry.id}.json">JSON</a></p>`);
   out.push(...provenanceHtml(entry));
   const { html: profileBlock, urls } = profileHtml(profile, who, entry, path);
   out.push(...profileBlock);
@@ -245,7 +245,7 @@ function conversationPage(entry, messages, profile, who) {
   out.push(`<h2>Conversa${paged ? ` (primeiras ${shown.length} mensagens)` : ''}</h2>`);
   out.push(...messagesHtml(shown));
   if (paged) {
-    out.push(`<p>As outras ${messages.length - shown.length} mensagens estão nas páginas por mês acima, no <a href="/export/masterwhats-${entry.id}.md">Markdown completo</a> e <a href="/#/chat/${entry.id}">no app</a>.</p>`);
+    out.push(`<p>As outras ${messages.length - shown.length} mensagens estão nas páginas por mês acima, no <a href="/export/vorcarozap-${entry.id}.md">Markdown completo</a> e <a href="/#/chat/${entry.id}">no app</a>.</p>`);
   }
   out.push(...sourcesHtml(urls));
   out.push('</article>');
@@ -273,8 +273,8 @@ function monthPage(entry, who, ym, msgs, prevYm, nextYm) {
     + (prevYm ? `<a href="${parent}/${prevYm}" rel="prev">${longMonth(prevYm)}</a> · ` : '')
     + (nextYm ? `<a href="${parent}/${nextYm}" rel="next">${longMonth(nextYm)}</a> · ` : '')
     + `<a href="/#/chat/${entry.id}/msg/${msgs[0].id}">Abrir no vorcarozap</a> · `
-    + `<a href="/export/masterwhats-${entry.id}-${ym}.md">Markdown deste mês</a> · `
-    + `<a href="/export/masterwhats-${entry.id}.md">Markdown completo</a></p>`);
+    + `<a href="/export/vorcarozap-${entry.id}-${ym}.md">Markdown deste mês</a> · `
+    + `<a href="/export/vorcarozap-${entry.id}.md">Markdown completo</a></p>`);
   out.push(...messagesHtml(msgs));
   out.push('</article>');
 
@@ -428,8 +428,8 @@ function llmsFull(built, people) {
     const source = sourceOf(entry);
     out.push(`### ${who} — ${entry.total_messages} mensagens, ${entry.date_range.start} a ${entry.date_range.end}`, '');
     out.push(`- Página: ${SITE}/chat/${entry.id}`);
-    if (months) out.push(`- Um mês por página: ${[...months.keys()].map(ym => `${SITE}/chat/${entry.id}/${ym}`).join(' · ')}`, `- Markdown por mês (troque o mês): ${SITE}/export/masterwhats-${entry.id}-${[...months.keys()][0]}.md`);
-    out.push(`- Conversa completa em Markdown: ${SITE}/export/masterwhats-${entry.id}.md · JSON: ${SITE}/export/masterwhats-${entry.id}.json`);
+    if (months) out.push(`- Um mês por página: ${[...months.keys()].map(ym => `${SITE}/chat/${entry.id}/${ym}`).join(' · ')}`, `- Markdown por mês (troque o mês): ${SITE}/export/vorcarozap-${entry.id}-${[...months.keys()][0]}.md`);
+    out.push(`- Conversa completa em Markdown: ${SITE}/export/vorcarozap-${entry.id}.md · JSON: ${SITE}/export/vorcarozap-${entry.id}.json`);
     out.push(`- Fonte: ${source.label}`);
     if (entry.saved_as) out.push(`- Salvo no celular como: ${entry.saved_as}`);
     if (entry.note) out.push(`- Observação: ${entry.note}`);
@@ -456,9 +456,9 @@ function llmsFull(built, people) {
   out.push('## Fontes gerais', '', ...SOURCES.map(s => `- [${s.label}](${s.url})`), '');
   out.push('## Export', '',
     'Comece pelo arquivo de uma conversa (7 a 40 KB, links acima); os consolidados são grandes e raramente necessários.',
-    `- Zip com tudo: ${SITE}/export/masterwhats-export.zip (3 MB)`,
-    `- Tudo em Markdown: ${SITE}/export/masterwhats.md (3 MB)`,
-    `- Tudo em JSON: ${SITE}/export/masterwhats.json (14 MB)`, '');
+    `- Zip com tudo: ${SITE}/export/vorcarozap-export.zip (3 MB)`,
+    `- Tudo em Markdown: ${SITE}/export/vorcarozap.md (3 MB)`,
+    `- Tudo em JSON: ${SITE}/export/vorcarozap.json (14 MB)`, '');
   return out.join('\n');
 }
 
@@ -477,8 +477,8 @@ function sitemap(built, people) {
   for (const { person } of people) rows.push(url(`${SITE}/quem/${person.slug}`, '0.7'));
   rows.push(url(`${SITE}/llms.txt`, '0.7'));
   rows.push(url(`${SITE}/llms-full.txt`, '0.7'));
-  rows.push(url(`${SITE}/export/masterwhats.md`, '0.6', 'monthly'));
-  for (const { entry } of built) rows.push(url(`${SITE}/export/masterwhats-${entry.id}.md`, '0.5', 'monthly'));
+  rows.push(url(`${SITE}/export/vorcarozap.md`, '0.6', 'monthly'));
+  for (const { entry } of built) rows.push(url(`${SITE}/export/vorcarozap-${entry.id}.md`, '0.5', 'monthly'));
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${rows.join('\n')}\n</urlset>\n`;
 }
 
@@ -524,8 +524,8 @@ writeFileSync(join(DIST, 'quem', 'index.html'), peopleIndex(people));
 // The sizes the index quotes decide whether a crawler downloads a file. They
 // are stamped from the files themselves rather than typed and forgotten.
 const mb = (name) => `${(statSync(join(DIST, 'export', name)).size / 1e6).toFixed(1)} MB`;
-const SIZES = { 'masterwhats.md': mb('masterwhats.md'), 'masterwhats.json': mb('masterwhats.json'), 'masterwhats-export.zip': mb('masterwhats-export.zip') };
-const stampSizes = (text) => text.replace(/(masterwhats(?:-export)?\.(?:md|json|zip)) \([\d.,]+ MB\)/g, (m, name) => `${name} (${SIZES[name] || m.slice(name.length + 2, -1)})`);
+const SIZES = { 'vorcarozap.md': mb('vorcarozap.md'), 'vorcarozap.json': mb('vorcarozap.json'), 'vorcarozap-export.zip': mb('vorcarozap-export.zip') };
+const stampSizes = (text) => text.replace(/(vorcarozap(?:-export)?\.(?:md|json|zip)) \([\d.,]+ MB\)/g, (m, name) => `${name} (${SIZES[name] || m.slice(name.length + 2, -1)})`);
 writeFileSync(join(DIST, 'llms.txt'), stampSizes(readFileSync(join(DIST, 'llms.txt'), 'utf-8')));
 writeFileSync(join(DIST, 'llms-full.txt'), stampSizes(llmsFull(built, people)));
 writeFileSync(join(DIST, 'sitemap.xml'), sitemap(built, people));

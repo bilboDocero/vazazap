@@ -10,7 +10,7 @@ import { join } from 'path';
 
 const ROOT = join(import.meta.dirname, '../..');
 const DIST = join(ROOT, 'dist');
-const SITE = 'https://www.masterwhats.com.br';
+const SITE = 'https://www.vorcarozap.com.br';
 
 const conversations = JSON.parse(
   readFileSync(join(ROOT, 'public/data/conversations.json'), 'utf-8')
@@ -68,7 +68,7 @@ describe('one page per conversation', () => {
   it('shows only a preview of the big one and says where the rest is', () => {
     const html = page('martha-graeff');
     expect(html).toContain('(primeiras 200 mensagens)');
-    expect(html).toContain('/export/masterwhats-martha-graeff.md');
+    expect(html).toContain('/export/vorcarozap-martha-graeff.md');
     expect(html.length).toBeLessThan(400_000);
   });
 
@@ -80,7 +80,7 @@ describe('one page per conversation', () => {
       expect(ld['@type']).toBe('Conversation');
       expect(ld['@id']).toBe(`${SITE}/chat/${conv.id}`);
       expect(ld.isPartOf['@id']).toBe(`${SITE}/#dataset`);
-      expect(ld.encoding.map(e => e.contentUrl)).toContain(`${SITE}/export/masterwhats-${conv.id}.md`);
+      expect(ld.encoding.map(e => e.contentUrl)).toContain(`${SITE}/export/vorcarozap-${conv.id}.md`);
       if (conv.source?.startsWith('IPJ-A')) expect(ld.isBasedOn['@type'], conv.id).toBe('DigitalDocument');
     }
   });
@@ -130,9 +130,9 @@ describe('a conversation too big for one page', () => {
 
   it('holds only that month, in order, chained to its neighbours', () => {
     const html = readFileSync(join(DIST, 'chat/martha-graeff/2024-12/index.html'), 'utf-8');
-    expect(html).toContain('<link rel="canonical" href="https://www.masterwhats.com.br/chat/martha-graeff/2024-12">');
-    expect(html).toContain('<link rel="prev" href="https://www.masterwhats.com.br/chat/martha-graeff/2024-11">');
-    expect(html).toContain('<link rel="next" href="https://www.masterwhats.com.br/chat/martha-graeff/2025-01">');
+    expect(html).toContain('<link rel="canonical" href="https://www.vorcarozap.com.br/chat/martha-graeff/2024-12">');
+    expect(html).toContain('<link rel="prev" href="https://www.vorcarozap.com.br/chat/martha-graeff/2024-11">');
+    expect(html).toContain('<link rel="next" href="https://www.vorcarozap.com.br/chat/martha-graeff/2025-01">');
     const stamps = [...html.matchAll(/<time datetime="(\d{4}-\d{2})-\d{2}T/g)].map(m => m[1]);
     expect(stamps.length).toBeGreaterThan(100);
     expect(new Set(stamps)).toEqual(new Set(['2024-12']));
@@ -175,7 +175,7 @@ describe('people', () => {
     expect(html).not.toContain('Pedro Gonet');
     expect(html).toContain('Daniel Vorcaro ↔ Ciro Soares</a>');
     expect(html).toContain('href="/chat/ciro-soares#msg-34"');
-    expect(html).toContain('href="https://www.masterwhats.com.br/#/chat/ciro-soares/msg/34"');
+    expect(html).toContain('href="https://www.vorcarozap.com.br/#/chat/ciro-soares/msg/34"');
     expect(html).toContain('laudo p. 207, fig. 219');
     expect(html).toMatch(/<time datetime="2025-03-29T13:58:\d{2}-03:00">29\/03\/2025 13:58<\/time>/);
   });
@@ -212,15 +212,15 @@ describe('the home page', () => {
     const blocks = ldBlocks(readFileSync(join(DIST, 'index.html'), 'utf-8'));
     const dataset = blocks.find(b => b['@type'] === 'Dataset');
     expect(dataset['@id']).toBe(`${SITE}/#dataset`);
-    expect(dataset.distribution.map(d => d.contentUrl)).toContain(`${SITE}/export/masterwhats-export.zip`);
+    expect(dataset.distribution.map(d => d.contentUrl)).toContain(`${SITE}/export/vorcarozap-export.zip`);
   });
 });
 
 describe('llms.txt', () => {
   it('quotes the real size of the big files', () => {
     const t = readFileSync(join(DIST, 'llms.txt'), 'utf-8');
-    const real = (statSync(join(DIST, 'export/masterwhats.md')).size / 1e6).toFixed(1);
-    expect(t).toContain(`masterwhats.md (${real} MB)`);
+    const real = (statSync(join(DIST, 'export/vorcarozap.md')).size / 1e6).toFixed(1);
+    expect(t).toContain(`vorcarozap.md (${real} MB)`);
   });
 });
 
@@ -232,7 +232,7 @@ describe('llms-full.txt', () => {
     expect(t).toContain(`## Conversas (${conversations.length})`);
     for (const conv of conversations) {
       expect(t, conv.id).toContain(`${SITE}/chat/${conv.id}`);
-      expect(t, conv.id).toContain(`${SITE}/export/masterwhats-${conv.id}.md`);
+      expect(t, conv.id).toContain(`${SITE}/export/vorcarozap-${conv.id}.md`);
     }
   });
 
@@ -262,7 +262,7 @@ describe('sitemap.xml', () => {
     expect(locs).toContain(`${SITE}/llms-full.txt`);
     for (const conv of conversations) {
       expect(locs, conv.id).toContain(`${SITE}/chat/${conv.id}`);
-      expect(locs, conv.id).toContain(`${SITE}/export/masterwhats-${conv.id}.md`);
+      expect(locs, conv.id).toContain(`${SITE}/export/vorcarozap-${conv.id}.md`);
     }
     expect(locs.some(l => l.includes('#'))).toBe(false);
   });

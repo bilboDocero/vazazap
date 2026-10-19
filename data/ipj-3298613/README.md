@@ -1,6 +1,6 @@
 # IPJ-A nº 3298613/2026 — extração
 
-Segunda fonte de dados do MasterWhats, ao lado do export de conversas com Martha
+Segunda fonte de dados do vorcarozap, ao lado do export de conversas com Martha
 Graeff (`data/messages.json`).
 
 ## Documento

@@ -6,7 +6,7 @@ import {
   clearReadConversations,
 } from '../../src/lib/read-state.js';
 
-const KEY = 'masterwhats:read-conversations';
+const KEY = 'vorcarozap:read-conversations';
 
 describe('read state', () => {
   beforeEach(() => localStorage.clear());

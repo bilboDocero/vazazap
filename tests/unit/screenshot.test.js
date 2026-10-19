@@ -30,20 +30,20 @@ const spentActivation = () => Object.assign(new Error('spent'), { name: 'NotAllo
 
 describe('screenshotFilename()', () => {
   it('builds a name from the contact', () => {
-    expect(screenshotFilename('Ciro Soares')).toBe('masterwhats-ciro-soares.png');
+    expect(screenshotFilename('Ciro Soares')).toBe('vorcarozap-ciro-soares.png');
   });
 
   it('strips accents and punctuation', () => {
     expect(screenshotFilename('Alexandre de Moraes BRASILIA'))
-      .toBe('masterwhats-alexandre-de-moraes-brasilia.png');
-    expect(screenshotFilename('Luiz Rennó')).toBe('masterwhats-luiz-renno.png');
-    expect(screenshotFilename('DV (autoenvio)')).toBe('masterwhats-dv-autoenvio.png');
+      .toBe('vorcarozap-alexandre-de-moraes-brasilia.png');
+    expect(screenshotFilename('Luiz Rennó')).toBe('vorcarozap-luiz-renno.png');
+    expect(screenshotFilename('DV (autoenvio)')).toBe('vorcarozap-dv-autoenvio.png');
   });
 
   it('falls back when there is no usable name', () => {
-    expect(screenshotFilename('')).toBe('masterwhats-conversa.png');
-    expect(screenshotFilename('!!!')).toBe('masterwhats-conversa.png');
-    expect(screenshotFilename(undefined)).toBe('masterwhats-conversa.png');
+    expect(screenshotFilename('')).toBe('vorcarozap-conversa.png');
+    expect(screenshotFilename('!!!')).toBe('vorcarozap-conversa.png');
+    expect(screenshotFilename(undefined)).toBe('vorcarozap-conversa.png');
   });
 });
 
@@ -150,7 +150,7 @@ describe('delivery', () => {
 
     expect(result.outcome).toBe('preview');
     expect(result.blob).toBeInstanceOf(Blob);
-    expect(result.filename).toBe('masterwhats-ciro.png');
+    expect(result.filename).toBe('vorcarozap-ciro.png');
     expect(clickSpy).not.toHaveBeenCalled();
   });
 

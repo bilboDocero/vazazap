@@ -3,8 +3,8 @@ import { exportUrl, EXPORT_ALL_URL, downloadFile } from '../../src/lib/export.js
 
 describe('exportUrl', () => {
   it('points at the file the build writes', () => {
-    expect(exportUrl('alexandre-de-moraes', 'md')).toBe('/export/masterwhats-alexandre-de-moraes.md');
-    expect(exportUrl('martha-graeff', 'json')).toBe('/export/masterwhats-martha-graeff.json');
+    expect(exportUrl('alexandre-de-moraes', 'md')).toBe('/export/vorcarozap-alexandre-de-moraes.md');
+    expect(exportUrl('martha-graeff', 'json')).toBe('/export/vorcarozap-martha-graeff.json');
   });
 
   it('refuses a format the build does not produce', () => {
@@ -12,7 +12,7 @@ describe('exportUrl', () => {
   });
 
   it('has one zip for everything', () => {
-    expect(EXPORT_ALL_URL).toBe('/export/masterwhats-export.zip');
+    expect(EXPORT_ALL_URL).toBe('/export/vorcarozap-export.zip');
   });
 });
 
@@ -22,11 +22,11 @@ describe('downloadFile', () => {
     const original = HTMLAnchorElement.prototype.click;
     HTMLAnchorElement.prototype.click = function () { clicked.push({ href: this.getAttribute('href'), download: this.download }); };
     try {
-      downloadFile('/export/masterwhats-ciro-soares.md');
+      downloadFile('/export/vorcarozap-ciro-soares.md');
     } finally {
       HTMLAnchorElement.prototype.click = original;
     }
-    expect(clicked).toEqual([{ href: '/export/masterwhats-ciro-soares.md', download: 'masterwhats-ciro-soares.md' }]);
+    expect(clicked).toEqual([{ href: '/export/vorcarozap-ciro-soares.md', download: 'vorcarozap-ciro-soares.md' }]);
     expect(document.querySelector('a[download]')).toBeNull();
   });
 });

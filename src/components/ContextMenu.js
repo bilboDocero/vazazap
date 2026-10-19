@@ -108,7 +108,7 @@ export function attachContextMenu(chatContainer, { senderNames = {}, incomingSen
 
           if (navigator.share) {
             navigator.share({
-              title: 'MasterWhats',
+              title: 'vorcarozap',
               text: shareText,
               url: shareUrl,
             }).catch(() => {
