@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
     "build": "python3 scripts/split_data.py && vite build && node scripts/export.mjs dist/export && node scripts/prerender.mjs",
@@ -28,6 +30,7 @@
   },
   "dependencies": {
     "@stripe/stripe-js": "^10.1.0",
+    "@vercel/analytics": "^2.0.1",
     "html2canvas": "^1.4.1",
     "pg": "^8.23.1",
     "stripe": "^23.0.0"
