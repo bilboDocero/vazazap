@@ -27,7 +27,7 @@ export async function createStripeCheckoutSession(row, type) {
   return getStripe().checkout.sessions.create({
     ui_mode: 'hosted_page', mode: 'payment', client_reference_id: row.id,
     metadata, payment_intent_data: { metadata },
-    payment_method_types: row.billing_type === 'PIX' ? ['pix'] : ['card'],
+    // Payment methods are managed in the Stripe Dashboard.
     tax_id_collection: { enabled: true },
     success_url: route + '?payment=success&session_id={CHECKOUT_SESSION_ID}&record_id=' + encodeURIComponent(row.id) + '&type=' + type,
     cancel_url: route + '?payment=cancel&record_id=' + encodeURIComponent(row.id) + '&type=' + type,

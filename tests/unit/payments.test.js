@@ -90,7 +90,7 @@ describe('Payment creation and persistence', () => {
     expect(insertPendingPurchase.mock.invocationCallOrder[0]).toBeLessThan(createSession.mock.invocationCallOrder[0]);
     const [params, options] = createSession.mock.calls[0];
     expect(params.line_items[0].price_data.unit_amount).toBe(490);
-    expect(params.payment_method_types).toEqual(['pix']);
+    expect(params).not.toHaveProperty('payment_method_types');
     expect(params.metadata).toEqual(params.payment_intent_data.metadata);
     expect(params.metadata.recordId).toBe(draft(type).id);
     expect(options.idempotencyKey).toContain(draft(type).id);
