@@ -9,6 +9,42 @@ const people = [
 ];
 
 const references = {
+  memeColacao: {
+    text: '“Colação” é uma forma carinhosa de escrever “coração” presente nas conversas com Martha Graeff. O meme leva esse vocabulário para situações inventadas, como café, alarme e currículo.',
+    links: [{ label: 'Ver o uso de “colação” no acervo', url: '#/chat/martha-graeff/msg/10975' }],
+  },
+  memePeleleca: {
+    text: '“Peleleca” aparece como apelido em uma mensagem do acervo. A resenha imagina o estranhamento de levar essa palavra para o ambiente de trabalho, uma senha ou um dicionário.',
+    links: [{ label: 'Ver a referência a “peleleca” no acervo', url: '#/chat/martha-graeff/msg/13984' }],
+  },
+  memePalaa: {
+    text: 'A escrita exagerada “PALAAAAAAA AGOLAAAA” aparece na conversa com Martha. A piada transforma essa reação em nome de ferramenta corporativa, aproveitando a sonoridade e o exagero.',
+    links: [{ label: 'Ver a expressão original no acervo', url: '#/chat/martha-graeff/msg/13985' }],
+  },
+  memeSaldo: {
+    text: 'Humor negro sobre o salário durar pouco: o saldo vira um personagem que nasce no dia do pagamento e desaparece nos débitos. Visita hospitalar e herança são metáforas criadas para a resenha.',
+    links: [],
+  },
+  memeLeitura: {
+    text: 'A brincadeira é com o hábito de abrir uma conversa por curiosidade e continuar lendo por muito mais tempo que o planejado. Café frio, várias abas e comparação com uma série fazem parte dessa cena fictícia.',
+    links: [],
+  },
+  memePlanilha: {
+    text: 'A planilha de orçamento ganha a linguagem de um obituário. O contraste entre uma ferramenta de organização e o desespero com os gastos é o humor negro do cartão.',
+    links: [],
+  },
+  memeFatura: {
+    text: 'O meme explora o duplo sentido de “vencer” uma conta e exagera a sensação de susto ao receber a fatura. A cena, os personagens e as dificuldades financeiras são inventados.',
+    links: [],
+  },
+  memeCamarote: {
+    text: 'O camarote imaginário troca sinais de luxo por pequenas comodidades do cotidiano: tomada, cadeira e água da torneira. A herança em boletos é uma provocação sobre a distância entre glamour e orçamento apertado.',
+    links: [],
+  },
+  memeApelidos: {
+    text: 'A graça está em tentar traduzir apelidos e expressões de uma conversa privada para quem chega de fora. O personagem compara essa dificuldade com as piadas internas do próprio grupo imaginário.',
+    links: [],
+  },
   dani: {
     text: 'A CNN noticiou em 03/09/2026 um áudio de março de 2025 enviado por Nikolas Ferreira a Vorcaro. O parlamentar confirmou a autenticidade à emissora. A cobertura registra o uso de “Dani”. As reações desta comunidade são inventadas.',
     links: [{ label: 'Ler a cobertura da CNN Brasil', url: 'https://www.cnnbrasil.com.br/politica/em-audio-nikolas-diz-a-vorcaro-se-arrepender-de-critica-a-evento-do-master/' }],
@@ -74,33 +110,33 @@ function group(id, name, messages, { announcement = false } = {}) {
 
 export function getResenhaGroups() {
   const memes = [
-    [0, 'Vim entender o caso. Saí chamando o café de meu colação. O vocabulário é mais contagioso que corrente de bom-dia 😂', meme('ABRI O ACERVO', 'Fechei a aba.\nO “colação” ficou.')],
-    [1, 'Meu corretor automático já desistiu de mim. Digito coração, ele oferece colação e um pedido de férias.', meme('CORRETOR AUTOMÁTICO', 'Deseja adicionar “colação”\nao dicionário?', 'neutral')],
-    [2, 'No meu grupo fictício da firma, “peleleca” seria nome de projeto. Ninguém entenderia o escopo, mas a reunião ia acontecer.', meme('PROJETO PELELECA', 'Prazo: ontem.\nEscopo: ninguém sabe.', 'cream')],
-    [3, 'Meu saldo não está baixo. Está em cuidados paliativos e o banco ainda cobra pela visita. PALAAAAAAA AGOLAAAA.', meme('OBITUÁRIO DO SALDO', 'Nasceu no quinto dia útil.\nMorreu no débito automático.')],
-    [4, 'A partir de hoje meu alarme se chama Colação. Vai ser a primeira vez que eu mando meu colação calar a boca às seis da manhã.'],
-    [5, 'Abri três abas e um café. Minha fé na humanidade pediu cremação e avisou que não quer flores, só estorno.', meme('NOTA DE FALECIMENTO', 'A fé na humanidade se foi.\nO café também esfriou.', 'neutral')],
-    [0, 'Meu colação continua batendo. Meu planejamento financeiro já foi de arrasta e deixou o cheque especial como herdeiro.'],
-    [1, 'O grupo precisava de uma figurinha escrita “calma, meu colação” para cada pessoa que manda áudio de quatro minutos.', meme('ÁUDIO DE 4 MINUTOS', 'Calma, meu colação.\nEu ainda tô no primeiro.')],
-    [2, 'Organizei minha vida na planilha: coluna A, salário; coluna B, gastos; coluna C, causa mortis. O Excel perguntou se eu queria acender uma vela.', meme('PLANILHA FINANCEIRA', 'A: salário\nB: gastos\nC: causa mortis', 'cream')],
-    [3, 'A resenha tá boa, mas eu queria ter a mesma disposição pra ler os termos do meu cartão. Lá eu aceito sem nem piscar.'],
-    [4, 'Peleleca parece nome de senha que o site recusaria: falta maiúscula, número e um trauma.', meme('SENHA MUITO FRACA', 'Peleleca123!\nAinda falta um trauma.', 'neutral')],
-    [5, 'O áudio mental dessa leitura já tem trilha, intervalo e reprise. Só falta eu receber pela audiência.'],
-    [0, 'Meu currículo: organizado, proativo, fluente em “colação” e capaz de achar graça com o café frio.', meme('NOVA COMPETÊNCIA', 'Fluente em colação.\nIntermediário em planilha.')],
-    [1, 'A fofoca veio com índice. Minha confiança nas pessoas veio com atestado de óbito. Pelo menos o histórico de mensagens sobreviveu.', meme('FOFOCA ORGANIZADA', 'A esperança morreu.\nO histórico ficou.', 'cream')],
-    [2, '“Só mais uma mensagem” é o novo “só mais um episódio”. Já já o navegador pergunta se eu ainda estou assistindo.'],
-    [3, 'Meu camarote VIP é a cadeira perto da tomada. Open bar de água da torneira e uma herança de família: o medo de abrir a fatura.', meme('HERANÇA DA FAMÍLIA', 'Não deixou patrimônio.\nDeixou o nome no boleto.')],
-    [4, 'Eu queria uma função que traduzisse apelido em contexto. Mas aí percebi que nem eu explico os apelidos do meu grupo.'],
-    [5, 'Se eu escrever “PALAAAA” no trabalho, minha chefe vai achar que é o nome de uma ferramenta nova.', meme('NOVA FERRAMENTA', 'PALAAAA Pro\nPlano anual de desespero.', 'neutral')],
-    [0, 'Meu colação vendo que o grupo mandou mais vinte mensagens enquanto eu fazia um café: preciso de uma assessoria.', meme('SAÍ PRA PASSAR CAFÉ', 'Voltei com 20 mensagens\ne nenhuma conclusão.')],
-    [1, 'Cheguei na resenha querendo entender tudo. Por enquanto, só consigo explicar o apelido do meu gato.'],
-    [2, 'Minha fatura não vence. Ela executa. O Cebolinha imaginário da minha cabeça já está ensaiando o discurso no velório do meu salário.', meme('MINHA FATURA', 'Ela não vence.\nEla executa.', 'cream')],
-    [3, 'Aviso da minha cozinha: o café acabou, o biscoito acabou, a vontade de comentar aparentemente é renovável.'],
-    [4, 'Resumo do meu dia: trabalhei, peguei ônibus e consultei um dicionário que não tinha a palavra peleleca.', meme('DICIONÁRIO ATUALIZADO', 'Colação: substantivo.\nPeleleca: assunto do grupo.', 'neutral')],
-    [5, 'Vou sair por cinco minutos. Se a resenha ganhar segunda temporada, deixem meu lugar perto da tomada.'],
-    [0, 'Depois dessa resenha do fantasma, abri o aplicativo do banco e perguntei: salário, se você está entre nós, dê um sinal. O aplicativo pediu para tentar novamente mais tarde.', meme('SESSÃO ESPÍRITA DO SALDO', 'Salário, você está entre nós?\nErro: entidade não encontrada.', 'neutral')],
-    [4, 'Meu fantasma não apaga a luz nem arrasta corrente. Ele acende a tela às três da manhã com a notificação da fatura. Terror nacional, sem incentivo fiscal.', meme('ATIVIDADE PARANORMAL', '03:00 da manhã.\nSua fatura chegou.', 'cream')],
-  ].map(([speaker, text, card], index) => reaction(`resenha-meme-${index + 1}`, speaker, text, { card, minute: index * 2 }));
+    [0, 'Vim entender o caso. Saí chamando o café de meu colação. O vocabulário é mais contagioso que corrente de bom-dia 😂', meme('ABRI O ACERVO', 'Fechei a aba.\nO “colação” ficou.'), 'memeColacao'],
+    [1, 'Meu corretor automático já desistiu de mim. Digito coração, ele oferece colação e um pedido de férias.', meme('CORRETOR AUTOMÁTICO', 'Deseja adicionar “colação”\nao dicionário?', 'neutral'), 'memeColacao'],
+    [2, 'No meu grupo fictício da firma, “peleleca” seria nome de projeto. Ninguém entenderia o escopo, mas a reunião ia acontecer.', meme('PROJETO PELELECA', 'Prazo: ontem.\nEscopo: ninguém sabe.', 'cream'), 'memePeleleca'],
+    [3, 'Meu saldo não está baixo. Está em cuidados paliativos e o banco ainda cobra pela visita. PALAAAAAAA AGOLAAAA.', meme('OBITUÁRIO DO SALDO', 'Nasceu no quinto dia útil.\nMorreu no débito automático.'), 'memeSaldo'],
+    [4, 'A partir de hoje meu alarme se chama Colação. Vai ser a primeira vez que eu mando meu colação calar a boca às seis da manhã.', undefined, 'memeColacao'],
+    [5, 'Abri três abas e um café. Minha fé na humanidade pediu cremação e avisou que não quer flores, só estorno.', meme('NOTA DE FALECIMENTO', 'A fé na humanidade se foi.\nO café também esfriou.', 'neutral'), 'memeLeitura'],
+    [0, 'Meu colação continua batendo. Meu planejamento financeiro já foi de arrasta e deixou o cheque especial como herdeiro.', undefined, 'memeSaldo'],
+    [1, 'O grupo precisava de uma figurinha escrita “calma, meu colação” para cada pessoa que manda áudio de quatro minutos.', meme('ÁUDIO DE 4 MINUTOS', 'Calma, meu colação.\nEu ainda tô no primeiro.'), 'memeColacao'],
+    [2, 'Organizei minha vida na planilha: coluna A, salário; coluna B, gastos; coluna C, causa mortis. O Excel perguntou se eu queria acender uma vela.', meme('PLANILHA FINANCEIRA', 'A: salário\nB: gastos\nC: causa mortis', 'cream'), 'memePlanilha'],
+    [3, 'A resenha tá boa, mas eu queria ter a mesma disposição pra ler os termos do meu cartão. Lá eu aceito sem nem piscar.', undefined, 'memeFatura'],
+    [4, 'Peleleca parece nome de senha que o site recusaria: falta maiúscula, número e um trauma.', meme('SENHA MUITO FRACA', 'Peleleca123!\nAinda falta um trauma.', 'neutral'), 'memePeleleca'],
+    [5, 'O áudio mental dessa leitura já tem trilha, intervalo e reprise. Só falta eu receber pela audiência.', undefined, 'memeLeitura'],
+    [0, 'Meu currículo: organizado, proativo, fluente em “colação” e capaz de achar graça com o café frio.', meme('NOVA COMPETÊNCIA', 'Fluente em colação.\nIntermediário em planilha.'), 'memeColacao'],
+    [1, 'A fofoca veio com índice. Minha confiança nas pessoas veio com atestado de óbito. Pelo menos o histórico de mensagens sobreviveu.', meme('FOFOCA ORGANIZADA', 'A esperança morreu.\nO histórico ficou.', 'cream'), 'memeLeitura'],
+    [2, '“Só mais uma mensagem” é o novo “só mais um episódio”. Já já o navegador pergunta se eu ainda estou assistindo.', undefined, 'memeLeitura'],
+    [3, 'Meu camarote VIP é a cadeira perto da tomada. Open bar de água da torneira e uma herança de família: o medo de abrir a fatura.', meme('HERANÇA DA FAMÍLIA', 'Não deixou patrimônio.\nDeixou o nome no boleto.'), 'memeCamarote'],
+    [4, 'Eu queria uma função que traduzisse apelido em contexto. Mas aí percebi que nem eu explico os apelidos do meu grupo.', undefined, 'memeApelidos'],
+    [5, 'Se eu escrever “PALAAAA” no trabalho, minha chefe vai achar que é o nome de uma ferramenta nova.', meme('NOVA FERRAMENTA', 'PALAAAA Pro\nPlano anual de desespero.', 'neutral'), 'memePalaa'],
+    [0, 'Meu colação vendo que o grupo mandou mais vinte mensagens enquanto eu fazia um café: preciso de uma assessoria.', meme('SAÍ PRA PASSAR CAFÉ', 'Voltei com 20 mensagens\ne nenhuma conclusão.'), 'memeColacao'],
+    [1, 'Cheguei na resenha querendo entender tudo. Por enquanto, só consigo explicar o apelido do meu gato.', undefined, 'memeApelidos'],
+    [2, 'Minha fatura não vence. Ela executa. O Cebolinha imaginário da minha cabeça já está ensaiando o discurso no velório do meu salário.', meme('MINHA FATURA', 'Ela não vence.\nEla executa.', 'cream'), 'memeFatura'],
+    [3, 'Aviso da minha cozinha: o café acabou, o biscoito acabou, a vontade de comentar aparentemente é renovável.', undefined, 'memeLeitura'],
+    [4, 'Resumo do meu dia: trabalhei, peguei ônibus e consultei um dicionário que não tinha a palavra peleleca.', meme('DICIONÁRIO ATUALIZADO', 'Colação: substantivo.\nPeleleca: assunto do grupo.', 'neutral'), 'memePeleleca'],
+    [5, 'Vou sair por cinco minutos. Se a resenha ganhar segunda temporada, deixem meu lugar perto da tomada.', undefined, 'memeLeitura'],
+    [0, 'Depois dessa resenha do fantasma, abri o aplicativo do banco e perguntei: salário, se você está entre nós, dê um sinal. O aplicativo pediu para tentar novamente mais tarde.', meme('SESSÃO ESPÍRITA DO SALDO', 'Salário, você está entre nós?\nErro: entidade não encontrada.', 'neutral'), 'yasminFantasma'],
+    [4, 'Meu fantasma não apaga a luz nem arrasta corrente. Ele acende a tela às três da manhã com a notificação da fatura. Terror nacional, sem incentivo fiscal.', meme('ATIVIDADE PARANORMAL', '03:00 da manhã.\nSua fatura chegou.', 'cream'), 'memeFatura'],
+  ].map(([speaker, text, card, reference], index) => reaction(`resenha-meme-${index + 1}`, speaker, text, { card, reference, minute: index * 2 }));
 
   const vip = [
     [0, 'Na cobertura aparece “Dani”. Minha agenda tem “Daniel encanador” e ele também nunca atende no domingo.', 'dani', meme('CONTATOS VIP', 'Eles: Dani.\nEu: Daniel encanador.')],

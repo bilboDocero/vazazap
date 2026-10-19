@@ -17,13 +17,14 @@ describe('Memes e Resenha', () => {
     expect(new Set(messages.map(msg => msg.sender)).size).toBeGreaterThan(3);
   });
 
-  it('grounds every VIP reaction in a reference and keeps archive links valid', () => {
-    const group = getResenhaGroups().find(group => group.id === 'fofocas-famosos');
+  it.each(['fofocas-memes', 'fofocas-famosos'])('explains each reaction in %s and keeps archive links valid', (groupId) => {
+    const group = getResenhaGroups().find(group => group.id === groupId);
     const raw = JSON.parse(readFileSync('data/messages.json', 'utf8'));
     const archived = new Set((Array.isArray(raw) ? raw : raw.messages).map(msg => msg.id));
     for (const msg of group.messages) {
       expect(msg.context.text).toBeTruthy();
-      expect(msg.context.links.length).toBeGreaterThan(0);
+      expect(Array.isArray(msg.context.links)).toBe(true);
+      if (groupId === 'fofocas-famosos') expect(msg.context.links.length).toBeGreaterThan(0);
       for (const link of msg.context.links) {
         const match = /^#\/chat\/martha-graeff\/msg\/(\d+)$/.exec(link.url);
         if (match) expect(archived.has(Number(match[1]))).toBe(true);
@@ -43,9 +44,12 @@ describe('Memes e Resenha', () => {
     }
   });
 
-  it('shows simulation labels, visual cards and expandable context with working deep links', () => {
+  it.each([
+    ['fofocas-memes', '#/chat/martha-graeff/msg/10975'],
+    ['fofocas-famosos', '#/chat/martha-graeff/msg/31201'],
+  ])('shows expandable context and working deep links in %s', (groupId, archiveUrl) => {
     const container = document.createElement('div');
-    const selection = findCommunitySelection(getCommunitiesData(), 'fofocas-famosos');
+    const selection = findCommunitySelection(getCommunitiesData(), groupId);
     renderCommunitiesDetail(container, { selection });
     expect(container.querySelector('.communities-notice-banner').textContent).toContain('reações fictícios');
     expect(container.querySelectorAll('.communities-bubble-checks')).toHaveLength(0);
@@ -53,7 +57,7 @@ describe('Memes e Resenha', () => {
     const contexts = container.querySelectorAll('.communities-reaction-context');
     expect(contexts).toHaveLength(selection.group.messages.length);
     expect([...contexts].every(details => !details.open)).toBe(true);
-    expect(container.querySelector('a[href="#/chat/martha-graeff/msg/31201"]')).not.toBeNull();
+    expect(container.querySelector(`a[href="${archiveUrl}"]`)).not.toBeNull();
     const external = container.querySelector('.communities-reaction-context a[href^="https:"]');
     expect(external.rel).toContain('noopener');
     const card = container.querySelector('.communities-meme-card');

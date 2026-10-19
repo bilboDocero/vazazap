@@ -269,24 +269,6 @@
   line-height: 1;
 }
 
-.community-toggle-groups {
-  align-self: flex-start;
-  margin: 4px 16px 12px 74px;
-  padding: 4px 0;
-  border: 0;
-  background: transparent;
-  color: #008069;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color .15s ease;
-}
-
-.community-toggle-groups:hover {
-  color: #00A884;
-  text-decoration: underline;
-}
-
 .communities-divider {
   height: 1px;
   background: var(--WDS-lines-divider, #E9EDEF);

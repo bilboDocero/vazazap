@@ -44,7 +44,6 @@ export function renderCommunitiesPanel({ communities, selectedId, onSelect, onCr
   `;
 
   const listEl = panel.querySelector('.communities-list');
-  const expandedCommunities = new Set();
 
   function openCreateModal() {
     let modalEl = document.querySelector('.community-modal-overlay');
@@ -181,16 +180,12 @@ export function renderCommunitiesPanel({ communities, selectedId, onSelect, onCr
       // Groups list
       const groups = community.groups || [];
       const hasSubgroups = groups.length > 0;
-      const isExpanded = expandedCommunities.has(community.id);
 
       if (hasSubgroups) {
         const groupsContainer = document.createElement('div');
         groupsContainer.className = 'community-groups';
 
-        // Show the first group (Avisos), or show all if expanded
-        const visibleGroups = isExpanded ? groups : groups.slice(0, 1);
-
-        visibleGroups.forEach((group) => {
+        groups.forEach((group) => {
           const groupItem = document.createElement('div');
           groupItem.className = 'community-group-item';
           groupItem.dataset.id = group.id;
@@ -242,25 +237,6 @@ export function renderCommunitiesPanel({ communities, selectedId, onSelect, onCr
 
         card.appendChild(groupsContainer);
 
-        // "Ver todos" button if community has multiple groups
-        if (groups.length > 1) {
-          const toggleBtn = document.createElement('button');
-          toggleBtn.className = 'community-toggle-groups';
-          toggleBtn.type = 'button';
-          toggleBtn.textContent = isExpanded ? 'Mostrar menos' : 'Ver todos';
-          toggleBtn.setAttribute('aria-expanded', String(isExpanded));
-          toggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (expandedCommunities.has(community.id)) {
-              expandedCommunities.delete(community.id);
-            } else {
-              expandedCommunities.add(community.id);
-            }
-            renderList();
-            onSelect(community.id);
-          });
-          card.appendChild(toggleBtn);
-        }
       }
 
       // Divider line
