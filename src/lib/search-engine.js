@@ -81,7 +81,7 @@ export class SearchEngine {
       const conversation = conversations[conversationIndex];
       results.push({
         id, conversationId: conversation.id, contactName: conversation.contact,
-        date: dates[dateIndex], sender: senders[senderIndex],
+        date: dates[dateIndex], sender: senders[senderIndex], ...(conversation.excerpt ? { excerpt: true } : {}),
         ...excerpt(content, this.normalized[i], matchStart, needle.length),
       });
     }

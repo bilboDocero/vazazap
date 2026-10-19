@@ -4,74 +4,97 @@
       "DV",
       "Yasmin Brunet"
     ],
-    "saved_as": "Yasmin Brunet",
-    "phone": "5521993300088",
+    "saved_as": null,
+    "phone": null,
+    "status": "standby",
+    "schema_version": 2,
+    "publication_ready": false,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
     "date_range": {
-      "start": "2025-02-14",
-      "end": "2025-02-14"
+      "start": "2023-12-31",
+      "end": "2023-12-31"
     },
-    "total_messages": 4,
-    "source": "UOL Splash (10/10/2026) — Mensagens apreendidas",
-    "note": "Interações citadas nas apurações públicas do caso — arquivo estruturado para preenchimento integral posterior."
+    "date_range_complete": true,
+    "total_messages": 3,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes da conversa sobre deslocamento para o Rio no fim de 2023. A reportagem informa que a indisponibilidade do avião acabou levando ao uso de helicóptero, apesar do receio manifestado pela modelo.",
+    "limitations": [
+      "Seleção com mensagens intermediárias omitidas.",
+      "A hipótese sobre o apelido fantasma no BBB não foi usada como prova ou transcrição."
+    ],
+    "sources": [
+      {
+        "id": "veja-2026-10-02",
+        "publisher": "VEJA",
+        "url": "https://veja.abril.com.br/brasil/mensagens-da-pf-revelam-amizade-cheia-de-aventuras-de-vorcaro-com-yasmin-brunet/",
+        "published_at": "2026-10-02",
+        "accessed_at": "2026-10-19",
+        "description": "Apuração de Robson Bonin sobre mensagens de Yasmin e Vorcaro.",
+        "kind": "news_report"
+      }
+    ]
   },
   "messages": [
     {
       "id": 1,
-      "timestamp": "2025-02-14T17:00:00",
-      "date": "2025-02-14",
-      "time": "17:00:00",
-      "sender": "DV",
-      "content": "Oi Yasmin, tudo bem? Conseguiram ver aqueles detalhes do evento?",
+      "timestamp": null,
+      "date": "2023-12-31",
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "DV",
+      "content": "Pera aí. Deixa eu ver aqui como fazer. São quantas pessoas?",
+      "source_id": "veja-2026-10-02",
+      "source_locator": "Primeira resposta ao pedido de transporte de 31 de dezembro de 2023.",
+      "reported_date": "2023-12-31",
+      "excerpt": true
     },
     {
       "id": 2,
-      "timestamp": "2025-02-14T17:10:20",
-      "date": "2025-02-14",
-      "time": "17:10:20",
-      "sender": "Yasmin Brunet",
-      "content": "Oi Daniel! Sim, a equipe me passou tudo aqui, vai ficar incrível.",
+      "timestamp": null,
+      "date": "2023-12-31",
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "Yasmin Brunet",
+      "content": "Eu tenho um pouco de medo de helicóptero",
+      "source_id": "veja-2026-10-02",
+      "source_locator": "Resposta posterior à oferta de helicóptero.",
+      "reported_date": "2023-12-31",
+      "excerpt": true
     },
     {
       "id": 3,
-      "timestamp": "2025-02-14T17:12:00",
-      "date": "2025-02-14",
-      "time": "17:12:00",
+      "timestamp": null,
+      "date": "2023-12-31",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
       "sender": "DV",
-      "content": "Maravilha, qualquer dúvida me avisa direto.",
-      "type": "text",
-      "is_edited": false,
-      "attachment": null,
-      "urls": []
-    },
-    {
-      "id": 4,
-      "timestamp": "2025-02-14T17:15:00",
-      "date": "2025-02-14",
-      "time": "17:15:00",
-      "sender": "Yasmin Brunet",
-      "content": "Pode deixar, obrigada!",
-      "type": "text",
-      "is_edited": false,
-      "attachment": null,
-      "urls": []
+      "content": "Então vai avião mesmo",
+      "source_id": "veja-2026-10-02",
+      "source_locator": "Resposta ao receio da modelo; não constitui confirmação de voo de avião.",
+      "reported_date": "2023-12-31",
+      "excerpt": true
     }
   ],
   "index": {
     "dates": [
       {
-        "date": "2025-02-14",
-        "message_count": 4,
+        "date": "2023-12-31",
+        "message_count": 3,
         "first_message_id": 1,
-        "last_message_id": 4
+        "last_message_id": 3
       }
-    ]
+    ],
+    "undated_message_ids": []
   }
 }

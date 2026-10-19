@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Yasmin Brunet"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": "2023-12-31",
+      "end": "2023-12-31"
+    },
+    "date_range_complete": true,
+    "total_messages": 3,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes da conversa sobre deslocamento para o Rio no fim de 2023. A reportagem informa que a indisponibilidade do avião acabou levando ao uso de helicóptero, apesar do receio manifestado pela modelo.",
+    "limitations": [
+      "Seleção com mensagens intermediárias omitidas.",
+      "A hipótese sobre o apelido fantasma no BBB não foi usada como prova ou transcrição."
+    ],
+    "sources": [
+      {
+        "id": "veja-2026-10-02",
+        "publisher": "VEJA",
+        "url": "https://veja.abril.com.br/brasil/mensagens-da-pf-revelam-amizade-cheia-de-aventuras-de-vorcaro-com-yasmin-brunet/",
+        "published_at": "2026-10-02",
+        "accessed_at": "2026-10-19",
+        "description": "Apuração de Robson Bonin sobre mensagens de Yasmin e Vorcaro.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": "2023-12-31",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Pera aí. Deixa eu ver aqui como fazer. São quantas pessoas?",
+      "source_id": "veja-2026-10-02",
+      "source_locator": "Primeira resposta ao pedido de transporte de 31 de dezembro de 2023.",
+      "reported_date": "2023-12-31",
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": null,
+      "date": "2023-12-31",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Yasmin Brunet",
+      "content": "Eu tenho um pouco de medo de helicóptero",
+      "source_id": "veja-2026-10-02",
+      "source_locator": "Resposta posterior à oferta de helicóptero.",
+      "reported_date": "2023-12-31",
+      "excerpt": true
+    },
+    {
+      "id": 3,
+      "timestamp": null,
+      "date": "2023-12-31",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Então vai avião mesmo",
+      "source_id": "veja-2026-10-02",
+      "source_locator": "Resposta ao receio da modelo; não constitui confirmação de voo de avião.",
+      "reported_date": "2023-12-31",
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2023-12-31",
+        "message_count": 3,
+        "first_message_id": 1,
+        "last_message_id": 3
+      }
+    ],
+    "undated_message_ids": []
+  }
+}

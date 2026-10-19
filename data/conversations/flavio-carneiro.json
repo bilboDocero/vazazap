@@ -1,0 +1,107 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Flávio Carneiro"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": null,
+      "end": null
+    },
+    "date_range_complete": false,
+    "total_messages": 3,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes de conversas com o empresário e assessor de imagem Flávio Carneiro sobre a reação a críticas de Nikolas e sobre textos do PlatôBR. A declaração sobre voos é de Vorcaro, sem discriminação das viagens no trecho; Nikolas negou irregularidades. Na reportagem de outubro, o UOL informou aguardar manifestação de Carneiro.",
+    "limitations": [
+      "As fontes situam estes trechos por mês, sem dia ou horário confirmado.",
+      "O recorte sobre voos pertence ao diálogo com Carneiro, não ao chat com Nikolas.",
+      "A seleção não reproduz os textos jornalísticos ou o histórico completo de edição."
+    ],
+    "sources": [
+      {
+        "id": "uol-2026-09-03-voos",
+        "publisher": "UOL",
+        "url": "https://noticias.uol.com.br/politica/ultimas-noticias/2026/09/03/vorcaro-nikolas-ferreira-mensagens-voos.ghtm",
+        "published_at": "2026-09-03",
+        "accessed_at": "2026-10-19",
+        "description": "Publicação do recorte sobre voos e identificação de Carneiro como interlocutor.",
+        "kind": "news_report"
+      },
+      {
+        "id": "uol-2026-10-15",
+        "publisher": "UOL",
+        "url": "https://noticias.uol.com.br/politica/ultimas-noticias/2026/10/15/brazil-journal-istoe-como-vorcaro-montou-rede-de-influencia-em-sites.amp.htm",
+        "published_at": "2026-10-15",
+        "accessed_at": "2026-10-19",
+        "description": "Reportagem de Renata Agostini e Tiago Dantas com recortes sobre textos do PlatôBR.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Esse Nikolas, eu banquei todos os voos dele",
+      "source_id": "uol-2026-09-03-voos",
+      "source_locator": "Declaração no diálogo com Carneiro; mês indicado no texto.",
+      "reported_date": "2024-04",
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Flávio Carneiro",
+      "content": "Vou te mandando as minutas e você analisa e publicamos",
+      "source_id": "uol-2026-10-15",
+      "source_locator": "Envio de textos para análise, dois dias após o anúncio da compra pelo BRB; dia não inferido.",
+      "reported_date": "2025-03",
+      "excerpt": true
+    },
+    {
+      "id": 3,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Flávio Carneiro",
+      "content": "Vamo alterar agora",
+      "source_id": "uol-2026-10-15",
+      "source_locator": "Resposta na manhã seguinte à reclamação sobre a chamada da entrevista; mensagens intermediárias omitidas.",
+      "reported_date": "2025-03",
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [],
+    "undated_message_ids": [
+      1,
+      2,
+      3
+    ]
+  }
+}

@@ -4,74 +4,111 @@
       "DV",
       "Frederic Kachar"
     ],
-    "saved_as": "Frederic Kachar",
-    "phone": "5521994400077",
+    "saved_as": null,
+    "phone": null,
+    "status": "standby",
+    "schema_version": 2,
+    "publication_ready": false,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
     "date_range": {
-      "start": "2025-07-14",
-      "end": "2025-07-14"
+      "start": null,
+      "end": null
     },
+    "date_range_complete": false,
     "total_messages": 4,
-    "source": "UOL (15/10/2026) — Coluna Milly Lacombe",
-    "note": "Troca de mensagens entre o executivo da Editora Globo e Daniel Vorcaro — arquivo estruturado para preenchimento integral posterior."
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes sobre publicidade, exposição da marca Happy Aging e propostas de patrocínio. A reportagem também registra ocasiões em que Kachar defendeu a cobertura crítica dos veículos; estes recortes não demonstram, isoladamente, interferência editorial.",
+    "limitations": [
+      "Os dias das mensagens selecionadas não são informados no texto consultado.",
+      "A referência a outubro é ao plano comercial, não uma data de envio."
+    ],
+    "sources": [
+      {
+        "id": "uol-2026-10-15",
+        "publisher": "UOL",
+        "url": "https://www.bol.uol.com.br/noticias/2026/10/15/grupo-globo-demite-diretor-geral-apos-vazamento-de-conversas-com-vorcaro.htm",
+        "published_at": "2026-10-15",
+        "accessed_at": "2026-10-19",
+        "description": "Apuração de Renata Agostini e Tiago Dantas sobre conversas e desligamento de Kachar.",
+        "kind": "news_report"
+      }
+    ]
   },
   "messages": [
     {
       "id": 1,
-      "timestamp": "2025-07-14T11:00:00",
-      "date": "2025-07-14",
-      "time": "11:00:00",
-      "sender": "Frederic Kachar",
-      "content": "Daniel, bom dia. Como ficaram aqueles temas editoriais e as demandas de veiculação?",
+      "timestamp": null,
+      "date": null,
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "Frederic Kachar",
+      "content": "Vou pautar Vogue, Marie Claire e Ela",
+      "source_id": "uol-2026-10-15",
+      "source_locator": "Trecho sobre a divulgação da marca de Martha Graeff.",
+      "reported_date": null,
+      "excerpt": true
     },
     {
       "id": 2,
-      "timestamp": "2025-07-14T11:05:40",
-      "date": "2025-07-14",
-      "time": "11:05:40",
-      "sender": "DV",
-      "content": "Frederic, bom dia. O time de marketing já alinhou o cronograma com vocês, qualquer ajuste me fala.",
+      "timestamp": null,
+      "date": null,
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "Frederic Kachar",
+      "content": "Tínhamos um plano robusto pra outubro",
+      "source_id": "uol-2026-10-15",
+      "source_locator": "Trecho sobre o contrato de publicidade.",
+      "reported_date": null,
+      "excerpt": true
     },
     {
       "id": 3,
-      "timestamp": "2025-07-14T11:10:00",
-      "date": "2025-07-14",
-      "time": "11:10:00",
-      "sender": "Frederic Kachar",
-      "content": "Ótimo, vamos acompanhar o cronograma aqui. Um abraço.",
+      "timestamp": null,
+      "date": null,
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "DV",
+      "content": "Será feito",
+      "source_id": "uol-2026-10-15",
+      "source_locator": "Resposta no trecho sobre o contrato de publicidade.",
+      "reported_date": null,
+      "excerpt": true
     },
     {
       "id": 4,
-      "timestamp": "2025-07-14T11:12:00",
-      "date": "2025-07-14",
-      "time": "11:12:00",
-      "sender": "DV",
-      "content": "Um abraço e boa semana.",
+      "timestamp": null,
+      "date": null,
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "Frederic Kachar",
+      "content": "Tirei o banco nos dois casos",
+      "source_id": "uol-2026-10-15",
+      "source_locator": "Trecho que situa a retirada do nome do banco das propostas em 2025.",
+      "reported_date": "2025",
+      "excerpt": true
     }
   ],
   "index": {
-    "dates": [
-      {
-        "date": "2025-07-14",
-        "message_count": 4,
-        "first_message_id": 1,
-        "last_message_id": 4
-      }
+    "dates": [],
+    "undated_message_ids": [
+      1,
+      2,
+      3,
+      4
     ]
   }
 }

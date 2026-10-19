@@ -8,9 +8,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "python3 scripts/split_data.py && vite build && node scripts/export.mjs dist/export && node scripts/prerender.mjs",
+    "build": "node scripts/split-data.mjs && vite build && node scripts/export.mjs dist/export && node scripts/prerender.mjs",
     "preview": "vite preview",
-    "split-data": "python3 scripts/split_data.py",
+    "split-data": "node scripts/split-data.mjs",
     "export": "node scripts/export.mjs dist/export",
     "prerender": "node scripts/prerender.mjs",
     "test": "vitest run",

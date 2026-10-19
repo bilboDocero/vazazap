@@ -1,0 +1,68 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Luciano Huck"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": "2024-08-04",
+      "end": "2024-08-04"
+    },
+    "date_range_complete": true,
+    "total_messages": 1,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Pedido de uso de aeronave para ir a Varsóvia, de onde o apresentador seguiria para Kiev para entrevistar Volodymyr Zelensky, segundo o Poder360.",
+    "limitations": [
+      "Este recorte é um pedido; não registra sua execução.",
+      "Referências a Huck na conversa com Martha não foram convertidas em mensagens diretas de Huck."
+    ],
+    "sources": [
+      {
+        "id": "poder360-2026-09-30",
+        "publisher": "Poder360",
+        "url": "https://www.poder360.com.br/poder-gente/leia-as-mensagens-entre-luciano-huck-e-daniel-vorcaro/",
+        "published_at": "2026-09-30",
+        "accessed_at": "2026-10-19",
+        "description": "Apuração sobre mensagens diretas entre Huck e Vorcaro, com capturas das conversas.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": "2024-08-04",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Luciano Huck",
+      "content": "Alguma chance de usar o seu Falcon para fazer um bate e volta em Varsóvia?",
+      "source_id": "poder360-2026-09-30",
+      "source_locator": "Seção sobre aviões; terceiro pedido, datado de 4 de agosto de 2024.",
+      "reported_date": "2024-08-04",
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2024-08-04",
+        "message_count": 1,
+        "first_message_id": 1,
+        "last_message_id": 1
+      }
+    ],
+    "undated_message_ids": []
+  }
+}

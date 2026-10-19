@@ -1,0 +1,187 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Roberto Justus"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": "2024-12-21",
+      "end": "2025-11-17"
+    },
+    "date_range_complete": true,
+    "total_messages": 6,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes das cobranças de Justus sobre o aporte e sua conversão em ações da SteelCorp, seguidos de negociação de recompra. Segundo a nota de sua assessoria publicada pelo Poder360, a conversão não ocorreu, Vorcaro não se tornou sócio por esse acordo e a referência à recuperação judicial foi uma estratégia de negociação. O Globo também publicou uma mensagem de felicitação sobre a anunciada venda do Master à Fictor, que não se concretizou.",
+    "limitations": [
+      "A seleção não reproduz o histórico completo nem comprova a execução das propostas financeiras.",
+      "Os horários de setembro vêm das capturas publicadas pelo Poder360. As duas mensagens citadas em O Globo não têm horário documentado.",
+      "O ano de 2025 na mensagem de 17 de novembro é contextualizado pela referência à primeira prisão e à venda anunciada à Fictor."
+    ],
+    "sources": [
+      {
+        "id": "oglobo-2026-10-19",
+        "publisher": "O Globo · Lauro Jardim",
+        "url": "https://oglobo.globo.com/blogs/lauro-jardim/post/2026/10/justus-para-vorcaro-estou-certo-que-nao-mereco-isso.ghtml",
+        "published_at": "2026-10-19",
+        "accessed_at": "2026-10-19",
+        "description": "Coluna com recortes de dezembro de 2024 e da mensagem sobre a Fictor.",
+        "kind": "news_report"
+      },
+      {
+        "id": "poder360-2026-10-01",
+        "publisher": "Poder360",
+        "url": "https://www.poder360.com.br/poder-justica/justus-cobrou-vorcaro-por-aporte-e-chegou-a-falar-em-recuperacao-judicial/",
+        "published_at": "2026-10-01",
+        "accessed_at": "2026-10-19",
+        "description": "Reportagem, capturas do diálogo e nota da assessoria de Justus.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": "2024-12-21",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Roberto Justus",
+      "content": "Estou certo que não mereço isso.",
+      "source_id": "oglobo-2026-10-19",
+      "source_locator": "Última frase da cobrança de 21 de dezembro de 2024, transcrita na coluna.",
+      "reported_date": "2024-12-21",
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": "2025-09-01T23:53:41",
+      "date": "2025-09-01",
+      "time": "23:53:41",
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Roberto Justus",
+      "content": "Nunca na minha vida fiquei tão decepcionado com alguém.",
+      "source_id": "poder360-2026-10-01",
+      "source_locator": "Primeira frase da cobrança; captura de 01/09/2025 às 23:53:41.",
+      "reported_date": "2025-09-01",
+      "excerpt": true,
+      "source_image": "https://static.poder360.com.br/uploads/2026/10/Captura-de-Tela-2026-10-01-as-15.34.23.png"
+    },
+    {
+      "id": 3,
+      "timestamp": "2025-09-02T00:45:28",
+      "date": "2025-09-02",
+      "time": "00:45:28",
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Como seria sua ideia de recompra?",
+      "source_id": "poder360-2026-10-01",
+      "source_locator": "Captura da negociação de recompra, às 00:45:28.",
+      "reported_date": "2025-09-02",
+      "excerpt": true,
+      "source_image": "https://static.poder360.com.br/uploads/2026/10/Captura-de-Tela-2026-10-01-as-15.40.13.png"
+    },
+    {
+      "id": 4,
+      "timestamp": "2025-09-11T21:49:06",
+      "date": "2025-09-11",
+      "time": "21:49:06",
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Roberto Justus",
+      "content": "O problema é sobreviver até lá.",
+      "source_id": "poder360-2026-10-01",
+      "source_locator": "Trecho da mensagem sobre condições de pagamento, às 21:49:06.",
+      "reported_date": "2025-09-11",
+      "excerpt": true,
+      "source_image": "https://static.poder360.com.br/uploads/2026/10/Captura-de-Tela-2026-10-01-as-15.34.57.png"
+    },
+    {
+      "id": 5,
+      "timestamp": "2025-09-11T22:41:35",
+      "date": "2025-09-11",
+      "time": "22:41:35",
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Vamos fazer",
+      "source_id": "poder360-2026-10-01",
+      "source_locator": "Mensagem às 22:41:35; há áudios e outros registros entre os recortes selecionados.",
+      "reported_date": "2025-09-11",
+      "excerpt": true,
+      "source_image": "https://static.poder360.com.br/uploads/2026/10/Captura-de-Tela-2026-10-01-as-15.38.09.png"
+    },
+    {
+      "id": 6,
+      "timestamp": null,
+      "date": "2025-11-17",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Roberto Justus",
+      "content": "Fiquei muito feliz com a notícia da venda para o Fictor! Parabéns!",
+      "source_id": "oglobo-2026-10-19",
+      "source_locator": "Início da felicitação sobre a venda anunciada à Fictor, antes da primeira prisão; ano contextualizado no episódio.",
+      "reported_date": "2025-11-17",
+      "excerpt": true,
+      "date_basis": "year_context_in_report"
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2024-12-21",
+        "message_count": 1,
+        "first_message_id": 1,
+        "last_message_id": 1
+      },
+      {
+        "date": "2025-09-01",
+        "message_count": 1,
+        "first_message_id": 2,
+        "last_message_id": 2
+      },
+      {
+        "date": "2025-09-02",
+        "message_count": 1,
+        "first_message_id": 3,
+        "last_message_id": 3
+      },
+      {
+        "date": "2025-09-11",
+        "message_count": 2,
+        "first_message_id": 4,
+        "last_message_id": 5
+      },
+      {
+        "date": "2025-11-17",
+        "message_count": 1,
+        "first_message_id": 6,
+        "last_message_id": 6
+      }
+    ],
+    "undated_message_ids": []
+  }
+}

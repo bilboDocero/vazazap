@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "João Doria"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": null,
+      "end": null
+    },
+    "date_range_complete": false,
+    "total_messages": 2,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes do alerta sobre rumores envolvendo Vorcaro, Maurício Quadrado e o Master. Doria informou à Folha que a conversa ocorreu em maio de 2025 e a descreveu como um contato cordial anterior às investigações públicas.",
+    "limitations": [
+      "A fonte informa o mês, não o dia ou o horário.",
+      "O primeiro registro é somente parte da mensagem de Doria; o segundo vem depois de uma pergunta de Vorcaro não reproduzida aqui."
+    ],
+    "sources": [
+      {
+        "id": "folha-2026-03-05",
+        "publisher": "Folha de S.Paulo",
+        "url": "https://www1.folha.uol.com.br/amp/mercado/2026/03/doria-aconselhou-vorcaro-a-reagir-a-rumores-antes-de-investigacao-do-master-mostram-mensagens.shtml",
+        "published_at": "2026-03-05",
+        "accessed_at": "2026-10-19",
+        "description": "Apuração de Ana Paula Branco sobre o alerta de Doria e sua resposta à reportagem.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "João Doria",
+      "content": "Tenho escutado coisas que vão precisar de reação sua. Sempre com equilíbrio e ponderação. Mas jamais com silêncio.",
+      "source_id": "folha-2026-03-05",
+      "source_locator": "Trecho intermediário da mensagem de alerta.",
+      "reported_date": "2025-05",
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "João Doria",
+      "content": "A você. Ao Maurício. Ao banco",
+      "source_id": "folha-2026-03-05",
+      "source_locator": "Resposta à pergunta de Vorcaro sobre a que se referia.",
+      "reported_date": "2025-05",
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [],
+    "undated_message_ids": [
+      1,
+      2
+    ]
+  }
+}

@@ -146,7 +146,7 @@ export function showChatSearchDrawer(mainArea, conversationId, { dateIndex, onRe
 
       const meta = document.createElement('div');
       meta.className = 'chat-search-result-meta';
-      meta.textContent = `${formatDateShort(r.date)}  ${r.sender === 'DV' ? '✓✓' : ''}`;
+      meta.textContent = `${formatDateShort(r.date)}${r.excerpt ? ' · Recorte publicado' : `  ${r.sender === 'DV' ? '✓✓' : ''}`}`;
 
       const content = document.createElement('div');
       content.className = 'chat-search-result-content';
@@ -205,6 +205,13 @@ export function showChatSearchDrawer(mainArea, conversationId, { dateIndex, onRe
 }
 
 function buildCalendar(dateIndex, onSelect) {
+  dateIndex = dateIndex.filter(entry => /^\d{4}-\d{2}-\d{2}$/.test(entry.date));
+  if (!dateIndex.length) {
+    const empty = document.createElement('div');
+    empty.className = 'chat-calendar';
+    empty.textContent = 'Não há dias exatos informados nesta conversa. Use a busca por texto.';
+    return empty;
+  }
   const availableDates = new Set(dateIndex.map(d => d.date));
   const sortedDates = dateIndex.map(d => d.date).sort();
   const firstChatDate = sortedDates[0]; // e.g. "2024-02-10"

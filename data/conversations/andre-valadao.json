@@ -1,0 +1,106 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "André Valadão"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": "2024-04-27",
+      "end": "2024-04-29"
+    },
+    "date_range_complete": true,
+    "total_messages": 3,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes publicados pelo ICL Notícias sobre a intermediação de Valadão após uma crítica de Nikolas ao evento patrocinado pelo Master em Londres. Em nota reproduzida na reportagem, o pastor disse que apenas promoveu diálogo entre conhecidos, negou envolvimento nos negócios do banco e afirmou desconhecer irregularidades.",
+    "limitations": [
+      "A fala do pastor sobre Nikolas é um relato ao banqueiro, não uma mensagem escrita por Nikolas neste chat.",
+      "O áudio tem somente um trecho de transcrição; o arquivo original não integra o acervo."
+    ],
+    "sources": [
+      {
+        "id": "icl-2026-09-03-valadao",
+        "publisher": "ICL Notícias",
+        "url": "https://iclnoticias.com.br/pr-valadao-pediu-nikolas-nao-atacar-vorcaro/",
+        "published_at": "2026-09-03",
+        "accessed_at": "2026-10-19",
+        "description": "Reportagem de Juliana Dal Piva e Cleber Lourenço, atualizada em 4 de setembro com nota do pastor.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": "2024-04-27",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "De novo pedir sua ajuda com Nikolas.",
+      "source_id": "icl-2026-09-03-valadao",
+      "source_locator": "Início do pedido encaminhado no dia da publicação de Nikolas.",
+      "reported_date": "2024-04-27",
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": null,
+      "date": "2024-04-29",
+      "time": null,
+      "type": "audio",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "André Valadão",
+      "content": "Eu preferia que você falasse com ele primeiro",
+      "source_id": "icl-2026-09-03-valadao",
+      "source_locator": "Trecho do áudio em que Valadão relata o pedido que fez a Nikolas.",
+      "reported_date": "2024-04-29",
+      "excerpt": true
+    },
+    {
+      "id": 3,
+      "timestamp": null,
+      "date": "2024-04-29",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "André Valadão",
+      "content": "e daí pediu perdão demais e vai contornar tudo",
+      "source_id": "icl-2026-09-03-valadao",
+      "source_locator": "Trecho da mensagem escrita enviada horas depois, segundo a sequência descrita no texto.",
+      "reported_date": "2024-04-29",
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2024-04-27",
+        "message_count": 1,
+        "first_message_id": 1,
+        "last_message_id": 1
+      },
+      {
+        "date": "2024-04-29",
+        "message_count": 2,
+        "first_message_id": 2,
+        "last_message_id": 3
+      }
+    ],
+    "undated_message_ids": []
+  }
+}

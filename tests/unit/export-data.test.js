@@ -33,15 +33,42 @@ describe('one pair of files per conversation', () => {
 });
 
 describe('the JSON', () => {
+  it('carries public sources into exports and static pages without inventing timestamps', () => {
+    const excerpts = conversations.filter(conversation => conversation.coverage === 'selected_public_excerpts');
+    expect(excerpts.length).toBeGreaterThan(0);
+    for (const entry of excerpts) {
+      const exported = json(entry.id);
+      const original = JSON.parse(readFileSync(join(ROOT, 'data/conversations', entry.id + '.json'), 'utf8'));
+      const html = readFileSync(join(ROOT, 'dist/chat', entry.id, 'index.html'), 'utf8');
+      expect(exported.conversation.source_detail.kind).toBe('public-excerpts');
+      expect(exported.conversation.sources).toEqual(entry.sources);
+      expect(exported.messages.map(message => message.timestamp)).toEqual(original.messages.map(message => message.timestamp ? message.timestamp + '-03:00' : null));
+      expect(html).toContain('Recorte publicado');
+      if (original.messages.some(message => !message.time)) expect(html).toContain('Horário não informado');
+      expect(html).not.toContain('null-03:00');
+      expect(html).not.toContain('null/null');
+      expect(md(entry.id)).not.toContain('null null');
+      for (const source of entry.sources) {
+        expect(html).toContain(source.url);
+        expect(md(entry.id)).toContain(source.url);
+        expect(readFileSync(join(ROOT, 'dist/llms-full.txt'), 'utf8')).toContain(source.url);
+      }
+    }
+  });
   it('keeps every message', () => {
     for (const conv of conversations) {
       expect(json(conv.id).messages.length, conv.id).toBe(conv.total_messages);
     }
   });
 
-  it('stamps every timestamp with its UTC offset', () => {
+  it('stamps known timestamps with their UTC offset and preserves unknown ones', () => {
     for (const conv of conversations) {
       for (const msg of json(conv.id).messages) {
+        if (msg.timestamp === null) {
+          expect(msg.excerpt).toBe(true);
+          expect(msg.time).toBeNull();
+          continue;
+        }
         expect(msg.timestamp, `${conv.id} #${msg.id}`).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}-03:00$/);
       }
     }
@@ -115,7 +142,7 @@ describe('the Markdown', () => {
 
   it('keeps every message', () => {
     for (const conv of conversations) {
-      const headers = md(conv.id).split('\n').filter(l => /^\*\*.+\*\* · \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} · msg \d+/.test(l));
+      const headers = md(conv.id).split('\n').filter(l => /^\*\*.+\*\* · .+ · msg \d+(?: ·|$)/.test(l));
       expect(headers.length, conv.id).toBe(conv.total_messages);
     }
   });

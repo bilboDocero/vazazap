@@ -4,74 +4,65 @@
       "DV",
       "Luciano Huck"
     ],
-    "saved_as": "Luciano Huck",
-    "phone": "5511995500066",
+    "saved_as": null,
+    "phone": null,
+    "status": "standby",
+    "schema_version": 2,
+    "publication_ready": false,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
     "date_range": {
-      "start": "2024-10-28",
-      "end": "2024-10-28"
+      "start": "2024-08-04",
+      "end": "2024-08-04"
     },
-    "total_messages": 4,
-    "source": "Poder360 (30/09/2026) / Acervo Celular Vorcaro",
-    "note": "Diálogos sobre jantares privados em São Paulo — arquivo estruturado para preenchimento integral posterior."
+    "date_range_complete": true,
+    "total_messages": 1,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Pedido de uso de aeronave para ir a Varsóvia, de onde o apresentador seguiria para Kiev para entrevistar Volodymyr Zelensky, segundo o Poder360.",
+    "limitations": [
+      "Este recorte é um pedido; não registra sua execução.",
+      "Referências a Huck na conversa com Martha não foram convertidas em mensagens diretas de Huck."
+    ],
+    "sources": [
+      {
+        "id": "poder360-2026-09-30",
+        "publisher": "Poder360",
+        "url": "https://www.poder360.com.br/poder-gente/leia-as-mensagens-entre-luciano-huck-e-daniel-vorcaro/",
+        "published_at": "2026-09-30",
+        "accessed_at": "2026-10-19",
+        "description": "Apuração sobre mensagens diretas entre Huck e Vorcaro, com capturas das conversas.",
+        "kind": "news_report"
+      }
+    ]
   },
   "messages": [
     {
       "id": 1,
-      "timestamp": "2024-10-28T19:30:00",
-      "date": "2024-10-28",
-      "time": "19:30:00",
+      "timestamp": null,
+      "date": "2024-08-04",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
       "sender": "Luciano Huck",
-      "content": "Daniel, tudo em pé para o nosso jantar hoje mais tarde?",
-      "type": "text",
-      "is_edited": false,
-      "attachment": null,
-      "urls": []
-    },
-    {
-      "id": 2,
-      "timestamp": "2024-10-28T19:35:10",
-      "date": "2024-10-28",
-      "time": "19:35:10",
-      "sender": "DV",
-      "content": "Tudo certo Luciano! Só fechando umas coisas no banco e já sigo direto pro restaurante.",
-      "type": "text",
-      "is_edited": false,
-      "attachment": null,
-      "urls": []
-    },
-    {
-      "id": 3,
-      "timestamp": "2024-10-28T20:10:00",
-      "date": "2024-10-28",
-      "time": "20:10:00",
-      "sender": "DV",
-      "content": "To saindo do banco agora e indo a caminho.",
-      "type": "text",
-      "is_edited": false,
-      "attachment": null,
-      "urls": []
-    },
-    {
-      "id": 4,
-      "timestamp": "2024-10-28T20:12:00",
-      "date": "2024-10-28",
-      "time": "20:12:00",
-      "sender": "Luciano Huck",
-      "content": "Perfeito, te espero lá!",
-      "type": "text",
-      "is_edited": false,
-      "attachment": null,
-      "urls": []
+      "content": "Alguma chance de usar o seu Falcon para fazer um bate e volta em Varsóvia?",
+      "source_id": "poder360-2026-09-30",
+      "source_locator": "Seção sobre aviões; terceiro pedido, datado de 4 de agosto de 2024.",
+      "reported_date": "2024-08-04",
+      "excerpt": true
     }
   ],
   "index": {
     "dates": [
       {
-        "date": "2024-10-28",
-        "message_count": 4,
+        "date": "2024-08-04",
+        "message_count": 1,
         "first_message_id": 1,
-        "last_message_id": 4
+        "last_message_id": 1
       }
-    ]
+    ],
+    "undated_message_ids": []
   }
 }

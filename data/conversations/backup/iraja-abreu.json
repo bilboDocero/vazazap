@@ -4,74 +4,110 @@
       "DV",
       "Irajá Abreu"
     ],
-    "saved_as": "Irajá Senador",
-    "phone": "5561996600055",
+    "saved_as": null,
+    "phone": null,
+    "status": "standby",
+    "schema_version": 2,
+    "publication_ready": false,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
     "date_range": {
-      "start": "2025-05-18",
-      "end": "2025-05-18"
+      "start": null,
+      "end": null
     },
+    "date_range_complete": false,
     "total_messages": 4,
-    "source": "UOL (30/09/2026) — Mensagens privadas apreendidas",
-    "note": "Troca de mensagens diretas entre o senador e Daniel Vorcaro — arquivo estruturado para preenchimento integral posterior."
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes de brincadeiras e convite de viagem divulgados por O Globo e confirmados pelo UOL. Na resposta publicada, o gabinete de Irajá relacionou os contatos à articulação do PL 2.234/2022, sobre jogos e cassinos.",
+    "limitations": [
+      "O texto situa o início dos contatos em 11 de outubro de 2024, mas não exibe o carimbo de cada mensagem; os dias foram mantidos em aberto."
+    ],
+    "sources": [
+      {
+        "id": "uol-2026-09-30",
+        "publisher": "UOL",
+        "url": "https://noticias.uol.com.br/politica/ultimas-noticias/2026/09/30/mensagens-senador-do-psd-to-para-vorcaro.amp.htm",
+        "published_at": "2026-09-30",
+        "accessed_at": "2026-10-19",
+        "description": "Reportagem sobre as conversas de Irajá com Vorcaro e a resposta do gabinete.",
+        "kind": "news_report"
+      }
+    ]
   },
   "messages": [
     {
       "id": 1,
-      "timestamp": "2025-05-18T15:00:00",
-      "date": "2025-05-18",
-      "time": "15:00:00",
-      "sender": "Irajá Abreu",
-      "content": "Daniel, boa tarde! Consegue me atender rapidamente para falarmos daquele tema?",
+      "timestamp": null,
+      "date": null,
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "Irajá Abreu",
+      "content": "Cadê nossas norueguesas!? Rs",
+      "source_id": "uol-2026-09-30",
+      "source_locator": "Primeiro bloco de diálogos na seção de mensagens obtidas pela PF.",
+      "reported_date": "2024-10",
+      "excerpt": true
     },
     {
       "id": 2,
-      "timestamp": "2025-05-18T15:05:20",
-      "date": "2025-05-18",
-      "time": "15:05:20",
-      "sender": "DV",
-      "content": "Senador, boa tarde. Estou finalizando uma call aqui e já te ligo em 10 minutos.",
+      "timestamp": null,
+      "date": null,
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "DV",
+      "content": "Hehe. Vamos ter que mandar alguém la buscar",
+      "source_id": "uol-2026-09-30",
+      "source_locator": "Resposta no primeiro bloco.",
+      "reported_date": "2024-10",
+      "excerpt": true
     },
     {
       "id": 3,
-      "timestamp": "2025-05-18T15:20:10",
-      "date": "2025-05-18",
-      "time": "15:20:10",
-      "sender": "DV",
-      "content": "Te ligando agora.",
+      "timestamp": null,
+      "date": null,
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "Irajá Abreu",
+      "content": "Oi líder conseguiu viajar!?",
+      "source_id": "uol-2026-09-30",
+      "source_locator": "Bloco situado no dia seguinte ao primeiro diálogo.",
+      "reported_date": "2024-10",
+      "excerpt": true
     },
     {
       "id": 4,
-      "timestamp": "2025-05-18T15:35:00",
-      "date": "2025-05-18",
-      "time": "15:35:00",
-      "sender": "Irajá Abreu",
-      "content": "Beleza, combinado como falamos na ligação.",
+      "timestamp": null,
+      "date": null,
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "DV",
+      "content": "Fala hermano. Yes. Bora pra dubai?",
+      "source_id": "uol-2026-09-30",
+      "source_locator": "Resposta no bloco do convite de viagem.",
+      "reported_date": "2024-10",
+      "excerpt": true
     }
   ],
   "index": {
-    "dates": [
-      {
-        "date": "2025-05-18",
-        "message_count": 4,
-        "first_message_id": 1,
-        "last_message_id": 4
-      }
+    "dates": [],
+    "undated_message_ids": [
+      1,
+      2,
+      3,
+      4
     ]
   }
 }

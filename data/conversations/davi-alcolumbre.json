@@ -1,0 +1,103 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Davi Alcolumbre"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": "2025-02-01",
+      "end": "2025-02-01"
+    },
+    "date_range_complete": false,
+    "total_messages": 3,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes de felicitações e declarações de amizade entre Vorcaro e Davi Alcolumbre, divulgados pela Veja e confirmados pela Folha. Alcolumbre contestou as acusações, classificou as mensagens como pessoais e afirmou que elas não indicam ilegalidade.",
+    "limitations": [
+      "O fim de março de 2025 é mantido como mês, sem atribuição de um dia específico.",
+      "Declarações de amizade não demonstram, por si, favorecimento ou conduta ilícita."
+    ],
+    "sources": [
+      {
+        "id": "folha-2026-09-24",
+        "publisher": "Folha de S.Paulo",
+        "url": "https://www1.folha.uol.com.br/poder/2026/09/mensagens-apontam-relacao-de-proximidade-entre-alcolumbre-e-vorcaro.shtml",
+        "published_at": "2026-09-24",
+        "accessed_at": "2026-10-19",
+        "description": "Mensagens de fevereiro e março de 2025 e manifestação do senador.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": "2025-02-01",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Davi Alcolumbre",
+      "content": "Fala meu amor! Muito obrigado por tudo",
+      "source_id": "folha-2026-09-24",
+      "source_locator": "Início da resposta aos cumprimentos pela eleição à presidência do Senado.",
+      "reported_date": "2025-02-01",
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Davi Alcolumbre",
+      "content": "Sou seu irmão!!! Pra vida toda!!",
+      "source_id": "folha-2026-09-24",
+      "source_locator": "Declaração situada pela reportagem no fim de março de 2025.",
+      "reported_date": "2025-03",
+      "excerpt": true
+    },
+    {
+      "id": 3,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "A qualquer tempo pra qualquer coisa. Nunca vou esquecer",
+      "source_id": "folha-2026-09-24",
+      "source_locator": "Trecho da resposta, sem a interpolação editorial de parentesco feita pelo jornal.",
+      "reported_date": "2025-03",
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2025-02-01",
+        "message_count": 1,
+        "first_message_id": 1,
+        "last_message_id": 1
+      }
+    ],
+    "undated_message_ids": [
+      2,
+      3
+    ]
+  }
+}

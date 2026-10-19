@@ -110,7 +110,7 @@ export function attachSearch(sidebar, onResultClick) {
     contact.title = result.contactName;
     const date = document.createElement('span');
     date.className = 'search-result-date';
-    date.textContent = formatDateShort(result.date);
+    date.textContent = `${formatDateShort(result.date)}${result.excerpt ? ' · Recorte publicado' : ''}`;
     const top = document.createElement('div');
     top.className = 'search-result-top';
     top.append(contact, date);

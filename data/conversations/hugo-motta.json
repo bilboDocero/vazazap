@@ -1,0 +1,105 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Hugo Motta"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": "2025-03-03",
+      "end": "2025-05-23"
+    },
+    "date_range_complete": true,
+    "total_messages": 3,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Pedidos de entradas no Carnaval e recortes do episódio de Mônaco. A frase sobre Mônaco é de Vorcaro, não de Motta. À Folha, Motta negou ilícitos e atribuiu os contatos à sua interlocução com setores da sociedade.",
+    "limitations": [
+      "Há mensagens e uma ligação omitidas entre os recortes de 23 de maio."
+    ],
+    "sources": [
+      {
+        "id": "folha-2026-09-29",
+        "publisher": "Folha de S.Paulo",
+        "url": "https://www1.folha.uol.com.br/poder/2026/09/mensagens-indicam-proximidade-entre-vorcaro-e-motta-queria-estar-mesmo-era-em-monaco-com-voce.shtml",
+        "published_at": "2026-09-29",
+        "accessed_at": "2026-10-19",
+        "description": "Apuração de José Marques e Constança Rezende sobre os contatos entre Motta e Vorcaro.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": "2025-03-03",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Hugo Motta",
+      "content": "irmão consegue 4 entradas no camarote para as campeãs?",
+      "source_id": "folha-2026-09-29",
+      "source_locator": "Pedido de entradas para o desfile das campeãs.",
+      "reported_date": "2025-03-03",
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": null,
+      "date": "2025-05-23",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Mas queria mesmo estar era em Monaco com voce",
+      "source_id": "folha-2026-09-29",
+      "source_locator": "Conversa datada de 23 de maio de 2025 no corpo da reportagem.",
+      "reported_date": "2025-05-23",
+      "excerpt": true
+    },
+    {
+      "id": 3,
+      "timestamp": null,
+      "date": "2025-05-23",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Hugo Motta",
+      "content": "Blz irmaozao. Muito obrigado",
+      "source_id": "folha-2026-09-29",
+      "source_locator": "Agradecimento após a ligação e o envio de contato de motorista.",
+      "reported_date": "2025-05-23",
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2025-03-03",
+        "message_count": 1,
+        "first_message_id": 1,
+        "last_message_id": 1
+      },
+      {
+        "date": "2025-05-23",
+        "message_count": 2,
+        "first_message_id": 2,
+        "last_message_id": 3
+      }
+    ],
+    "undated_message_ids": []
+  }
+}

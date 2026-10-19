@@ -4,74 +4,77 @@
       "DV",
       "João Doria"
     ],
-    "saved_as": "João Doria",
-    "phone": "5511997700044",
+    "saved_as": null,
+    "phone": null,
+    "status": "standby",
+    "schema_version": 2,
+    "publication_ready": false,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
     "date_range": {
-      "start": "2025-03-22",
-      "end": "2025-03-22"
+      "start": null,
+      "end": null
     },
-    "total_messages": 4,
-    "source": "Folha de S.Paulo (05/03/2026) — Agenda e mensagens apreendidas",
-    "note": "Mensagens em que Doria aconselha Vorcaro a reagir a rumores de mercado antes da deflagração de investigações — arquivo estruturado para preenchimento integral posterior."
+    "date_range_complete": false,
+    "total_messages": 2,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes do alerta sobre rumores envolvendo Vorcaro, Maurício Quadrado e o Master. Doria informou à Folha que a conversa ocorreu em maio de 2025 e a descreveu como um contato cordial anterior às investigações públicas.",
+    "limitations": [
+      "A fonte informa o mês, não o dia ou o horário.",
+      "O primeiro registro é somente parte da mensagem de Doria; o segundo vem depois de uma pergunta de Vorcaro não reproduzida aqui."
+    ],
+    "sources": [
+      {
+        "id": "folha-2026-03-05",
+        "publisher": "Folha de S.Paulo",
+        "url": "https://www1.folha.uol.com.br/amp/mercado/2026/03/doria-aconselhou-vorcaro-a-reagir-a-rumores-antes-de-investigacao-do-master-mostram-mensagens.shtml",
+        "published_at": "2026-03-05",
+        "accessed_at": "2026-10-19",
+        "description": "Apuração de Ana Paula Branco sobre o alerta de Doria e sua resposta à reportagem.",
+        "kind": "news_report"
+      }
+    ]
   },
   "messages": [
     {
       "id": 1,
-      "timestamp": "2025-03-22T10:15:00",
-      "date": "2025-03-22",
-      "time": "10:15:00",
-      "sender": "João Doria",
-      "content": "Daniel, bom dia. Vi que há ruídos no mercado sobre o banco. Sugiro que você reaja ativamente e solte posicionamento firme antes que isso ganhe tração.",
+      "timestamp": null,
+      "date": null,
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "João Doria",
+      "content": "Tenho escutado coisas que vão precisar de reação sua. Sempre com equilíbrio e ponderação. Mas jamais com silêncio.",
+      "source_id": "folha-2026-03-05",
+      "source_locator": "Trecho intermediário da mensagem de alerta.",
+      "reported_date": "2025-05",
+      "excerpt": true
     },
     {
       "id": 2,
-      "timestamp": "2025-03-22T10:20:10",
-      "date": "2025-03-22",
-      "time": "10:20:10",
-      "sender": "DV",
-      "content": "Obrigado pelo toque, João. Já estamos alinhando uma nota institucional e conversando com a equipe de assessoria.",
+      "timestamp": null,
+      "date": null,
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
-    },
-    {
-      "id": 3,
-      "timestamp": "2025-03-22T10:22:45",
-      "date": "2025-03-22",
-      "time": "10:22:45",
+      "urls": [],
       "sender": "João Doria",
-      "content": "Excelente. A velocidade na comunicação faz toda a diferença nesses momentos. Conte comigo.",
-      "type": "text",
-      "is_edited": false,
-      "attachment": null,
-      "urls": []
-    },
-    {
-      "id": 4,
-      "timestamp": "2025-03-22T10:25:00",
-      "date": "2025-03-22",
-      "time": "10:25:00",
-      "sender": "DV",
-      "content": "Muito obrigado pela força e pela parceria de sempre.",
-      "type": "text",
-      "is_edited": false,
-      "attachment": null,
-      "urls": []
+      "content": "A você. Ao Maurício. Ao banco",
+      "source_id": "folha-2026-03-05",
+      "source_locator": "Resposta à pergunta de Vorcaro sobre a que se referia.",
+      "reported_date": "2025-05",
+      "excerpt": true
     }
   ],
   "index": {
-    "dates": [
-      {
-        "date": "2025-03-22",
-        "message_count": 4,
-        "first_message_id": 1,
-        "last_message_id": 4
-      }
+    "dates": [],
+    "undated_message_ids": [
+      1,
+      2
     ]
   }
 }

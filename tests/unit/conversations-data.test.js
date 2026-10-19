@@ -8,6 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { messageDateKey } from '../../src/lib/message-date.js';
 
 const ROOT = join(import.meta.dirname, '../..');
 const DATA_DIR = join(ROOT, 'public/data');
@@ -23,7 +24,7 @@ describe('conversations.json', () => {
   });
 
   it('is ordered by most recent message, newest first', () => {
-    const stamps = conversations.map(c => c.last_message?.timestamp || '');
+    const stamps = conversations.map(c => c.last_message?.timestamp || (c.last_message?.date !== 'undated' ? c.last_message?.date || '' : ''));
     expect(stamps).toEqual([...stamps].sort().reverse());
   });
 
@@ -57,6 +58,13 @@ describe('conversations.json', () => {
 
   it('keeps the date range consistent with the last message', () => {
     for (const conv of conversations) {
+      if (conv.coverage === 'selected_public_excerpts') {
+        const source = JSON.parse(readFileSync(join(ROOT, 'data/conversations', conv.id + '.json'), 'utf8'));
+        const known = source.messages.map(messageDateKey).filter(date => date !== 'undated').sort();
+        expect(conv.date_range).toEqual({ start: known[0] || null, end: known.at(-1) || null });
+        expect(conv.last_message.timestamp).toBe(source.messages.at(-1).timestamp);
+        continue;
+      }
       expect(
         conv.last_message.timestamp.startsWith(conv.date_range.end), conv.id
       ).toBe(true);
@@ -110,13 +118,17 @@ describe('per-conversation chunks', () => {
 });
 
 describe('profile coverage', () => {
-  it('every conversation has a profile written for it', async () => {
+  it('every conversation has a profile or a cited context for its public excerpts', async () => {
     const { CONTACT_PROFILES } = await import('../../src/lib/profile-content.js');
-    const missing = conversations
-      .map(c => c.id)
-      .filter(id => !CONTACT_PROFILES[id]);
-
-    expect(missing).toEqual([]);
+    for (const conversation of conversations) {
+      if (CONTACT_PROFILES[conversation.id]) continue;
+      // Public excerpts carry their documented context in the catalog instead
+      // of publishing the old, unsourced DRAFT_PROFILES biographies.
+      expect(conversation.coverage, conversation.id).toBe('selected_public_excerpts');
+      expect(conversation.context.trim().length, conversation.id).toBeGreaterThan(0);
+      expect(conversation.sources.length, conversation.id).toBeGreaterThan(0);
+      expect(conversation.sources.every(source => /^https:\/\//.test(source.url))).toBe(true);
+    }
   });
 
   it('every profile has at least one section with text', async () => {

@@ -22,6 +22,7 @@ import {
   ROOT, SITE, REPO, TIMEZONE, UTC_OFFSET,
   loadEntries, loadMessages, sourceOf, contactOf, whoIs, createResolver, createLocator, isPaged,
   urlsIn, linksToMarkdown, longDate, phonePretty, MEDIA,
+  archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor,
 } from './lib/corpus.mjs';
 
 const targetArg = process.argv[2];
@@ -35,8 +36,7 @@ const entries = loadEntries();
 // Highlights point at messages; resolved once here, for every file below.
 const resolve = createResolver(entries);
 const hrefFor = createLocator(entries);
-const monthFmt = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' });
-const monthName = (ym) => monthFmt.format(new Date(`${ym}-15T12:00:00`));
+const monthName = (ym) => archiveDate(ym, true);
 const md = (text, context) => linksToMarkdown(text, { resolve, context, hrefFor });
 
 // ── text helpers ───────────────────────────────────────────────────────────
@@ -123,13 +123,19 @@ function conversationMarkdown(entry, messages, { standalone = true, month = null
   out.push(`| Fonte | ${source.label} |`);
   if (source.document) out.push(`| Documento | \`${source.document}\`${source.document_pages ? `, ${source.document_pages} páginas` : ''}${source.document_url ? ` — [no repositório](${source.document_url})` : ''} (sha256 \`${source.document_sha256 || 'n/d'}\`) |`);
   out.push(`| Como chegou ao público | ${source.how} |`);
-  out.push(`| Período | ${month ? `${messages[0].date} a ${messages.at(-1).date}` : `${entry.date_range.start} a ${entry.date_range.end}`} |`);
+  out.push(`| Período | ${month ? archivePeriod({ start: messageDateKey(messages[0]), end: messageDateKey(messages.at(-1)) }) : archivePeriod(entry.date_range)} |`);
   out.push(`| Mensagens | ${month ? `${messages.length} (de ${entry.total_messages} na conversa)` : entry.total_messages} |`);
   if (entry.saved_as) out.push(`| Contato salvo como | ${entry.saved_as} |`);
   if (entry.phone) out.push(`| Telefone | ${phonePretty(entry.phone)} |`);
   out.push(`| Fuso dos horários | ${TIMEZONE} (UTC${UTC_OFFSET}) |`);
   if (entry.note) out.push(`| Observação | ${entry.note} |`);
   out.push('');
+  if (source.kind === 'public-excerpts') {
+    out.push(entry.context || '', '', 'Seleção parcial; há mensagens omitidas entre os recortes.', '');
+    for (const limitation of entry.limitations || []) out.push(`- ${limitation}`);
+    for (const ref of entry.sources || []) out.push(`- Fonte: [${ref.publisher}](${ref.url}) — ${ref.published_at || ref.document_date || 'data de publicação não informada'}`);
+    out.push('');
+  }
 
   const who = whoIs(entry, profile);
   const { text: profileText, urls } = profileMarkdown(`Quem é ${who}`, profile, entry.id);
@@ -138,18 +144,22 @@ function conversationMarkdown(entry, messages, { standalone = true, month = null
   out.push(`${sub} Conversa`, '');
   let day = null;
   for (const msg of messages) {
-    if (msg.date !== day) {
-      day = msg.date;
+    if (messageDateKey(msg) !== day) {
+      day = messageDateKey(msg);
       out.push(`${standalone ? '###' : '####'} ${longDate(day)}`, '');
     }
     // Time to the second and the message id: the key a citation needs.
-    const tags = [`${msg.date} ${msg.time}`, `msg ${msg.id}`];
+    const tags = [msg.date && msg.time ? `${msg.date} ${msg.time}` : `${archiveDate(messageDateKey(msg))} ${archiveTime(msg.time)}`, `msg ${msg.id}`];
+    if (msg.excerpt) tags.push('recorte publicado');
+    if (msg.date_basis) tags.push('data deduzida da sequência descrita na fonte');
     if (msg.is_edited) tags.push('editada');
     if (msg.view_once) tags.push('visualização única');
     if (msg.source_page) tags.push(`laudo p. ${msg.source_page}${msg.source_figure ? `, fig. ${msg.source_figure}` : ''}`);
     out.push(`**${msg.sender}** · ${tags.join(' · ')}`);
     const body = messageBody(msg);
     if (body) out.push(...body.split('\n').map(escapeLine));
+    const ref = publicSourceFor(msg, entry);
+    if (ref) out.push(`Fonte: [${ref.publisher}](${ref.url}) — ${msg.source_locator}`);
     out.push('');
   }
 
@@ -180,9 +190,10 @@ function conversationJson(entry, messages) {
       source: source.label,
       source_detail: source,
       note: entry.note || null,
+      ...(entry.coverage ? { coverage: entry.coverage, sources: entry.sources, context: entry.context, limitations: entry.limitations, date_range_complete: entry.date_range_complete } : {}),
     },
     profile: profileJson(getContactProfile(entry.id), entry.id),
-    messages: messages.map(m => ({ ...m, timestamp: `${m.timestamp}${UTC_OFFSET}` })),
+    messages: messages.map(m => ({ ...m, timestamp: m.timestamp ? `${m.timestamp}${UTC_OFFSET}` : null })),
   };
 }
 
@@ -207,6 +218,7 @@ function readme(conversations) {
     '| `vorcarozap.md` / `vorcarozap.json` | Tudo num arquivo só |', '',
     '## Como ler', '',
     `- Horários em ${TIMEZONE} (UTC${UTC_OFFSET}); no JSON, cada \`timestamp\` já carrega o fuso.`,
+    '- Nos recortes publicados, datas parciais e horários desconhecidos são preservados; timestamp nulo não representa meia-noite. Há lacunas entre os recortes e uma fonte por registro.',
     '- Mensagens do relatório da PF trazem `laudo p. N, fig. M` — página e figura do PDF de origem, para conferência.',
     '- `_[Foto]_`, `_[Vídeo]_`, `_[Áudio]_`, `_[Documento]_`: a mídia não faz parte do material público; só o tipo é conhecido.',
     '- `[imagem de visualização única — conteúdo não recuperado]`: enviada em visualização única e não recuperada pela perícia.', '',
@@ -226,7 +238,7 @@ function allMarkdown(built) {
     // Vorcaro's own profile quotes the Martha chat when it says "search".
     profileMarkdown('Quem é Daniel Vorcaro', VORCARO_PROFILE, 'martha-graeff').text,
     '## Conversas', '',
-    ...built.map(b => `- [${contactOf(b.entry)}](#${b.entry.id}) — ${b.entry.total_messages} mensagens, ${b.entry.date_range.start} a ${b.entry.date_range.end}`),
+    ...built.map(b => `- [${contactOf(b.entry)}](#${b.entry.id}) — ${b.entry.total_messages} mensagens, ${archivePeriod(b.entry.date_range)}`),
     '', '---', '',
   ];
   for (const b of built) {
@@ -265,7 +277,7 @@ for (const entry of entries) {
   // reader after a single exchange does not have to take all of it.
   if (isPaged(entry)) {
     const months = new Map();
-    for (const m of messages) { const ym = m.date.slice(0, 7); if (!months.has(ym)) months.set(ym, []); months.get(ym).push(m); }
+    for (const m of messages) { const ym = messageMonthKey(m); if (!months.has(ym)) months.set(ym, []); months.get(ym).push(m); }
     for (const [ym, msgs] of months) {
       const monthMd = conversationMarkdown(entry, msgs, { month: ym });
       const monthJson = JSON.stringify({ ...conversationJson(entry, msgs), month: ym }, null, 1);

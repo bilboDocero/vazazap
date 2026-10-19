@@ -179,8 +179,8 @@ export function attachContextMenu(chatContainer, { senderNames = {}, incomingSen
     fields.className = 'msg-info-fields';
 
     fields.appendChild(createField('Remetente', senderDisplay));
-    if (msg.date) {
-      fields.appendChild(createField('Data', formatDateLong(msg.date)));
+    if (msg.date || msg.reported_date || msg.excerpt) {
+      fields.appendChild(createField('Data', formatDateLong(msg.date || msg.reported_date)));
     }
     if (msg.time) {
       fields.appendChild(createField('Hora', msg.time));

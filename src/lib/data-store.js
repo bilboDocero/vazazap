@@ -1,3 +1,5 @@
+import { messageDateKey } from './message-date.js';
+
 /**
  * DataStore — lazy-loading data layer with LRU cache for day-chunks.
  *
@@ -117,7 +119,12 @@ export class DataStore {
   async findDateForMessage(conversationId, messageId) {
     const dates = await this.getConversationIndex(conversationId);
     const id = Number(messageId);
+    // Partial/unknown dates can interleave; their explicit membership wins.
     for (const entry of dates) {
+      if (entry.message_ids?.includes(id)) return entry.date;
+    }
+    for (const entry of dates) {
+      if (entry.message_ids) continue;
       if (id >= entry.first_message_id && id <= entry.last_message_id) {
         return entry.date;
       }
@@ -144,7 +151,7 @@ export class DataStore {
     }
 
     const isIsoDate = /^\d{4}-\d{2}-\d{2}$/.test(date);
-    const month = isIsoDate ? date.slice(0, 7) : null;
+    const month = isIsoDate || /^\d{4}-\d{2}$/.test(date) ? date.slice(0, 7) : null;
     const chunkPath = month ? `${month}.json` : `${date}.json`;
     const chunkKey = month ? `${conversationId}/${month}` : cacheKey;
 
@@ -159,7 +166,7 @@ export class DataStore {
         if (month) {
           const byDay = new Map();
           for (const msg of allMsgs) {
-            const d = msg.date;
+            const d = messageDateKey(msg);
             if (!byDay.has(d)) byDay.set(d, []);
             byDay.get(d).push(msg);
           }

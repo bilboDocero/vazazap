@@ -1,0 +1,108 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Nikolas Ferreira"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": "2025-03-30",
+      "end": "2025-04-01"
+    },
+    "date_range_complete": true,
+    "total_messages": 3,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes do áudio em que Nikolas intermedeia uma demanda de Thiago Rodrigues de Faria e das respostas do banqueiro. Nikolas admitiu os contatos, negou irregularidades e afirmou não ter recebido dinheiro.",
+    "limitations": [
+      "O áudio de visualização única enviado por Vorcaro não foi reconstruído.",
+      "A fonte corrigiu a referência a lindão por ambiguidade na escuta; esse termo não foi adotado na transcrição.",
+      "O dia da última resposta é derivado da sequência relativa descrita na reportagem, não de um carimbo visível."
+    ],
+    "sources": [
+      {
+        "id": "uol-2026-09-03",
+        "publisher": "UOL",
+        "url": "https://www.bol.uol.com.br/noticias/2026/09/03/nikolas-ferreira-audio-daniel-vorcaro.ghtm",
+        "published_at": "2026-09-03",
+        "accessed_at": "2026-10-19",
+        "description": "Reportagem atualizada com o áudio do pedido e as respostas de Vorcaro.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": "2025-03-30",
+      "time": null,
+      "type": "audio",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Nikolas Ferreira",
+      "content": "tô passando aí pra você, pra se for do teu interesse, passar o contato dele aqui",
+      "source_id": "uol-2026-09-03",
+      "source_locator": "Trecho da transcrição do áudio sobre o encaminhamento do contato do advogado.",
+      "reported_date": "2025-03-30",
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": null,
+      "date": "2025-03-30",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Amém irmão. Estamos na guerra juntos",
+      "source_id": "uol-2026-09-03",
+      "source_locator": "Resposta escrita após o envio do contato do advogado.",
+      "reported_date": "2025-03-30",
+      "excerpt": true
+    },
+    {
+      "id": 3,
+      "timestamp": null,
+      "date": "2025-04-01",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Deixa comigo",
+      "source_id": "uol-2026-09-03",
+      "source_locator": "Resposta descrita um dia após o aviso do dia seguinte ao áudio de 30 de março.",
+      "date_basis": "relative_sequence_in_report",
+      "reported_date": "2025-04-01",
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2025-03-30",
+        "message_count": 2,
+        "first_message_id": 1,
+        "last_message_id": 2
+      },
+      {
+        "date": "2025-04-01",
+        "message_count": 1,
+        "first_message_id": 3,
+        "last_message_id": 3
+      }
+    ],
+    "undated_message_ids": []
+  }
+}

@@ -68,6 +68,9 @@ def load_extra_conversations():
     for path in sorted(CONVERSATIONS_DIR.glob("*.json")):
         with open(path, "r", encoding="utf-8") as f:
             payload = json.load(f)
+        if payload["metadata"].get("publication_ready") is False:
+            print(f"Skipping standby conversation {path.name}")
+            continue
         loaded.append((path.stem, payload, payload["index"]))
         print(f"Loading conversations/{path.name}...")
     return loaded
@@ -82,11 +85,20 @@ def get_conversation_id(metadata):
     return slugify("-".join(participants))
 
 
+def date_key(message):
+    return message.get("date") or message.get("reported_date") or "undated"
+
+
+def sort_time(message):
+    key = date_key(message)
+    return message.get("timestamp") or (key if key != "undated" else "")
+
+
 def group_messages_by_date(messages):
     """Group messages by their date field."""
     by_date = defaultdict(list)
     for msg in messages:
-        by_date[msg["date"]].append(msg)
+        by_date[date_key(msg)].append(msg)
     return by_date
 
 
@@ -94,7 +106,7 @@ def group_messages_by_month(messages):
     """Group messages by YYYY-MM prefix."""
     by_month = defaultdict(list)
     for msg in messages:
-        ym = msg["date"][:7]
+        ym = date_key(msg)[:7]
         by_month[ym].append(msg)
     return by_month
 
@@ -113,7 +125,7 @@ def build_search_index(messages):
         content = (msg.get("content", "") or "").strip()
         if not content:
             continue
-        d = msg["date"]
+        d = date_key(msg)
         s = msg["sender"]
 
         if d not in date_to_idx:
@@ -148,15 +160,15 @@ def write_global_search_index(sources):
         metadata = data["metadata"]
         others = [p for p in metadata["participants"] if p != "DV"]
         contact = metadata.get("group_name") or (others[0] if others else metadata["participants"][0])
-        conversations.append({"id": conv_id, "contact": contact})
+        conversations.append({"id": conv_id, "contact": contact, **({"excerpt": True} if metadata.get("coverage") == "selected_public_excerpts" else {})})
         for message in data["messages"]:
             if message["type"] != "system" and (message.get("content") or "").strip():
-                ordered.append((message["timestamp"], conversation_index, message))
+                ordered.append((sort_time(message), conversation_index, message))
 
     # Newest results first, with a stable cursor across pages and conversations.
     ordered.sort(key=lambda item: item[0], reverse=True)
     for _, conversation_index, message in ordered:
-        date, sender = message["date"], message["sender"]
+        date, sender = date_key(message), message["sender"]
         if date not in date_ids:
             date_ids[date] = len(dates)
             dates.append(date)
@@ -272,6 +284,13 @@ def split_conversation(conv_id, data, index):
 
     by_date = group_messages_by_date(messages)
     dates = sorted(by_date.keys())
+    if metadata.get("schema_version") == 2:
+        # Explicit IDs avoid overlapping ranges when precision varies in a chat.
+        index = {"dates": [{"date": key, "message_count": len(by_date[key]),
+                            "first_message_id": min(m["id"] for m in by_date[key]),
+                            "last_message_id": max(m["id"] for m in by_date[key]),
+                            "message_ids": [m["id"] for m in by_date[key]]}
+                           for key in dates]}
 
     by_month = group_messages_by_month(messages)
     months = sorted(by_month.keys())
@@ -325,12 +344,17 @@ def split_conversation(conv_id, data, index):
         "last_message": {
             "content": last_msg["content"][:80],
             "timestamp": last_msg["timestamp"],
+            "date": date_key(last_msg),
             "sender": last_msg["sender"],
         } if last_msg else None,
     }
-    for key in ("phone", "saved_as", "source", "note", "is_group", "group_name"):
+    for key in ("phone", "saved_as", "source", "note", "is_group", "group_name", "sources", "context", "limitations", "coverage", "status", "publication_ready", "date_range_complete"):
         if metadata.get(key) is not None:
             entry[key] = metadata[key]
+    if metadata.get("schema_version") == 2:
+        reported = [key for key in dates if key != "undated"]
+        entry["date_range"] = {"start": reported[0] if reported else None,
+                               "end": reported[-1] if reported else None}
     if str(metadata.get("source", "")).startswith("IPJ-A") and REPORT_DOCUMENT:
         entry["source_document"] = REPORT_DOCUMENT
     return entry
@@ -360,7 +384,7 @@ def main():
     entries = [split_conversation(*source) for source in sources]
 
     # Most recent conversation first, the way WhatsApp orders the chat list.
-    entries.sort(key=lambda e: e["last_message"]["timestamp"] if e["last_message"] else "",
+    entries.sort(key=lambda e: sort_time(e["last_message"]) if e["last_message"] else "",
                  reverse=True)
     write_json(OUTPUT_DIR / "conversations.json", {"conversations": entries})
     write_global_search_index(sources)

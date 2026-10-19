@@ -6,6 +6,8 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor } from '../../src/lib/message-date.js';
+export { archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor };
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const DATA_DIR = join(ROOT, 'data');
@@ -41,6 +43,13 @@ export function loadMessages(entry) {
  * split_data.py computed them once.
  */
 export function sourceOf(entry) {
+  if (entry.coverage === 'selected_public_excerpts') {
+    return {
+      kind: 'public-excerpts', label: 'Recortes de mensagens publicados em fontes públicas',
+      how: 'Seleção parcial de citações, com referência por registro; não é uma conversa integral nem validação forense independente.',
+      sources: entry.sources || [], context: entry.context || null, limitations: entry.limitations || [],
+    };
+  }
   if (entry.source?.startsWith('IPJ-A')) {
     const doc = entry.source_document || {};
     return {
@@ -142,11 +151,13 @@ export function mentionsOf(person, entries, messagesOf) {
   return found;
 }
 
-const brDate = (iso) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}`;
+const brDate = archiveDate;
 
 /** "15/11/2025 18:22 · laudo p. 109, fig. 108" — what a quote needs to be checked. */
 export function citationOf(msg) {
-  const parts = [`${brDate(msg.date)} ${msg.time.slice(0, 5)}`];
+  const parts = [`${brDate(messageDateKey(msg))} ${archiveTime(msg.time)}`];
+  if (msg.excerpt) parts.push('recorte publicado');
+  if (msg.source_locator) parts.push(msg.source_locator);
   if (msg.source_page) parts.push(`laudo p. ${msg.source_page}${msg.source_figure ? `, fig. ${msg.source_figure}` : ''}`);
   return parts.join(' · ');
 }
@@ -168,7 +179,7 @@ export function createLocator(entries) {
   return (conversationId, msg) => {
     const entry = byId.get(conversationId);
     if (!entry) return null;
-    return isPaged(entry) ? `/chat/${conversationId}/${msg.date.slice(0, 7)}#msg-${msg.id}` : `/chat/${conversationId}#msg-${msg.id}`;
+    return isPaged(entry) ? `/chat/${conversationId}/${messageMonthKey(msg)}#msg-${msg.id}` : `/chat/${conversationId}#msg-${msg.id}`;
   };
 }
 
@@ -252,8 +263,7 @@ export const linksToMarkdown = (text, opts) => renderLinks(text, { ...opts, mode
 export const linksToHtml = (text, opts) => renderLinks(text, { ...opts, mode: 'html' });
 export const linksToText = (text) => renderLinks(text, { mode: 'text' });
 
-const dateFmt = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
-export const longDate = (iso) => dateFmt.format(new Date(`${iso}T12:00:00`));
+export const longDate = (iso) => archiveDate(iso, true);
 
 export const phonePretty = (p) => (p && /^55\d{10,11}$/.test(p)
   ? `+55 ${p.slice(2, 4)} ${p.slice(4, -4)}-${p.slice(-4)}`

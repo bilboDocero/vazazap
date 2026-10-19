@@ -9,6 +9,7 @@
  *    because the input to linkify is already fully escaped.
  */
 import { escapeHtml, formatTime, formatDateLong, linkify } from '../lib/utils.js';
+import { publicSourceFor } from '../lib/message-date.js';
 import { ScrollLoader } from '../lib/scroll-loader.js';
 import { ICON_INFO, ICON_SEARCH, ICON_CHECKEMPTY, ICON_BELL, ICON_TIMER, ICON_DOWNLOAD, ICON_CLOSE_CIRCULAR, ICON_vorcarozap_LOGO, ICON_MEETBALL, ICON_CHEVRON_DW, ICON_SCREENSHOT } from '../lib/icons.js';
 
@@ -36,7 +37,7 @@ const BACK_ICON = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" s
  * @param {Array} messages
  * @returns {HTMLElement}
  */
-function renderDaySection(date, messages, isGroup = false) {
+function renderDaySection(date, messages, isGroup = false, conversation = null) {
   const section = document.createElement('section');
   section.className = 'chat-day';
   section.dataset.date = date;
@@ -50,8 +51,8 @@ function renderDaySection(date, messages, isGroup = false) {
   // Messages
   let previous = null;
   for (const msg of messages) {
-    const row = renderMessage(msg, isGroup);
-    const gap = previous ? new Date(msg.timestamp) - new Date(previous.timestamp) : Infinity;
+    const row = renderMessage(msg, isGroup, conversation);
+    const gap = previous?.timestamp && msg.timestamp ? new Date(msg.timestamp) - new Date(previous.timestamp) : Infinity;
     const grouped = previous && previous.sender === msg.sender && previous.type !== 'system'
       && msg.type !== 'system' && gap >= 0 && gap < 5 * 60 * 1000;
     row.classList.add(grouped ? 'is-continuation' : 'is-group-start');
@@ -176,7 +177,7 @@ function renderAudioMessage(msg, isOutgoing) {
 
   const foot = document.createElement('div');
   foot.className = 'chat-audio-foot';
-  foot.textContent = 'Áudio não recuperado · transcrição da perícia';
+  foot.textContent = msg.excerpt ? 'Áudio não disponível · transcrição parcial publicada' : 'Áudio não recuperado · transcrição da perícia';
   el.appendChild(foot);
 
   if (transcript) {
@@ -427,7 +428,7 @@ function getSenderColor(sender) {
  * @param {boolean} [isGroup=false]
  * @returns {HTMLElement}
  */
-function renderMessage(msg, isGroup = false) {
+function renderMessage(msg, isGroup = false, conversation = null) {
   const isOutgoing = msg.sender === 'DV';
   const isSystem = msg.type === 'system';
 
@@ -509,6 +510,30 @@ function renderMessage(msg, isGroup = false) {
   }
 
   bubble.appendChild(content);
+
+  if (msg.excerpt) {
+    const provenance = document.createElement('div');
+    provenance.className = 'chat-excerpt-source';
+    const label = document.createElement('span');
+    label.textContent = 'Recorte publicado';
+    provenance.appendChild(label);
+    const source = publicSourceFor(msg, conversation);
+    if (source && /^https?:\/\//i.test(source.url)) {
+      const link = document.createElement('a');
+      link.href = source.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = `Fonte: ${source.publisher}`;
+      link.title = msg.source_locator || source.description;
+      provenance.appendChild(link);
+    }
+    if (msg.date_basis) {
+      const basis = document.createElement('span');
+      basis.textContent = 'Data deduzida da sequência descrita na fonte';
+      provenance.appendChild(basis);
+    }
+    bubble.appendChild(provenance);
+  }
 
   // Metadata row (time + edited flag)
   const meta = document.createElement('span');
@@ -727,6 +752,23 @@ export function renderChatView(container, { conversation, dateIndex, loadMessage
 
   el.appendChild(header);
 
+  if (conversation.coverage === 'selected_public_excerpts') {
+    const details = document.createElement('details');
+    details.className = 'chat-excerpt-context';
+    const summary = document.createElement('summary');
+    summary.textContent = 'Seleção parcial · contexto e fontes';
+    details.appendChild(summary);
+    const context = document.createElement('p');
+    context.textContent = conversation.context;
+    details.appendChild(context);
+    for (const limitation of ['Há mensagens omitidas entre os recortes.', ...(conversation.limitations || [])]) {
+      const note = document.createElement('p');
+      note.textContent = limitation;
+      details.appendChild(note);
+    }
+    el.appendChild(details);
+  }
+
   // Messages area
   const messagesArea = document.createElement('div');
   messagesArea.className = 'chat-messages';
@@ -768,7 +810,7 @@ export function renderChatView(container, { conversation, dateIndex, loadMessage
     container: messagesArea,
     dateIndex,
     loadMessages,
-    renderDay: (date, messages) => renderDaySection(date, messages, isGroup),
+    renderDay: (date, messages) => renderDaySection(date, messages, isGroup, conversation),
   });
 
   return { element: el, loader };

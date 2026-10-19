@@ -1,0 +1,106 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Benedito Gonçalves"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": "2024-05-17",
+      "end": "2024-07-02"
+    },
+    "date_range_complete": true,
+    "total_messages": 3,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "A Folha publicou mensagens cordiais e convites para encontros entre Vorcaro e Benedito Gonçalves, ministro do STJ. O jornal informou que o ministro não havia respondido até a publicação e que, no primeiro semestre de 2026, se declarou impedido de julgar causas relacionadas ao Master.",
+    "limitations": [
+      "Os recortes não constituem uma sequência contínua nem demonstram, por si, interferência em processos.",
+      "Figurinhas, arquivos e mensagens intermediárias não foram reconstruídos."
+    ],
+    "sources": [
+      {
+        "id": "folha-2026-09-18",
+        "publisher": "Folha de S.Paulo",
+        "url": "https://www1.folha.uol.com.br/poder/2026/09/ministro-do-stj-disse-estar-sempre-a-disposicao-de-vorcaro-indicam-mensagens.shtml",
+        "published_at": "2026-09-18",
+        "accessed_at": "2026-10-19",
+        "description": "Recortes dos contatos de maio e julho de 2024 e contexto da apuração.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": "2024-05-17",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Benedito Gonçalves",
+      "content": "Boa noite feliz em rever o amigo. Festa bonita! Parabéns! Ab Benedito",
+      "source_id": "folha-2026-09-18",
+      "source_locator": "Mensagem após encontro, atribuída pelo jornal a 17 de maio de 2024.",
+      "reported_date": "2024-05-17",
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": null,
+      "date": "2024-05-17",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Vamos marcar o charuto em Brasília",
+      "source_id": "folha-2026-09-18",
+      "source_locator": "Convite que sucede outras duas respostas de Vorcaro, omitidas nesta seleção.",
+      "reported_date": "2024-05-17",
+      "excerpt": true
+    },
+    {
+      "id": 3,
+      "timestamp": null,
+      "date": "2024-07-02",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Benedito Gonçalves",
+      "content": "E aqui sempre à disposição",
+      "source_id": "folha-2026-09-18",
+      "source_locator": "Trecho da resposta na troca de 2 de julho de 2024.",
+      "reported_date": "2024-07-02",
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2024-05-17",
+        "message_count": 2,
+        "first_message_id": 1,
+        "last_message_id": 2
+      },
+      {
+        "date": "2024-07-02",
+        "message_count": 1,
+        "first_message_id": 3,
+        "last_message_id": 3
+      }
+    ],
+    "undated_message_ids": []
+  }
+}

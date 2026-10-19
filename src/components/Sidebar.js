@@ -143,7 +143,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
 
     const lastDate = conv.last_message?.timestamp
       ? conv.last_message.timestamp.split('T')[0]
-      : '';
+      : (conv.last_message?.date || '');
     const lastTimeLabel = lastDate ? formatRelativeDate(lastDate) : '';
 
     const lastPreview = escapeHtml(conv.last_message?.content || '');

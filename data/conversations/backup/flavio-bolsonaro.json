@@ -4,74 +4,102 @@
       "DV",
       "Flávio Bolsonaro"
     ],
-    "saved_as": "Flavio Bolsonaro",
-    "phone": "5521998880022",
+    "saved_as": null,
+    "phone": null,
+    "status": "standby",
+    "schema_version": 2,
+    "publication_ready": false,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
     "date_range": {
-      "start": "2025-08-20",
-      "end": "2025-08-20"
+      "start": "2025-11-07",
+      "end": "2025-11-16"
     },
-    "total_messages": 4,
-    "source": "CNN Brasil / PF (12/09/2026) — Operação Compliance Zero",
-    "note": "Mensagens e áudios sobre aportes de recursos para a Dark Horse identificados pela PF — arquivo estruturado para preenchimento integral posterior."
+    "date_range_complete": true,
+    "total_messages": 3,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Datas, horários, nome salvo e telefone não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes das tratativas sobre o filme Dark Horse. As respostas de 7 de novembro aparecem após um vídeo enviado por Flávio; a mensagem de apoio é de 16 de novembro de 2025.",
+    "limitations": [
+      "Seleção parcial: não inclui o áudio de cobrança nem comprova a conclusão dos pagamentos."
+    ],
+    "sources": [
+      {
+        "id": "intercept-2026-05-13",
+        "publisher": "Intercept Brasil",
+        "url": "https://www.intercept.com.br/2026/05/13/audio-flavio-negociou-vorcaro-milhoes/",
+        "published_at": "2026-05-13",
+        "accessed_at": "2026-10-19",
+        "description": "Apuração sobre o financiamento de Dark Horse e os contatos com Flávio Bolsonaro.",
+        "kind": "news_report"
+      }
+    ]
   },
   "messages": [
     {
       "id": 1,
-      "timestamp": "2025-08-20T11:20:00",
-      "date": "2025-08-20",
-      "time": "11:20:00",
-      "sender": "DV",
-      "content": "Flávio, bom dia. Como ficaram os detalhes sobre os recursos da Dark Horse?",
+      "timestamp": null,
+      "date": "2025-11-07",
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "DV",
+      "content": "Que demais",
+      "source_id": "intercept-2026-05-13",
+      "source_locator": "Parágrafo sobre o vídeo de visualização única enviado em 7 de novembro.",
+      "reported_date": "2025-11-07",
+      "excerpt": true
     },
     {
       "id": 2,
-      "timestamp": "2025-08-20T11:25:30",
-      "date": "2025-08-20",
-      "time": "11:25:30",
-      "sender": "Flávio Bolsonaro",
-      "content": "Fala Daniel, estamos alinhando a estrutura com o time aqui para finalizar essa semana.",
+      "timestamp": null,
+      "date": "2025-11-07",
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
+      "urls": [],
+      "sender": "DV",
+      "content": "Ficou perfeito",
+      "source_id": "intercept-2026-05-13",
+      "source_locator": "Mesmo episódio; resposta posterior à anterior.",
+      "reported_date": "2025-11-07",
+      "excerpt": true
     },
     {
       "id": 3,
-      "timestamp": "2025-08-20T11:28:10",
-      "date": "2025-08-20",
-      "time": "11:28:10",
-      "sender": "DV",
-      "content": "Excelente, qualquer ajuste que precisar o time do banco apoia diretamente.",
+      "timestamp": null,
+      "date": "2025-11-16",
+      "time": null,
       "type": "text",
-      "is_edited": false,
+      "is_edited": null,
       "attachment": null,
-      "urls": []
-    },
-    {
-      "id": 4,
-      "timestamp": "2025-08-20T11:30:00",
-      "date": "2025-08-20",
-      "time": "11:30:00",
+      "urls": [],
       "sender": "Flávio Bolsonaro",
-      "content": "Perfeito, te mantenho informado assim que tivermos o retorno.",
-      "type": "text",
-      "is_edited": false,
-      "attachment": null,
-      "urls": []
+      "content": "Irmão, estou e estarei contigo sempre, não tem meia conversa entre a gente. Só preciso que me dê uma luz! Abs!",
+      "source_id": "intercept-2026-05-13",
+      "source_locator": "Mensagem reproduzida na abertura da reportagem.",
+      "reported_date": "2025-11-16",
+      "excerpt": true
     }
   ],
   "index": {
     "dates": [
       {
-        "date": "2025-08-20",
-        "message_count": 4,
+        "date": "2025-11-07",
+        "message_count": 2,
         "first_message_id": 1,
-        "last_message_id": 4
+        "last_message_id": 2
+      },
+      {
+        "date": "2025-11-16",
+        "message_count": 1,
+        "first_message_id": 3,
+        "last_message_id": 3
       }
-    ]
+    ],
+    "undated_message_ids": []
   }
 }

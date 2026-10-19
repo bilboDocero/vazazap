@@ -35,6 +35,7 @@ import {
   loadEntries, loadMessages, sourceOf, contactOf, whoIs, createResolver, mentionsOf, createLocator, isPaged, PREVIEW_MESSAGES,
   urlsIn, linksToMarkdown, linksToText, linksToHtml, escapeHtml,
   longDate, phonePretty, messageText, citationOf, messageUrl,
+  archiveDate, archiveTime, archivePeriod, messageDateKey, messageMonthKey, publicSourceFor,
 } from './lib/corpus.mjs';
 
 const DIST = join(ROOT, 'dist');
@@ -49,14 +50,13 @@ const entries = loadEntries();
 const resolve = createResolver(entries);
 const byId = new Map(entries.map(e => [e.id, e]));
 
-const monthFmt = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' });
-const longMonth = (ym) => monthFmt.format(new Date(`${ym}-15T12:00:00`));
+const longMonth = (ym) => archiveDate(ym, true);
 
 /** 'YYYY-MM' → messages of that month, in order. */
 function monthsOf(messages) {
   const months = new Map();
   for (const msg of messages) {
-    const ym = msg.date.slice(0, 7);
+    const ym = messageMonthKey(msg);
     if (!months.has(ym)) months.set(ym, []);
     months.get(ym).push(msg);
   }
@@ -131,7 +131,7 @@ function appPage({ title, description, path, jsonLd, chat, hash, article, extraH
 /** A description a search result can show, from the profile when there is one. */
 function describe(entry, profile, who) {
   const first = profile?.sections?.[0]?.paragraphs?.[0]?.text;
-  const fallback = `Conversa entre Daniel Vorcaro e ${who}: ${entry.total_messages} mensagens, de ${entry.date_range.start} a ${entry.date_range.end}, no vorcarozap.`;
+  const fallback = `Conversa entre Daniel Vorcaro e ${who}: ${entry.total_messages} ${entry.coverage ? 'recortes publicados' : 'mensagens'}, ${archivePeriod(entry.date_range)}, no vorcarozap.`;
   if (!first) return fallback;
   const text = linksToText(first).replace(/\s+/g, ' ').trim();
   if (text.length <= 155) return text;
@@ -149,7 +149,6 @@ function conversationLd(entry, who, description, { path, month, first, last, par
     url,
     inLanguage: 'pt-BR',
     description,
-    temporalCoverage: `${first}/${last}`,
     about: [
       { '@type': 'Person', name: 'Daniel Vorcaro' },
       { '@type': 'Person', name: who },
@@ -161,20 +160,32 @@ function conversationLd(entry, who, description, { path, month, first, last, par
     ],
     dateModified: today,
   };
+  if (first && last) data.temporalCoverage = `${first}/${last}`;
   if (source.kind === 'police-report') data.isBasedOn = reportDoc(source);
+  if (source.kind === 'public-excerpts') data.isBasedOn = source.sources.map(ref => ({ '@type': ref.kind === 'court_decision_mirror' ? 'DigitalDocument' : 'Article', name: ref.description, url: ref.url }));
   return data;
 }
 
-function messagesHtml(messages) {
+function messageTimeHtml(msg, text = archiveTime(msg.time)) {
+  return msg.timestamp ? `<time datetime="${msg.timestamp}${UTC_OFFSET}">${escapeHtml(text)}</time>` : `<span class="message-time">${escapeHtml(text)}</span>`;
+}
+
+function excerptHtml(msg, entry) {
+  if (!msg.excerpt) return '';
+  const source = publicSourceFor(msg, entry);
+  return ` <small>Recorte publicado${msg.date_basis ? ' · data deduzida da sequência descrita na fonte' : ''}${source ? ` · <a href="${escapeHtml(source.url)}" rel="noopener">${escapeHtml(source.publisher)}</a> · ${escapeHtml(msg.source_locator)}` : ''}</small>`;
+}
+
+function messagesHtml(messages, entry) {
   const out = [];
   let day = null;
   for (const msg of messages) {
-    if (msg.date !== day) {
-      day = msg.date;
+    if (messageDateKey(msg) !== day) {
+      day = messageDateKey(msg);
       out.push(`<h3>${longDate(day)}</h3>`);
     }
     const cite = msg.source_page ? ` <small>(laudo p. ${msg.source_page}${msg.source_figure ? `, fig. ${msg.source_figure}` : ''})</small>` : '';
-    out.push(`<p id="msg-${msg.id}"><time datetime="${msg.timestamp}${UTC_OFFSET}">${msg.time.slice(0, 5)}</time> <b>${escapeHtml(msg.sender)}</b>: ${escapeHtml(messageText(msg))}${cite}</p>`);
+    out.push(`<p id="msg-${msg.id}">${messageTimeHtml(msg)} <b>${escapeHtml(msg.sender)}</b>: ${escapeHtml(messageText(msg))}${cite}${excerptHtml(msg, entry)}</p>`);
   }
   return out;
 }
@@ -186,6 +197,11 @@ function provenanceHtml(entry) {
   if (source.document) out.push(`<dt>Documento</dt><dd>${source.document_url ? `<a href="${escapeHtml(source.document_url)}" rel="noopener">${escapeHtml(source.document)}</a>` : escapeHtml(source.document)}${source.document_pages ? `, ${source.document_pages} páginas` : ''} (no repositório; o site não serve o PDF)</dd>`);
   if (source.document_sha256) out.push(`<dt>sha256 do documento</dt><dd><code>${source.document_sha256}</code></dd>`);
   out.push(`<dt>Como chegou ao público</dt><dd>${escapeHtml(source.how)}</dd>`);
+  if (source.kind === 'public-excerpts') {
+    out.push(`<dt>Contexto</dt><dd>${escapeHtml(entry.context)}</dd>`);
+    for (const limitation of entry.limitations || []) out.push(`<dt>Limitação</dt><dd>${escapeHtml(limitation)}</dd>`);
+    for (const ref of source.sources) out.push(`<dt>Publicação consultada</dt><dd><a href="${escapeHtml(ref.url)}">${escapeHtml(ref.publisher)}</a> · ${escapeHtml(ref.published_at || ref.document_date || 'data não informada')}</dd>`);
+  }
   if (entry.saved_as) out.push(`<dt>Contato salvo como</dt><dd>${escapeHtml(entry.saved_as)}</dd>`);
   if (entry.phone) out.push(`<dt>Telefone</dt><dd>${escapeHtml(phonePretty(entry.phone))}</dd>`);
   out.push(`<dt>Fuso dos horários</dt><dd>${TIMEZONE} (UTC${UTC_OFFSET})</dd>`);
@@ -226,7 +242,7 @@ function conversationPage(entry, messages, profile, who) {
 
   out.push(`<article id="prerender">`);
   out.push(`<h1>Daniel Vorcaro ↔ ${escapeHtml(who)}</h1>`);
-  out.push(`<p>${entry.total_messages} mensagens, de ${entry.date_range.start} a ${entry.date_range.end}. `
+  out.push(`<p>${entry.total_messages} ${entry.coverage ? 'recortes publicados' : 'mensagens'}, ${archivePeriod(entry.date_range)}. `
     + `<a href="/#/chat/${entry.id}">Abrir no vorcarozap</a> · `
     + `<a href="/export/vorcarozap-${entry.id}.md">Markdown completo</a> · `
     + `<a href="/export/vorcarozap-${entry.id}.json">JSON</a></p>`);
@@ -243,7 +259,7 @@ function conversationPage(entry, messages, profile, who) {
   }
 
   out.push(`<h2>Conversa${paged ? ` (primeiras ${shown.length} mensagens)` : ''}</h2>`);
-  out.push(...messagesHtml(shown));
+  out.push(...messagesHtml(shown, entry));
   if (paged) {
     out.push(`<p>As outras ${messages.length - shown.length} mensagens estão nas páginas por mês acima, no <a href="/export/vorcarozap-${entry.id}.md">Markdown completo</a> e <a href="/#/chat/${entry.id}">no app</a>.</p>`);
   }
@@ -275,7 +291,7 @@ function monthPage(entry, who, ym, msgs, prevYm, nextYm) {
     + `<a href="/#/chat/${entry.id}/msg/${msgs[0].id}">Abrir no vorcarozap</a> · `
     + `<a href="/export/vorcarozap-${entry.id}-${ym}.md">Markdown deste mês</a> · `
     + `<a href="/export/vorcarozap-${entry.id}.md">Markdown completo</a></p>`);
-  out.push(...messagesHtml(msgs));
+  out.push(...messagesHtml(msgs, entry));
   out.push('</article>');
 
   const description = `Conversa entre Daniel Vorcaro e ${who} em ${longMonth(ym)}: ${msgs.length} mensagens, de ${msgs[0].date} a ${msgs.at(-1).date}.`;
@@ -345,7 +361,7 @@ ${body}
 function mentionHtml(conversationId, msg, alias, primary) {
   const cite = msg.source_page ? ` <small>(laudo p. ${msg.source_page}${msg.source_figure ? `, fig. ${msg.source_figure}` : ''})</small>` : '';
   return `<div class="msg" id="m-${conversationId}-${msg.id}">`
-    + `<time datetime="${msg.timestamp}${UTC_OFFSET}">${citationOf(msg).split(' · ')[0]}</time> · <b>${escapeHtml(msg.sender)}</b>${cite}${alias !== primary ? ` <small>· por «${escapeHtml(alias)}»</small>` : ''}<br>`
+    + `${messageTimeHtml(msg, citationOf(msg).split(' · ')[0])} · <b>${escapeHtml(msg.sender)}</b>${cite}${excerptHtml(msg, byId.get(conversationId))}${alias !== primary ? ` <small>· por «${escapeHtml(alias)}»</small>` : ''}<br>`
     + `${escapeHtml(messageText(msg))}<br>`
     + `<span class="links"><a href="${locate(conversationId, msg)}">ver na conversa</a> · <a href="${messageUrl(conversationId, msg)}">no app</a> · msg ${msg.id}</span>`
     + `</div>`;
@@ -413,11 +429,12 @@ function profileParagraphs(profile, context) {
 
 function llmsFull(built, people) {
   const total = built.reduce((n, b) => n + b.entry.total_messages, 0);
+  const knownDates = built.flatMap(({ entry }) => Object.values(entry.date_range)).filter(Boolean).sort();
   const about = SETTINGS_CONTENT.sections.find(s => s.title === 'Sobre o Projeto');
   const rest = SETTINGS_CONTENT.sections.filter(s => s !== about);
   const out = [
     '# vorcarozap — conteúdo completo', '',
-    `> Tudo que o site diz, em texto. Cada citação traz ⟨data hora · laudo p., fig.⟩ e linka a mensagem na página estática (${SITE}/chat/<id>#msg-<n>, ou a página do mês na conversa com Martha Graeff); a mesma página abre o app nessa mensagem para quem tem JavaScript. O mesmo n aparece como "msg n" no Markdown de cada conversa. ${built.length} conversas, ${total} mensagens, de ${built.at(-1)?.entry.date_range.start ?? ''} a ${built[0]?.entry.date_range.end ?? ''}. Gerado em ${today}. Código e dados: ${REPO}.`, '',
+    `> Tudo que o site diz, em texto. Cada citação traz ⟨data hora · laudo p., fig.⟩ e linka a mensagem na página estática (${SITE}/chat/<id>#msg-<n>, ou a página do mês na conversa com Martha Graeff); a mesma página abre o app nessa mensagem para quem tem JavaScript. O mesmo n aparece como "msg n" no Markdown de cada conversa. ${built.length} conversas, ${total} mensagens, ${archivePeriod({ start: knownDates[0], end: knownDates.at(-1) })}. Gerado em ${today}. Código e dados: ${REPO}.`, '',
     '## Sobre o projeto', '',
     ...(about?.paragraphs || []).map(p => linksToMarkdown(p.text, { resolve, hrefFor: locate }) + '\n'),
     '## Quem é Daniel Vorcaro', '',
@@ -426,11 +443,15 @@ function llmsFull(built, people) {
   ];
   for (const { entry, who, profile, months } of built) {
     const source = sourceOf(entry);
-    out.push(`### ${who} — ${entry.total_messages} mensagens, ${entry.date_range.start} a ${entry.date_range.end}`, '');
+    out.push(`### ${who} — ${entry.total_messages} mensagens, ${archivePeriod(entry.date_range)}`, '');
     out.push(`- Página: ${SITE}/chat/${entry.id}`);
     if (months) out.push(`- Um mês por página: ${[...months.keys()].map(ym => `${SITE}/chat/${entry.id}/${ym}`).join(' · ')}`, `- Markdown por mês (troque o mês): ${SITE}/export/vorcarozap-${entry.id}-${[...months.keys()][0]}.md`);
     out.push(`- Conversa completa em Markdown: ${SITE}/export/vorcarozap-${entry.id}.md · JSON: ${SITE}/export/vorcarozap-${entry.id}.json`);
     out.push(`- Fonte: ${source.label}`);
+    if (entry.coverage === 'selected_public_excerpts') {
+      out.push(`- Contexto: ${entry.context}`);
+      for (const ref of entry.sources) out.push(`- Publicação consultada: [${ref.publisher}](${ref.url})`);
+    }
     if (entry.saved_as) out.push(`- Salvo no celular como: ${entry.saved_as}`);
     if (entry.note) out.push(`- Observação: ${entry.note}`);
     out.push('');

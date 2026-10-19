@@ -1,0 +1,98 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Paulo Henrique Costa"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": null,
+      "end": null
+    },
+    "date_range_complete": false,
+    "total_messages": 3,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "Recortes das mensagens entre o então presidente do BRB e Vorcaro citadas em decisão do STF e publicados pela Folha. A investigação aborda transações bancárias e imóveis que, segundo a suspeita investigada, seriam destinados a Costa. A defesa afirmou ao jornal que ele não cometeu crime.",
+    "limitations": [
+      "A reportagem consultada não informa as datas e os horários destes recortes.",
+      "A ordem reúne episódios distintos e não estabelece a cronologia entre eles.",
+      "Falas a advogados ou corretores não foram atribuídas a esta conversa com Costa."
+    ],
+    "sources": [
+      {
+        "id": "folha-2026-04-16",
+        "publisher": "Folha de S.Paulo",
+        "url": "https://www1.folha.uol.com.br/amp/mercado/2026/04/ex-presidente-do-brb-disse-que-virava-noites-para-cumprir-agenda-de-vorcaro-veja-mensagens-e-fotos-de-imoveis.shtml",
+        "published_at": "2026-04-16",
+        "accessed_at": "2026-10-19",
+        "description": "Mensagens citadas na decisão judicial, com resposta da defesa de Costa.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Paulo Henrique Costa",
+      "content": "Claro. Qual o empreendimento?",
+      "source_id": "folha-2026-04-16",
+      "source_locator": "Seção sobre visitas a imóveis; resposta de Costa.",
+      "reported_date": null,
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Paulo Henrique Costa",
+      "content": "Continuo no deal mode. Estou virando noite e tentando resolver",
+      "source_id": "folha-2026-04-16",
+      "source_locator": "Trecho da declaração sobre seu empenho; sem o início transcrito de duas formas pelo jornal.",
+      "reported_date": null,
+      "excerpt": true
+    },
+    {
+      "id": 3,
+      "timestamp": null,
+      "date": null,
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Fala amigo, ótimo, também estou empolgado",
+      "source_id": "folha-2026-04-16",
+      "source_locator": "Resposta de Vorcaro na seção sobre operações no BRB.",
+      "reported_date": null,
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [],
+    "undated_message_ids": [
+      1,
+      2,
+      3
+    ]
+  }
+}

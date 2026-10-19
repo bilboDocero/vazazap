@@ -1,0 +1,85 @@
+{
+  "metadata": {
+    "participants": [
+      "DV",
+      "Chiquinho Feitosa"
+    ],
+    "saved_as": null,
+    "phone": null,
+    "status": "published",
+    "schema_version": 2,
+    "publication_ready": true,
+    "coverage": "selected_public_excerpts",
+    "reviewed_at": "2026-10-19",
+    "date_range": {
+      "start": "2024-05-28",
+      "end": "2024-05-28"
+    },
+    "date_range_complete": true,
+    "total_messages": 2,
+    "source": "Recortes de fontes públicas; referências por mensagem.",
+    "note": "Seleção parcial, com lacunas entre os recortes. Dados não documentados permanecem nulos. Conferência da publicação não equivale a validação forense independente.",
+    "context": "O Poder360 publicou uma mensagem em que Chiquinho Feitosa afirma estar em um jantar com Gilmar Mendes e Cristiano Zanin. Ambos os gabinetes negaram o jantar mencionado; Zanin também negou relação com Feitosa e Vorcaro. O registro documenta a afirmação de Feitosa, não comprova que o encontro tenha ocorrido.",
+    "limitations": [
+      "Não há mensagens enviadas por Gilmar Mendes ou Cristiano Zanin neste chat.",
+      "A reportagem indica 20h55 para a mensagem de Feitosa, sem segundos ou carimbo completo; o horário permanece nulo.",
+      "A resposta não comprova a realização do encontro proposto para o dia seguinte."
+    ],
+    "sources": [
+      {
+        "id": "poder360-2026-09-25",
+        "publisher": "Poder360",
+        "url": "https://www.poder360.com.br/poder-justica/lobista-diz-ter-tratado-de-master-com-zanin-que-nega-contato/",
+        "published_at": "2026-09-25",
+        "accessed_at": "2026-10-19",
+        "description": "Reportagem de Nino Guimarães com a troca e as negativas dos ministros.",
+        "kind": "news_report"
+      }
+    ]
+  },
+  "messages": [
+    {
+      "id": 1,
+      "timestamp": null,
+      "date": "2024-05-28",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "Chiquinho Feitosa",
+      "content": "Querido amigo, estou aqui jantando com Gilmar, Zanin e as esposas.",
+      "source_id": "poder360-2026-09-25",
+      "source_locator": "Início da mensagem atribuída a Feitosa em 28 de maio, às 20h55; conteúdo contestado pelos ministros.",
+      "reported_date": "2024-05-28",
+      "excerpt": true
+    },
+    {
+      "id": 2,
+      "timestamp": null,
+      "date": "2024-05-28",
+      "time": null,
+      "type": "text",
+      "is_edited": null,
+      "attachment": null,
+      "urls": [],
+      "sender": "DV",
+      "content": "Ótimo, vou estar. Nos vemos amanhã",
+      "source_id": "poder360-2026-09-25",
+      "source_locator": "Resposta transcrita na reportagem, sem horário informado.",
+      "reported_date": "2024-05-28",
+      "excerpt": true
+    }
+  ],
+  "index": {
+    "dates": [
+      {
+        "date": "2024-05-28",
+        "message_count": 2,
+        "first_message_id": 1,
+        "last_message_id": 2
+      }
+    ],
+    "undated_message_ids": []
+  }
+}

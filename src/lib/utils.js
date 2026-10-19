@@ -1,3 +1,5 @@
+import { archiveDate, archiveTime } from './message-date.js';
+
 /**
  * Utility functions for vorcarozap.
  */
@@ -24,13 +26,7 @@ export function slugify(name) {
  * @returns {string}
  */
 export function formatDateLong(dateStr) {
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const date = new Date(year, month - 1, day);
-  return date.toLocaleDateString('pt-BR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  return archiveDate(dateStr, true);
 }
 
 /**
@@ -40,8 +36,7 @@ export function formatDateLong(dateStr) {
  * @returns {string}
  */
 export function formatDateShort(dateStr) {
-  const [year, month, day] = dateStr.split('-');
-  return `${day}/${month}/${year}`;
+  return archiveDate(dateStr);
 }
 
 /**
@@ -50,7 +45,7 @@ export function formatDateShort(dateStr) {
  * @returns {string}
  */
 export function formatTime(time) {
-  return time.slice(0, 5);
+  return archiveTime(time);
 }
 
 /**
@@ -111,6 +106,7 @@ export function formatNumber(n) {
  * @returns {string}
  */
 export function formatRelativeDate(dateStr) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr || '')) return archiveDate(dateStr);
   const [year, month, day] = dateStr.split('-').map(Number);
   const date = new Date(year, month - 1, day);
   const today = new Date();
