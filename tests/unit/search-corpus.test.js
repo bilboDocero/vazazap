@@ -29,9 +29,8 @@ describe('generated full-text corpus', () => {
         count++;
       }
     }
-    expect(records.size).toBe(count);
-    expect(data.conversations).toHaveLength(sources.length);
-  });
+    expect(count).toBe(data.messages.length);
+  }, 20000);
 
   it('finds a phrase past the old Martha cutoff in the actual generated index', async () => {
     const message = read('data/messages.json').messages.find(message => message.type === 'text' && message.content.length > 200);

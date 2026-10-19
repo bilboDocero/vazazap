@@ -28,3 +28,5 @@ export const ICON_CHEVRON_DW = `<svg viewBox="0 0 12 12" width="12" height="12" 
 export const ICON_vorcarozap_LOGO = `<img src="/assets/vorcarozap-logo.png" width="20" height="20" alt="" style="vertical-align:middle;" />`;
 
 export const ICON_DOWNLOAD = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 17.5v1a1.5 1.5 0 0 0 1.5 1.5h13a1.5 1.5 0 0 0 1.5-1.5v-1"/></svg>`;
+
+export const ICON_ARCHIVE = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.42l.82-1zM5 19V8h14v11H5zm6-7h2v3h2.55l-3.55 3.55L8.45 15H11v-3z"/></svg>`;

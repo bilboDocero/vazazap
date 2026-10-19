@@ -529,6 +529,7 @@ async function init() {
     onVitrine: () => router.navigate('vitrine'),
     onAnunciar: () => router.navigate('anunciar'),
     onAgenda: () => router.navigate('agenda'),
+    onArchived: () => router.navigate('archived'),
     onSelect: (id) => {
       // Close profile/settings if open before navigating
       closeProfile();
@@ -561,6 +562,12 @@ async function init() {
 
   const router = new HashRouter();
   router.on('home', () => { sidebar.showChats?.(); navRail.setActive?.('chats'); showEmptyState(); });
+  router.on('archived', () => {
+    closeProfile();
+    closeSettings();
+    sidebar.showArchived?.();
+    navRail.setActive?.('chats');
+  });
 
   handleCheckoutReturn();
   window.addEventListener('hashchange', handleCheckoutReturn);

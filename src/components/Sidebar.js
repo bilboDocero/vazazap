@@ -7,9 +7,13 @@
 import { formatTime, escapeHtml, formatNumber, formatRelativeDate } from '../lib/utils.js';
 import { highlightNavigationShortcut } from '../lib/navigation-highlights.js';
 
-import { ICON_SEARCH as SEARCH_ICON, ICON_MEETBALL } from '../lib/icons.js';
+import { ICON_SEARCH as SEARCH_ICON, ICON_MEETBALL, ICON_ARCHIVE } from '../lib/icons.js';
 import { defaultAvatarSvg } from '../lib/avatar.js';
 import { ICON_CHAT, ICON_CALLS, ICON_STATUS, ICON_CHANNELS, ICON_COMMUNITIES, ICON_STORE, ICON_ADVERTISE } from './NavRail.js';
+import { getArchivedSet, saveArchivedSet, toggleArchived, ARCHIVED_CONVERSATIONS, DEFAULT_ARCHIVED_IDS } from '../lib/archived-chats.js';
+import { showToast } from './Toast.js';
+
+export { ARCHIVED_CONVERSATIONS, DEFAULT_ARCHIVED_IDS };
 
 /**
  * The two conversations pinned under "Favoritas" — the leaks this project is
@@ -24,7 +28,7 @@ export const FAVORITE_CONVERSATIONS = new Set(['alexandre-de-moraes', 'martha-gr
  * @param {function} options.onSelect - called with conversation id
  * @param {Set<string>} [options.readConversations] - ids already opened
  */
-export function renderSidebar(container, { conversations, onSelect, onProfile, onAbout, onExportAll, onCalls, onChats, onStatus, onChannels, onCommunities, onVitrine, onAnunciar, onAgenda, readConversations = new Set() }) {
+export function renderSidebar(container, { conversations, onSelect, onProfile, onAbout, onExportAll, onCalls, onChats, onStatus, onChannels, onCommunities, onVitrine, onAnunciar, onAgenda, onArchived, readConversations = new Set() }) {
   const el = document.createElement('aside');
   el.className = 'sidebar';
   el.setAttribute('role', 'navigation');
@@ -33,11 +37,19 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   // Static sidebar chrome — safe innerHTML (no user input)
   el.innerHTML = `
     <div class="sidebar-header">
-      <span class="sidebar-header-title">Conversas</span>
-      <button class="sidebar-find-btn" aria-label="Agenda de contatos" title="Nova conversa · Agenda de contatos">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11v6a2 2 0 0 1-2 2H8l-5 3V5a2 2 0 0 1 2-2h8M19 2v6m-3-3h6"/></svg>
-      </button>
-      <button class="sidebar-menu-btn" aria-label="Menu">${ICON_MEETBALL}</button>
+      <div class="sidebar-header-main" style="display:flex; align-items:center; width:100%; justify-content:space-between;">
+        <span class="sidebar-header-title">Conversas</span>
+        <button class="sidebar-find-btn" aria-label="Agenda de contatos" title="Nova conversa · Agenda de contatos">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11v6a2 2 0 0 1-2 2H8l-5 3V5a2 2 0 0 1 2-2h8M19 2v6m-3-3h6"/></svg>
+        </button>
+        <button class="sidebar-menu-btn" aria-label="Menu">${ICON_MEETBALL}</button>
+      </div>
+      <div class="sidebar-header-archived" style="display:none; align-items:center; width:100%;">
+        <button class="sidebar-archived-back-btn" aria-label="Voltar para todas as conversas" title="Voltar">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <span class="sidebar-header-title">Arquivadas</span>
+      </div>
     </div>
     <div class="sidebar-search">
       <div class="sidebar-search-wrapper">
@@ -58,6 +70,7 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
       <button class="sidebar-tag" data-filter="nao-lidas">Não lidas <span class="sidebar-tag-count"></span></button>
       <button class="sidebar-tag" data-filter="favoritas">Favoritas</button>
       <button class="sidebar-tag" data-filter="grupos">Grupos</button>
+      <button class="sidebar-tag" data-filter="arquivadas">Arquivadas <span class="sidebar-tag-archived-count">5</span></button>
     </div>
     <div class="conversation-list" role="list"></div>
   `;
@@ -65,6 +78,19 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   const list = el.querySelector('.conversation-list');
   const searchInput = el.querySelector('.sidebar-search-input');
   const searchClear = el.querySelector('.sidebar-search-clear');
+  const headerMain = el.querySelector('.sidebar-header-main');
+  const headerArchived = el.querySelector('.sidebar-header-archived');
+  const backBtn = el.querySelector('.sidebar-archived-back-btn');
+  let archivedSet = getArchivedSet();
+  let activeConversationMenu = null;
+
+  function closeConversationContextMenu() {
+    if (activeConversationMenu) {
+      activeConversationMenu.remove();
+      activeConversationMenu = null;
+    }
+  }
+
   el.querySelector('.sidebar-find-btn').addEventListener('click', () => {
     if (onAgenda) onAgenda();
     else searchInput.focus();
@@ -83,6 +109,28 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
     searchInput.blur();
   });
 
+  // ── WhatsApp Archived Row & Banner ───────────────────
+  const archivedRow = document.createElement('div');
+  archivedRow.className = 'sidebar-archived-row';
+  archivedRow.setAttribute('role', 'button');
+  archivedRow.setAttribute('tabindex', '0');
+  archivedRow.title = 'Conversas arquivadas';
+  archivedRow.innerHTML = `
+    <span class="sidebar-archived-icon">${ICON_ARCHIVE}</span>
+    <span class="sidebar-archived-label">Arquivadas</span>
+    <span class="sidebar-archived-count">5</span>
+  `;
+  list.appendChild(archivedRow);
+
+  const archivedBanner = document.createElement('div');
+  archivedBanner.className = 'sidebar-archived-banner';
+  archivedBanner.style.display = 'none';
+  archivedBanner.innerHTML = `<span>Estas conversas permanecem arquivadas quando você recebe novas mensagens.</span>`;
+  list.appendChild(archivedBanner);
+
+  const archivedRowCountEl = archivedRow.querySelector('.sidebar-archived-count');
+  const archivedTagCountEl = el.querySelector('.sidebar-tag-archived-count');
+
   for (const conv of conversations) {
     const item = document.createElement('div');
     item.className = 'conversation-item';
@@ -90,6 +138,8 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
     item.setAttribute('tabindex', '0');
     item.dataset.id = conv.id;
     if (FAVORITE_CONVERSATIONS.has(conv.id)) item.dataset.favorite = 'true';
+    const isConvArchived = archivedSet.has(conv.id);
+    if (isConvArchived) item.dataset.archived = 'true';
 
     const lastDate = conv.last_message?.timestamp
       ? conv.last_message.timestamp.split('T')[0]
@@ -107,12 +157,16 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
       ? `<img src="${conv.avatar}" alt="${displayName}" class="conversation-item-avatar-img" loading="lazy" decoding="async" />`
       : defaultAvatarSvg(conv.id);
 
+    const archivedPill = isConvArchived
+      ? `<span class="conversation-item-archived-pill" title="Conversa arquivada">${ICON_ARCHIVE}</span>`
+      : '';
+
     // Escaped user-facing data inserted via innerHTML
     item.innerHTML = `
       <div class="conversation-item-avatar">${avatarHtml}</div>
       <div class="conversation-item-content">
         <div class="conversation-item-top">
-          <span class="conversation-item-name">${displayName}</span>
+          <span class="conversation-item-name">${displayName}${archivedPill}</span>
           <span class="conversation-item-time">${lastTimeLabel}</span>
         </div>
         <div class="conversation-item-bottom">
@@ -128,6 +182,57 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
         e.preventDefault();
         onSelect(conv.id);
       }
+    });
+
+    // Context Menu on Conversation (Right-click to archive/unarchive)
+    item.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      closeConversationContextMenu();
+      closeSidebarMenu();
+
+      const menu = document.createElement('div');
+      menu.className = 'conversation-context-menu';
+
+      const isArch = archivedSet.has(conv.id);
+      const actionText = isArch ? 'Desarquivar conversa' : 'Arquivar conversa';
+
+      menu.innerHTML = `
+        <button type="button" class="conversation-context-item action-archive">
+          <span class="conversation-context-icon">${ICON_ARCHIVE}</span>
+          <span>${actionText}</span>
+        </button>
+      `;
+
+      menu.querySelector('.action-archive').addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        closeConversationContextMenu();
+        const res = toggleArchived(conv.id);
+        archivedSet = res.set;
+        item.dataset.archived = res.isArchived ? 'true' : 'false';
+        const pill = item.querySelector('.conversation-item-archived-pill');
+        if (res.isArchived && !pill) {
+          const nameEl = item.querySelector('.conversation-item-name');
+          if (nameEl) nameEl.insertAdjacentHTML('beforeend', `<span class="conversation-item-archived-pill" title="Conversa arquivada">${ICON_ARCHIVE}</span>`);
+        } else if (!res.isArchived && pill) {
+          pill.remove();
+        }
+        refreshArchivedCount();
+        applyFilter();
+        showToast(container, res.isArchived ? 'Conversa arquivada' : 'Conversa desarquivada');
+      });
+
+      document.body.appendChild(menu);
+
+      const rect = menu.getBoundingClientRect();
+      const x = Math.min(e.clientX, window.innerWidth - rect.width - 12);
+      const y = Math.min(e.clientY, window.innerHeight - rect.height - 12);
+      menu.style.left = `${Math.max(12, x)}px`;
+      menu.style.top = `${Math.max(12, y)}px`;
+
+      activeConversationMenu = menu;
+      setTimeout(() => {
+        document.addEventListener('click', closeConversationContextMenu, { once: true });
+      }, 0);
     });
 
     list.appendChild(item);
@@ -161,10 +266,23 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   const isUnread = (conv) => !readConversations.has(conv.id);
 
   function matchesFilter(conv) {
-    if (activeFilter === 'nao-lidas') return isUnread(conv);
+    if (activeFilter === 'arquivadas') return archivedSet.has(conv.id);
+    if (activeFilter === 'nao-lidas') return isUnread(conv) && !archivedSet.has(conv.id);
     if (activeFilter === 'favoritas') return FAVORITE_CONVERSATIONS.has(conv.id);
-    if (activeFilter === 'grupos') return Boolean(conv.is_group || conv.group_name || conv.id === 'ciro-daniel-fabio-hugo');
-    return true;
+    if (activeFilter === 'grupos') return Boolean(conv.is_group || conv.group_name || conv.id === 'ciro-daniel-fabio-hugo') && !archivedSet.has(conv.id);
+    return !archivedSet.has(conv.id);
+  }
+
+  function refreshArchivedCount() {
+    const totalArchived = conversations.filter(c => archivedSet.has(c.id)).length;
+    const unreadArchived = conversations.filter(c => archivedSet.has(c.id) && isUnread(c)).length;
+    if (archivedRowCountEl) {
+      archivedRowCountEl.textContent = String(totalArchived);
+      archivedRowCountEl.classList.toggle('has-unread', unreadArchived > 0);
+    }
+    if (archivedTagCountEl) {
+      archivedTagCountEl.textContent = String(totalArchived);
+    }
   }
 
   /** Refresh the unread badges, the tab tally and — if filtering by unread —
@@ -182,10 +300,19 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
       if (badge) badge.style.display = readConversations.has(item.dataset.id) ? 'none' : '';
     }
 
+    refreshArchivedCount();
     applyFilter();
   }
 
   function applyFilter() {
+    const isArchived = activeFilter === 'arquivadas';
+    if (headerMain) headerMain.style.display = isArchived ? 'none' : 'flex';
+    if (headerArchived) headerArchived.style.display = isArchived ? 'flex' : 'none';
+    if (archivedBanner) archivedBanner.style.display = isArchived ? '' : 'none';
+    if (archivedRow) archivedRow.style.display = isArchived ? 'none' : '';
+    if (archivedRow) archivedRow.classList.toggle('active', isArchived);
+    searchInput.placeholder = isArchived ? 'Pesquisar conversas arquivadas' : 'Pesquisar mensagens';
+
     const byId = new Map(conversations.map(c => [c.id, c]));
     let visible = 0;
 
@@ -203,9 +330,59 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
           ? 'Nenhum grupo encontrado.'
           : (activeFilter === 'favoritas'
               ? 'Nenhuma conversa favorita.'
-              : 'Nenhuma conversa aqui.'));
+              : (activeFilter === 'arquivadas'
+                  ? 'Nenhuma conversa arquivada.'
+                  : 'Nenhuma conversa aqui.')));
     // The lock note belongs at the end of the real list, not of an empty one.
     lockMsg.style.display = visible ? '' : 'none';
+    if (isArchived) {
+      lockMsg.innerHTML = `
+        <svg viewBox="0 0 10 12" width="10" height="12"><path fill="currentColor" d="M5.175 0A2.318 2.318 0 0 0 2.86 2.318v.884H1.5a1 1 0 0 0-1 1V11a1 1 0 0 0 1 1h7.35a1 1 0 0 0 1-1V4.202a1 1 0 0 0-1-1H7.491v-.884A2.317 2.317 0 0 0 5.175 0Zm0 1.05c.7 0 1.267.567 1.267 1.268v.884H3.909v-.884c0-.7.567-1.268 1.266-1.268Z"/></svg>
+        <span>${archivedSet.size} conversas arquivadas de relevância histórica</span>
+      `;
+    } else {
+      lockMsg.innerHTML = `
+        <svg viewBox="0 0 10 12" width="10" height="12"><path fill="currentColor" d="M5.175 0A2.318 2.318 0 0 0 2.86 2.318v.884H1.5a1 1 0 0 0-1 1V11a1 1 0 0 0 1 1h7.35a1 1 0 0 0 1-1V4.202a1 1 0 0 0-1-1H7.491v-.884A2.317 2.317 0 0 0 5.175 0Zm0 1.05c.7 0 1.267.567 1.267 1.268v.884H3.909v-.884c0-.7.567-1.268 1.266-1.268Z"/></svg>
+        <span>Acervo de <span class="sidebar-lock-link" data-action="profile-dv"><strong>Daniel Vorcaro</strong></span></span>
+      `;
+      const link = lockMsg.querySelector('.sidebar-lock-link');
+      if (link && onProfile) link.addEventListener('click', onProfile);
+    }
+  }
+
+  function openArchivedView() {
+    activeFilter = 'arquivadas';
+    tagButtons.forEach(b => {
+      const match = b.dataset.filter === 'arquivadas';
+      b.classList.toggle('active', match);
+      b.setAttribute('aria-pressed', String(match));
+    });
+    applyFilter();
+    list.scrollTop = 0;
+  }
+
+  function closeArchivedView() {
+    activeFilter = 'todas';
+    tagButtons.forEach(b => {
+      const match = b.dataset.filter === 'todas';
+      b.classList.toggle('active', match);
+      b.setAttribute('aria-pressed', String(match));
+    });
+    applyFilter();
+    list.scrollTop = 0;
+  }
+
+  archivedRow.addEventListener('click', () => openArchivedView());
+
+  archivedRow.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openArchivedView();
+    }
+  });
+
+  if (backBtn) {
+    backBtn.addEventListener('click', () => closeArchivedView());
   }
 
   for (const btn of tagButtons) {
@@ -213,7 +390,6 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
       activeFilter = btn.dataset.filter;
       tagButtons.forEach(b => b.classList.toggle('active', b === btn));
       tagButtons.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
-      searchInput.placeholder = 'Pesquisar mensagens';
       applyFilter();
       list.scrollTop = 0;
     });
@@ -282,10 +458,19 @@ export function renderSidebar(container, { conversations, onSelect, onProfile, o
   el.showAnunciar = panel => el.showSection('anunciar', panel);
   el.showCommercial = panel => el.showSection('anunciar', panel);
   el.showAgenda = panel => el.showSection('agenda', panel);
+  el.showArchived = () => {
+    el.classList.remove('sidebar--calls', 'sidebar--section', 'sidebar--communities', 'sidebar--vitrine', 'sidebar--anunciar', 'sidebar--commercial', 'sidebar--agenda');
+    el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel, .commercial-panel, .vitrine-panel, .agenda-panel').forEach(p => p.remove());
+    selectTab('chats');
+    openArchivedView();
+  };
   el.showChats = () => {
     el.classList.remove('sidebar--calls', 'sidebar--section', 'sidebar--communities', 'sidebar--vitrine', 'sidebar--anunciar', 'sidebar--commercial', 'sidebar--agenda');
     el.querySelectorAll('.calls-panel, .updates-panel, .communities-panel, .commercial-panel, .vitrine-panel, .agenda-panel').forEach(p => p.remove());
     selectTab('chats');
+  };
+  el.closeArchived = () => {
+    closeArchivedView();
   };
 
   // Sidebar 3-dot menu (mobile only, hidden on desktop via CSS)
