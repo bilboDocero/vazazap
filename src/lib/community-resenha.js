@@ -73,6 +73,34 @@ const references = {
     text: 'Em 02/10/2026, reportagens registraram a volta de um vídeo do BBB 24 em que Yasmin Brunet menciona um “fantasma”, apelido de alguém de fora da casa. Internautas associaram o apelido a Vorcaro, mas a identidade não foi confirmada por Yasmin nem demonstrada pelas mensagens citadas na cobertura. Os memes brincam com essa teoria da internet.',
     links: [{ label: 'Ler sobre a teoria e seus limites', url: 'https://www.diariodocentrodomundo.com.br/web-aponta-vorcaro-como-fantasma-de-yasmin-brunet-no-bbb-24-entenda/' }],
   },
+  memeRisco: {
+    text: 'A resenha inventa produtos bancários e situações de atendimento para satirizar o contraste entre promessas comerciais, risco e orçamento doméstico. As ofertas, taxas e diálogos não correspondem a produtos ou declarações de uma instituição real.',
+    links: [],
+  },
+  memeAssessoria: {
+    text: 'Os personagens imaginam uma assessoria de imprensa para problemas cotidianos. Notas oficiais, sigilo de geladeira e versões da planilha são recursos de sátira à linguagem usada para administrar crises, não documentos reais.',
+    links: [],
+  },
+  senadoRegistros: {
+    text: 'Em 22/10/2026, a Agência Brasil noticiou parecer da PGR contrário ao mandado de segurança que pede eventuais registros de visitas de Vorcaro e outros citados ao Senado. O fundamento relatado é a legitimidade do autor da ação; a decisão de Luiz Fux seguia pendente na notícia. As piadas sobre portarias e agendas são inventadas e não confirmam visitas.',
+    links: [{ label: 'Ler o contexto do pedido e do parecer', url: 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-10/pgr-da-parecer-contra-pedido-de-acesso-registro-de-vorcaro-no-senado' }],
+  },
+  adiamentos: {
+    text: 'A CNN relatou em 22/10/2026 o segundo cancelamento da oitiva de Fabiano Zettel e uma estimativa de conclusão de ao menos um inquérito em novembro. A PF confirmou o cancelamento sem detalhar oficialmente o motivo. A previsão não é prazo judicial; a resenha exagera a espera sem atribuir intenção de obstrução a alguém.',
+    links: [{ label: 'Ler a reportagem sobre os adiamentos', url: 'https://www.cnnbrasil.com.br/politica/analise-adiamentos-de-depoimentos-marcam-caso-master/' }],
+  },
+  imagemMaster: {
+    text: 'A Folha publicou em 21/10/2026 mensagens de 2024 e 2025 entre Vorcaro e Ana Matos sobre repercussões nas redes, Nikolas Ferreira e pedidos de interlocução com Pablo Marçal. As equipes dos dois e a comunicação de Vorcaro não responderam até a publicação. O tema da sátira é a gestão de imagem; as mensagens não demonstram, isoladamente, participação dos citados nas fraudes investigadas.',
+    links: [{ label: 'Ler a reportagem sobre comunicação e redes sociais', url: 'https://www1.folha.uol.com.br/poder/2026/10/vorcaro-disse-a-assessora-que-se-dava-muito-bem-com-nikolas-e-pediu-que-ela-falasse-com-marcal-apos-post.shtml' }],
+  },
+  saoRoque: {
+    text: 'Em 21/10/2026, o Estadão noticiou decisão do TCE-SP que determina ressarcimento de R$ 93,15 milhões pelo ex-presidente do São Roque Prev por aplicações no Master. Cabe recurso; o ex-gestor sustentou que houve decisões colegiadas e pareceres especializados. A consultoria terá apuração própria, sem conclusão de fraude nesse processo. As planilhas e falas da resenha são fictícias.',
+    links: [{ label: 'Ler a decisão noticiada e a posição do ex-gestor', url: 'https://www.infomoney.com.br/brasil/tce-sp-condena-ex-gestor-do-sao-roque-prev-a-devolver-r-93-mi-aplicados-no-master/' }],
+  },
+  parecerMendonca: {
+    text: 'Em parecer de 17/10/2026, divulgado pelo Poder360 em 19/10, a PGR entendeu que a representação contra Mendonça não demonstrava enquadramento na Lei de Abuso de Autoridade, ressalvando a decisão do Plenário. É uma manifestação, não julgamento ou validação integral dos atos. A piada trata da linguagem processual e da confusão de quem acompanha o caso.',
+    links: [{ label: 'Ler o parecer da PGR na Petição 16.704 (PDF)', url: 'https://static.poder360.com.br/uploads/2026/10/PGR-nao-ve-abuso-de-autroridade-de-Mendonca-19-out-2026.pdf' }],
+  },
 };
 
 function meme(title, punchline, theme = 'green') {
@@ -136,6 +164,18 @@ export function getResenhaGroups() {
     [5, 'Vou sair por cinco minutos. Se a resenha ganhar segunda temporada, deixem meu lugar perto da tomada.', undefined, 'memeLeitura'],
     [0, 'Depois dessa resenha do fantasma, abri o aplicativo do banco e perguntei: salário, se você está entre nós, dê um sinal. O aplicativo pediu para tentar novamente mais tarde.', meme('SESSÃO ESPÍRITA DO SALDO', 'Salário, você está entre nós?\nErro: entidade não encontrada.', 'neutral'), 'yasminFantasma'],
     [4, 'Meu fantasma não apaga a luz nem arrasta corrente. Ele acende a tela às três da manhã com a notificação da fatura. Terror nacional, sem incentivo fiscal.', meme('ATIVIDADE PARANORMAL', '03:00 da manhã.\nSua fatura chegou.', 'cream'), 'memeFatura'],
+    [0, 'Meu gerente imaginário disse que meu perfil é conservador. Concordei: conservo o mesmo tênis desde três ministros da Fazenda atrás.', meme('PERFIL CONSERVADOR', 'Conservo o tênis.\nO dinheiro não deu.', 'neutral'), 'memeRisco'],
+    [1, 'A diversificação da minha carteira está impecável: devo no cartão, no cheque especial e pra minha irmã. Três credores, nenhuma paz.', meme('CARTEIRA DIVERSIFICADA', 'Três credores.\nNenhuma paz.'), 'memeRisco'],
+    [2, 'Contratei uma assessoria imaginária para minha geladeira. Agora a ausência de comida é uma janela estratégica de jejum. O vazio ganhou cargo.', meme('NOTA DA GELADEIRA', 'Não falta comida.\nSobra oportunidade de jejum.', 'cream'), 'memeAssessoria'],
+    [3, 'A portaria do meu prédio quer RG, apartamento e motivo da visita. Vou pedir transferência pro universo VIP: lá até a curiosidade precisa de advogado.', meme('PORTEIRO PREMIUM', 'Meu RG é obrigatório.\nMinha curiosidade, indeferida.', 'neutral'), 'senadoRegistros'],
+    [4, 'Depois dessa leitura, minha procrastinação ficou ofendida com o nome. Agora exige ser chamada de readequação do cronograma. Mandou uma nota e adiou a entrega.', meme('PROCRASTINAÇÃO COM ASSESSORIA', 'O prazo acabou.\nA justificativa foi prorrogada.'), 'adiamentos'],
+    [5, 'Minha planilha agora tem três versões: a real, a que mando pra família e a final_final_agora_vai. A última tem mais autoestima que números.', meme('BALANÇO EMOCIONAL', 'Ativo: esperança.\nPassivo: todo o resto.', 'cream'), 'memeAssessoria'],
+    [0, 'Peleleca Participações é minha holding fictícia: controla um pote sem tampa, um carregador falso e 100% do meu arrependimento. Governança de gaveta.', meme('PELELECA PARTICIPAÇÕES', 'Holding do pote sem tampa.\nControle total do arrependimento.'), 'memePeleleca'],
+    [1, 'Meu banco imaginário lançou o atendimento Colação Black: chama você de querido antes de cobrar a tarifa. O abraço já vem no CET.', meme('COLAÇÃO BLACK', 'Carinho personalizado.\nTarifa também.', 'neutral'), 'memeRisco'],
+    [2, 'Li sobre os pareceres e resolvi levar três opiniões pra feira. O tomate continuou caro. Aparentemente o caixa não aceita fundamentação como pagamento.', undefined, 'saoRoque'],
+    [3, 'Minha fatura abriu uma consultoria de reputação: mudou o nome de dívida para relação de longo prazo. Até pra me ferrar agora querem vínculo afetivo.', meme('RELACIONAMENTO SÉRIO', 'Eu e os juros.\nSó eles estão crescendo.', 'cream'), 'memeAssessoria'],
+    [4, 'PALAAAA Pro ganhou uma atualização: você clica em resolver e ele agenda uma reunião sobre o significado de resolver. O problema vira gerente.', meme('PALAAAA PRO 2.0', 'Erro ao resolver.\nReunião criada com sucesso.', 'neutral'), 'memePalaa'],
+    [5, 'Fechei o acervo pra descansar a cabeça. Abri o aplicativo do banco. Foi como sair do documentário e entrar na experiência imersiva.', undefined, 'memeLeitura'],
   ].map(([speaker, text, card, reference], index) => reaction(`resenha-meme-${index + 1}`, speaker, text, { card, reference, minute: index * 2 }));
 
   const vip = [
@@ -161,6 +201,18 @@ export function getResenhaGroups() {
     [1, 'Se essa teoria da Yasmin virasse filme, o fantasma não aparecia no espelho. Só em reunião que poderia ter sido um e-mail. O verdadeiro terror corporativo.', 'yasminFantasma', meme('ASSOMBRAÇÃO CORPORATIVA', 'Não aparece no espelho.\nAparece na reunião das 7h.', 'neutral')],
     [2, 'Na versão Scooby-Doo dessa teoria, eu ia puxar o lençol do fantasma e encontrar meu gerente oferecendo previdência privada. Nem no sobrenatural eu escapo da meta dele.', 'yasminFantasma', meme('PUXEI O LENÇOL', 'Era meu gerente:\n“Já pensou na aposentadoria?”', 'cream')],
     [5, 'A teoria do fantasma da Yasmin ainda não tem identidade confirmada. O único espírito que eu reconheço sem perícia é o do meu salário: mal entrou na conta e já foi para um lugar melhor.', 'yasminFantasma', meme('FANTASMA COMPROVADO', 'Meu salário.\nApareceu e logo desencarnou.')],
+    [0, 'Li sobre a gestão de imagem e descobri meu erro: quando passo vergonha, eu peço desculpa sozinho. Falta profissionalizar esse desastre.', 'imagemMaster', meme('GESTÃO DE CRISE', 'Minha estrutura:\neu apagando o story.', 'neutral')],
+    [1, 'No meu camarote imaginário, a crítica é independente: entra sozinha e sai acompanhada de três assessores. Hospitalidade é tudo.', 'imagemMaster', meme('CRÍTICA NO CAMAROTE', 'Entrada livre.\nSaída com assessoria.', 'cream')],
+    [2, 'Transparência, na minha repartição fictícia, é igual vidro de carro de luxo: quem está dentro vê tudo. Quem está fora só enxerga o próprio nariz.', 'senadoRegistros', meme('TRANSPARÊNCIA VIP', 'Vidro transparente.\nPelícula de sigilo.')],
+    [3, 'Pedi a agenda do meu clube imaginário. Recebi a agenda da reunião que vai discutir se eu posso pedir a agenda. O segredo está em me fazer morrer de tédio.', 'senadoRegistros'],
+    [4, 'O calendário dessa leitura já podia cobrar cachê. Julho, agosto, setembro, outubro... novembro entrou no elenco sem nem fazer teste.', 'adiamentos', meme('TEMPORADA RENOVADA', 'O prazo saiu de cena.\nNovembro entrou no elenco.', 'neutral')],
+    [5, 'No meu clube VIP inventado, a pontualidade funciona assim: o evento atrasa, a prestação de contas atrasa, mas o garçom não pode demorar dois minutos. Prioridades têm dress code.', 'adiamentos', meme('PONTUALIDADE SELETIVA', 'O prazo pode esperar.\nO espumante, jamais.', 'cream')],
+    [0, 'Fui ler o parecer e precisei de um parecer sobre o parecer. Minha opinião agora está conclusa na cozinha, aguardando manifestação do café.', 'parecerMendonca', meme('MINHA OPINIÃO', 'Conclusa ao café.\nAguardando fundamentação.')],
+    [1, 'A internet leu um parecer e entregou sentença, recurso e trailer da série em seis minutos. Não acompanha processo: faz speedrun de convicção.', 'parecerMendonca', meme('JURISTA DE COMENTÁRIOS', 'Leu a manchete.\nJá transitou em julgado.', 'neutral')],
+    [2, 'R$ 93,15 milhões é um número que meu Excel abriria perguntando se eu tenho certeza. O meu orçamento pede confirmação pra comprar queijo.', 'saoRoque', meme('EXCEL POPULAR', 'Deseja mesmo\nadicionar queijo?', 'cream')],
+    [3, 'No comitê fictício da minha casa, a decisão de pedir pizza também foi colegiada. Curiosamente, quando chegou a conta, o colegiado estava em área sem sinal.', 'saoRoque', meme('DECISÃO COLEGIADA', 'Todo mundo aprovou a pizza.\nA conta ficou sem quórum.')],
+    [4, 'Meu fórum internacional seria no ponto de ônibus: debate sobre mobilidade, painel sobre atraso e um especialista explicando por que a culpa é minha. Só faltou patrocínio pro guarda-chuva.', 'londres', meme('FÓRUM INTERNACIONAL', 'Painel: por que o ônibus não vem.\nLocal: debaixo de chuva.', 'neutral')],
+    [5, 'Networking é lindo. No meu, todo mundo tem meu contato, lembra do meu nome e liga todo dia. Pena que é o setor de cobrança.', 'dani', meme('NETWORKING DE MILHÕES', 'Meu telefone não para.\nÉ a cobrança.', 'cream')],
   ].map(([speaker, text, reference, card], index) => reaction(`resenha-vip-${index + 1}`, speaker, text, { reference, card, minute: 60 + index * 3 }));
 
   return [
@@ -169,6 +221,10 @@ export function getResenhaGroups() {
       reaction('resenha-aviso-2', 1, 'Em Peleleca, Memes & Colação, o vocabulário do acervo encontra o humor do dia a dia. Tem corretor automático cansado, café frio e boleto pedindo atenção.', { minute: 2 }),
       reaction('resenha-aviso-3', 2, 'No VIPs, Famosos & Camarotes, cada brincadeira tem uma referência real em “Contexto da resenha”. São reações inventadas, não mensagens dos famosos citados.', { minute: 4 }),
       reaction('resenha-aviso-4', 3, 'Pra acompanhar documentos e notícias com fontes, a outra comunidade é Notícias e Documentos. Aqui a programação é café, contexto e resenha — nessa ordem ou na que o café permitir.', { minute: 6 }),
+      reaction('resenha-aviso-5', 4, 'Rodada nova liberada: sigilo, prazo elástico e assessoria pra geladeira vazia. Nosso departamento de relações públicas é um pano de prato; até agora absorveu mais crise que muita nota oficial.', { minute: 8, card: meme('ASSESSORIA DO GRUPO', 'Um pano de prato.\nAbsorve crise de verdade.', 'cream') }),
+      reaction('resenha-aviso-6', 5, 'O alvo da rodada é o camarote do poder: discurso de transparência com película escura e pontualidade só na hora do espumante. Aqui o tapete vermelho é o pano que caiu no chão.', { minute: 10 }),
+      reaction('resenha-aviso-7', 0, 'Antes de encaminhar a piada como prova, abre o Contexto da resenha. Se meme fosse perícia, meu tio já tinha laboratório credenciado no grupo da família.', { minute: 12, card: meme('LABORATÓRIO DO ZAP', 'Equipamento: um print.\nMétodo: confia.', 'neutral') }),
+      reaction('resenha-aviso-8', 1, 'Os personagens continuam inventados, o café continua imaginário e a vergonha alheia segue sem teto de gastos. Podem entrar: o único sigilo daqui é quem acabou com o biscoito.', { minute: 14 }),
     ], { announcement: true }),
     group('fofocas-memes', 'Peleleca, Memes & Colação', memes),
     group('fofocas-famosos', 'VIPs, Famosos & Camarotes', vip),

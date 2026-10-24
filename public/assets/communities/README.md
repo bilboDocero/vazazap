@@ -1,8 +1,8 @@
 # Capas da comunidade jornalística
 
-28 imagens de fontes oficiais e veículos públicos, consultadas em 19/10/2026. Os arquivos foram preservados nos formatos publicados pelas fontes. Há fotografias de arquivo e uma montagem original da EBC, identificadas nas legendas. Cada capa exibe descrição, crédito e link da publicação. As datas das notícias não devem ser confundidas com as datas das fotos de arquivo.
+28 imagens de fontes oficiais e veículos públicos, consultadas em 19/10/2026. Em 23/10/2026, a seleção foi ampliada para cobrir também as nove novas publicações, reutilizando fotografias locais com legendas específicas. Os arquivos foram preservados nos formatos publicados pelas fontes. Há fotografias de arquivo e uma montagem original da EBC, identificadas nas legendas. Cada capa exibe descrição, crédito e link da publicação de origem da imagem. As datas das notícias não devem ser confundidas com as datas das fotos de arquivo.
 
-A comunidade tem 33 publicações em quatro grupos; 30 têm capa antes do título e do texto. As imagens são locais e carregadas sob demanda, com dimensões declaradas. As referências detalhadas ficam em `src/lib/community-news-covers.js` e os resumos em `src/lib/community-news.js`.
+A comunidade tem 42 publicações em quatro grupos; 39 têm capa antes do título e do texto, incluindo todas as nove adicionadas na revisão de 23/10/2026. As imagens são locais e carregadas sob demanda, com dimensões declaradas. As referências detalhadas e a seleção por publicação ficam em `src/lib/community-news-covers.js` e os resumos em `src/lib/community-news.js`.
 
 | Arquivo | Crédito | Origem |
 | --- | --- | --- |

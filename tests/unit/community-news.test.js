@@ -6,7 +6,7 @@ import { getCommunitiesData, findCommunitySelection } from '../../src/lib/commun
 import { renderCommunitiesDetail } from '../../src/components/CommunitiesDetail.js';
 
 describe('Journalistic community', () => {
-  it('keeps every summary traceable to dated official or public-media sources', () => {
+  it('keeps every summary traceable to dated official or journalistic sources', () => {
     const groups = getJournalisticGroups();
     const messages = groups.flatMap(group => group.messages);
     expect(groups).toHaveLength(4);
@@ -23,7 +23,11 @@ describe('Journalistic community', () => {
         for (const source of msg.sources) {
           const url = new URL(source.url);
           expect(url.protocol).toBe('https:');
-          expect(['noticias.stf.jus.br', 'agenciabrasil.ebc.com.br', 'www.gov.br', 'www12.senado.leg.br']).toContain(url.hostname);
+          expect([
+            'noticias.stf.jus.br', 'agenciabrasil.ebc.com.br', 'www.gov.br', 'www12.senado.leg.br',
+            'noticias.uol.com.br', 'www1.folha.uol.com.br', 'c-level.folha.uol.com.br',
+            'www.cnnbrasil.com.br', 'www.infomoney.com.br', 'www.poder360.com.br', 'static.poder360.com.br',
+          ]).toContain(url.hostname);
           expect(source.title).toBeTruthy();
           expect(source.publishedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
           expect(source.publishedAt <= NEWS_REVIEWED_AT).toBe(true);
@@ -39,7 +43,7 @@ describe('Journalistic community', () => {
     expect(text).toContain('o ministro não teve acesso');
     expect(text).toContain('não comprova');
     expect(text).toContain('PGR');
-    expect(group.messages.at(-1).publishedAt).toBe('2026-10-13');
+    expect(group.messages.at(-1).publishedAt).toBe('2026-10-22');
   });
 
   it('ships photographs with credits, descriptions and original publication links', () => {
@@ -61,7 +65,7 @@ describe('Journalistic community', () => {
     const container = document.createElement('div');
     const selection = findCommunitySelection(getCommunitiesData(), 'plantao-avisos');
     renderCommunitiesDetail(container, { selection });
-    expect(container.textContent).toContain('Revisado em 19/10/2026');
+    expect(container.textContent).toContain('Revisado em 23/10/2026');
     expect(container.querySelectorAll('.communities-news-title')).toHaveLength(selection.group.messages.length);
     expect(container.querySelectorAll('.communities-bubble-checks')).toHaveLength(0);
     const image = container.querySelector('.communities-news-image img');

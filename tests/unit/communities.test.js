@@ -30,8 +30,8 @@ describe('Communities Content & Routing', () => {
       const avisos = news.groups.find(g => g.id === 'plantao-avisos');
       expect(avisos).toBeDefined();
       expect(avisos.name).toBe('Avisos');
-      expect(avisos.date).toBe('14/10/2026');
-      expect(avisos.snippet).toContain('PGR');
+      expect(avisos.date).toBe('23/10/2026');
+      expect(avisos.snippet).toBe(avisos.messages.at(-1).title);
       expect(avisos.unreadCount).toBe(0);
       expect(avisos.isMuted).toBe(true);
       expect(avisos.messages.length).toBeGreaterThanOrEqual(3);

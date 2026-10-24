@@ -291,3 +291,47 @@ export const communityNewsCovers = {
     "height": 800
   }
 };
+
+// Reuse attributed archive photographs with captions specific to each new post.
+function archiveCover(sourceUrl, caption) {
+  return { ...communityNewsCovers[sourceUrl], caption };
+}
+
+export const communityNewsPostCovers = {
+  'news-overview-october-23': archiveCover(
+    'https://agenciabrasil.ebc.com.br/economia/noticia/2025-11/especialistas-alertam-para-golpes-em-ressarcimentos-do-banco-master',
+    'Fachada do Banco Master. Foto de arquivo para o panorama das atualizações do acervo.',
+  ),
+  'news-brb-testimony-october-15': archiveCover(
+    'https://agenciabrasil.ebc.com.br/justica/noticia/2026-03/justica-mantem-prisao-de-vorcaro-e-cunhado-em-audiencia-de-custodia',
+    'Daniel Vorcaro em evento. Foto de arquivo publicada em março de 2026.',
+  ),
+  'news-testimony-delays-october-22': archiveCover(
+    'https://agenciabrasil.ebc.com.br/economia/noticia/2025-11/banco-central-oficializa-liquidacao-da-master-corretora',
+    'Banco Central em foto de arquivo. A atuação de servidores do órgão é uma das frentes de apuração citadas na reportagem.',
+  ),
+  'news-exploitation-request-october-23': archiveCover(
+    'https://agenciabrasil.ebc.com.br/justica/noticia/2026-03/defesa-de-vorcaro-pede-ao-stf-provas-objetivas-de-prisao-do-banqueiro',
+    'Daniel Vorcaro ao lado da marca do Banco Master. Retrato de arquivo publicado em março de 2026.',
+  ),
+  'news-pgr-mendonca-opinion-october': archiveCover(
+    'https://agenciabrasil.ebc.com.br/justica/noticia/2026-09/pgr-deve-se-manifestar-sobre-supostas-conversas-entre-vorcaro-e-moraes',
+    'Sede da Procuradoria-Geral da República em Brasília. Foto de arquivo.',
+  ),
+  'news-release-pending-october-21': archiveCover(
+    'https://agenciabrasil.ebc.com.br/justica/noticia/2026-03/supremo-tem-maioria-para-manter-prisao-preventiva-de-daniel-vorcaro',
+    'Sede do Supremo Tribunal Federal. Foto de arquivo para a atualização sobre o pedido de liberdade.',
+  ),
+  'news-senate-access-opinion-october-22': archiveCover(
+    'https://agenciabrasil.ebc.com.br/justica/noticia/2026-09/pgr-pede-anulacao-de-investigacao-sobre-conversas-de-moraes-e-vorcaro',
+    'Paulo Gonet, procurador-geral da República. Foto de arquivo.',
+  ),
+  'news-sao-roque-reimbursement-october': archiveCover(
+    'https://www12.senado.leg.br/noticias/materias/2026/01/15/cae-cria-grupo-para-acompanhar-investigacoes-sobre-o-banco-master',
+    'Banco Master em foto de arquivo. A decisão do TCE-SP trata de aplicações do São Roque Prev em letras financeiras da instituição.',
+  ),
+  'news-reputation-messages-october': archiveCover(
+    'https://agenciabrasil.ebc.com.br/justica/noticia/2026-03/defesa-de-vorcaro-pede-ao-stf-provas-objetivas-de-prisao-do-banqueiro',
+    'Daniel Vorcaro ao lado de uma tela com a marca do Master. Foto de arquivo para a notícia sobre gestão de imagem do banco.',
+  ),
+};

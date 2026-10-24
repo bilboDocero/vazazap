@@ -1,7 +1,7 @@
-import { communityNewsCovers } from './community-news-covers.js';
+import { communityNewsCovers, communityNewsPostCovers } from './community-news-covers.js';
 
 /** Editorial summaries of public records, not transcripts or a live news feed. */
-export const NEWS_REVIEWED_AT = '2026-10-19';
+export const NEWS_REVIEWED_AT = '2026-10-23';
 
 const source = (publisher, title, url, publishedAt) => ({ publisher, title, url, publishedAt });
 const sources = {
@@ -37,6 +37,15 @@ const sources = {
   bcSecrecy: source('Agência Brasil', 'Sigilo de oito anos para liquidação do Master é regra, diz Galípolo', 'https://agenciabrasil.ebc.com.br/economia/noticia/2026-04/sigilo-de-oito-anos-para-liquidacao-do-master-e-regra-diz-galipolo', '2026-04-08'),
   dataSharing: source('Agência Senado', 'Grupo da CAE sobre Caso Master vai pedir dados à CPI do Crime Organizado', 'https://www12.senado.leg.br/noticias/audios/2026/04/grupo-da-cae-sobre-caso-master-vai-pedir-dados-a-cpi-do-crime-organizado', '2026-04-14'),
   creditPortfolios: source('Agência Brasil', 'Galípolo descreve ação do Master que chamou atenção do Banco Central', 'https://agenciabrasil.ebc.com.br/economia/noticia/2026-05/galipolo-descreve-acao-do-master-que-chamou-atencao-do-banco-central', '2026-05-19'),
+  brbTestimony: source('UOL', 'Defesa diz que Vorcaro depôs, nega fraude no BRB e pede revogação de prisão', 'https://noticias.uol.com.br/politica/ultimas-noticias/2026/10/15/defesa-diz-que-vorcaro-depos-nega-fraude-no-brb-e-pede-revogacao-de-prisao.ghtm', '2026-10-15'),
+  pgrOctoberOpinion: source('PGR · documento reproduzido pelo Poder360', 'Parecer de 17/10/2026, ASSCRIM/PGR nº 1753454/2026 — Petição 16.704 (PDF, 9 páginas)', 'https://static.poder360.com.br/uploads/2026/10/PGR-nao-ve-abuso-de-autroridade-de-Mendonca-19-out-2026.pdf', '2026-10-19'),
+  pgrOctoberCoverage: source('Poder360', 'PGR rejeita abuso de autoridade em conduta de Mendonça no caso Master', 'https://www.poder360.com.br/poder-justica/pgr-rejeita-abuso-de-autoridade-em-conduta-de-mendonca-no-caso-master/', '2026-10-19'),
+  releasePending: source('CNN Brasil', 'Fachin trava análise de pedido de liberdade de Vorcaro há um mês', 'https://www.cnnbrasil.com.br/blogs/elijonasmaia/politica/fachin-trava-analise-de-pedido-de-liberdade-de-vorcaro-ha-um-mes/', '2026-10-21'),
+  saoRoqueDecision: source('Estadão Conteúdo / InfoMoney', 'TCE-SP condena ex-gestor do São Roque Prev a devolver R$ 93 mi aplicados no Master', 'https://www.infomoney.com.br/brasil/tce-sp-condena-ex-gestor-do-sao-roque-prev-a-devolver-r-93-mi-aplicados-no-master/', '2026-10-21'),
+  reputationMessages: source('Folha de S.Paulo', 'Vorcaro disse a assessora que se dava muito bem com Nikolas e pediu que ela falasse com Marçal após post', 'https://www1.folha.uol.com.br/poder/2026/10/vorcaro-disse-a-assessora-que-se-dava-muito-bem-com-nikolas-e-pediu-que-ela-falasse-com-marcal-apos-post.shtml', '2026-10-21'),
+  postponedTestimony: source('CNN Brasil', 'Análise: Adiamentos de depoimentos marcam caso Master', 'https://www.cnnbrasil.com.br/politica/analise-adiamentos-de-depoimentos-marcam-caso-master/', '2026-10-22'),
+  senateAccessOpinion: source('Agência Brasil', 'PGR dá parecer contra pedido de acesso a registro de Vorcaro no Senado', 'https://agenciabrasil.ebc.com.br/justica/noticia/2026-10/pgr-da-parecer-contra-pedido-de-acesso-registro-de-vorcaro-no-senado', '2026-10-22'),
+  exploitationInquiryRequest: source('Folha de S.Paulo / C-Level', 'PF pede a Fachin para investigar suspeita de tráfico de mulheres em festas de Vorcaro', 'https://c-level.folha.uol.com.br/financas/2026/10/pf-pede-a-fachin-para-investigar-suspeita-de-trafico-de-mulheres-em-festas-de-vorcaro.shtml', '2026-10-23'),
 };
 
 function dateLabel(date) {
@@ -47,7 +56,7 @@ function post(id, title, text, references, { label = 'Fato documentado', image }
   const publishedAt = references[0].publishedAt;
   return {
     id, title, text, label,
-    image: image || communityNewsCovers[references[0].url],
+    image: image || communityNewsPostCovers[id] || communityNewsCovers[references[0].url],
     sender: 'Curadoria do Acervo',
     senderColor: '#008069',
     date: dateLabel(publishedAt),
@@ -93,6 +102,9 @@ export function getJournalisticGroups() {
       post('news-pgr-pf-leadership', 'PGR se posiciona contra afastamento da direção da PF',
         'Em 14 de outubro, a Agência Brasil noticiou parecer da PGR contrário ao afastamento de Andrei Rodrigues e Leandro Almada. Para a procuradoria, faltavam elementos que justificassem a medida e a posição hierárquica não bastava para responsabilizá-los. A reportagem explica o conflito de decisões de setembro. A manifestação é um parecer submetido ao STF, não uma sentença sobre o conjunto do caso Master.',
         [sources.pfLeadership], { label: 'Manifestação da PGR' }),
+      post('news-overview-october-23', 'Atualização do acervo: novas apurações, pareceres e fiscalização',
+        'A revisão de 23 de outubro reúne oito atualizações. Em “Operação Compliance Zero”, estão o depoimento sobre o BRB, os adiamentos de oitivas e o pedido de apuração sobre possível exploração sexual, negada por Vorcaro. “STF: documentos e respostas” reúne o parecer sobre Mendonça, a situação do pedido de liberdade e a manifestação sobre registros do Senado. Em “Brasília: fiscalização e documentos”, entram a decisão recorrível sobre o São Roque Prev e mensagens sobre gestão de imagem. As datas dos acontecimentos aparecem nos textos; a data de cada publicação identifica a fonte consultada.',
+        [sources.exploitationInquiryRequest, sources.postponedTestimony, sources.brbTestimony, sources.pgrOctoberCoverage, sources.releasePending, sources.senateAccessOpinion, sources.saoRoqueDecision, sources.reputationMessages], { label: 'Atualização da curadoria · 23/10/2026' }),
     ], { announcement: true, avatarType: 'pink' }),
 
     group('plantao-compliance-zero', 'Operação Compliance Zero', [
@@ -120,6 +132,15 @@ export function getJournalisticGroups() {
       post('news-release-october', 'Defesa pede análise de solicitação de liberdade',
         'Em 8 de outubro, a defesa pediu a Fachin que André Mendonça fosse autorizado a examinar um pedido de soltura. A Agência Brasil informou que os processos estavam temporariamente na Presidência do STF. Esta publicação registra o pedido dos advogados; a fonte não noticia concessão de liberdade.',
         [sources.releaseRequest], { label: 'Manifestação da defesa' }),
+      post('news-brb-testimony-october-15', 'Após depoimento sobre o BRB, defesa nega fraude e pede arquivamento',
+        'Em 15 de outubro, Daniel Vorcaro prestou novo depoimento à PF sobre as operações Master–BRB. Segundo o UOL, a defesa afirmou que ele respondeu às perguntas, negou fraude e prejuízo ao banco público e sustentou que as operações tiveram decisões técnicas e colegiadas. Os advogados pediram arquivamento e revogação da prisão preventiva e anunciaram que solicitariam perícia na esfera cível no dia seguinte. A notícia registra a oitiva e as posições da defesa; não informa acolhimento dos pedidos nem perícia já determinada.',
+        [sources.brbTestimony], { label: 'Depoimento e manifestação da defesa' }),
+      post('news-testimony-delays-october-22', 'Oitiva de Zettel é adiada; conclusão de inquérito tem nova estimativa',
+        'Em análise publicada em 22 de outubro, a CNN relatou o segundo cancelamento do depoimento de Fabiano Zettel sobre “A Turma”, grupo que a PF suspeita ter atuado na intimidação de adversários de Vorcaro. A corporação confirmou o cancelamento sem detalhar oficialmente o motivo. Segundo a apuração de Elijonas Maia, ao menos um inquérito poderia ser concluído em novembro; as frentes sobre o grupo e sobre suposto favorecimento por servidores do BC estariam mais avançadas. A previsão é atribuída a fontes da reportagem, sem prazo judicial ou encerramento confirmado.',
+        [sources.postponedTestimony], { label: 'Andamento da investigação · apuração da imprensa' }),
+      post('news-exploitation-request-october-23', 'PF pede apuração sobre festas; Vorcaro nega exploração de mulheres',
+        'A Folha informou em 23 de outubro que a PF pediu ao STF autorização para investigar suspeitas de tráfico de mulheres para exploração sexual e favorecimento da prostituição em festas de Vorcaro. Segundo a reportagem, o pedido chegou a Edson Fachin na semana anterior, com base em mensagens do celular; André Mendonça permanecia relator. Em nota de 13 de outubro reproduzida pela matéria, Vorcaro negou ter explorado ou desrespeitado mulheres. O registro é de um pedido de apuração: a fonte não informa autorização concedida nem conclusão criminal.',
+        [sources.exploitationInquiryRequest], { label: 'Pedido de investigação e resposta' }),
     ]),
 
     group('plantao-stf-documentos', 'STF: documentos e respostas', [
@@ -153,6 +174,15 @@ export function getJournalisticGroups() {
       post('news-october-official-procedure', 'Atualização oficial: autorização para investigar cabe ao Plenário',
         'No informe conjunto de 13 de outubro, STF e PF esclareceram que todas as menções encontradas devem ser encaminhadas com seu contexto, em caráter descritivo. Reunidos os elementos e ouvida a PGR, o Plenário poderá deliberar sobre os encaminhamentos. O comunicado não anuncia condenação nem conclui a autenticidade das supostas conversas.',
         [sources.meeting]),
+      post('news-pgr-mendonca-opinion-october', 'Parecer da PGR não vê base para representação contra Mendonça',
+        'Em parecer assinado em 17 de outubro na Petição 16.704 e divulgado pelo Poder360 em 19 de outubro, a PGR entendeu que a representação contra André Mendonça não demonstrava conduta enquadrável na Lei de Abuso de Autoridade. O documento ressalva a competência do Plenário para autorizar investigação de integrante do STF. O trecho sobre o tema está nas páginas 3 e 4 do PDF vinculado. Trata-se da posição da procuradoria, sem equivalência a decisão do tribunal ou validação integral dos atos de condução do caso.',
+        [sources.pgrOctoberCoverage, sources.pgrOctoberOpinion], { label: 'Manifestação da PGR · documento disponível' }),
+      post('news-release-pending-october-21', 'Pedido de liberdade: defesa cobra análise e STF informa localização dos autos',
+        'Em 21 de outubro, a CNN informou que o pedido de revogação da prisão apresentado pela defesa em 18 de setembro completara um mês sem decisão. Os advogados reclamaram da tramitação entre a Presidência do STF e o gabinete do relator. Em resposta à reportagem, o Supremo afirmou que a petição continuava com André Mendonça e que os autos estavam conclusos a ele. Esta atualização complementa o pedido registrado em 8 de outubro no grupo da operação; a fonte não noticia soltura nem indeferimento.',
+        [sources.releasePending], { label: 'Pedido pendente e resposta do STF' }),
+      post('news-senate-access-opinion-october-22', 'Registros do Senado: PGR questiona cabimento da ação; decisão segue pendente',
+        'A Agência Brasil informou em 22 de outubro que Paulo Gonet apresentou parecer contrário ao mandado de segurança que pede acesso a eventuais registros de entrada e saída de Vorcaro, Viviane Barci e outros citados no Senado. O fundamento relatado é processual: para a PGR, o autor não pode defender direitos coletivos em nome próprio por essa via. Luiz Fux relata o caso, sem data de decisão informada na notícia. O parecer não confirma visitas ou encontros e não constitui decisão judicial de manutenção do sigilo.',
+        [sources.senateAccessOpinion], { label: 'Manifestação da PGR · acesso a documentos' }),
     ]),
 
     group('plantao-bastidores-brasilia', 'Brasília: fiscalização e documentos', [
@@ -180,6 +210,12 @@ export function getJournalisticGroups() {
       post('news-credit-portfolios', 'Carteiras de crédito e liquidez: a explicação do BC',
         'Em audiência de 19 de maio, Galípolo afirmou que a criação de novas carteiras pelo Master, mesmo em meio a dificuldades de liquidez, levou o BC a aprofundar a fiscalização. A Agência Brasil explicou a diferença entre possuir ativos e ter recursos disponíveis para cumprir obrigações de curto prazo. A venda de carteiras ao BRB integra a apuração da PF; a suspeita de fraude exige análise própria dos documentos.',
         [sources.creditPortfolios], { label: 'Manifestação do Banco Central' }),
+      post('news-sao-roque-reimbursement-october', 'São Roque Prev: TCE-SP determina ressarcimento de R$ 93,15 milhões',
+        'Em reportagem de 21 de outubro, o Estadão informou que o TCE-SP julgou irregulares as contas de 2024 do São Roque Prev e determinou que o ex-presidente Vanderlei Massarioli ressarça R$ 93,15 milhões aplicados em letras financeiras do Master, com atualização e abatimento de valores recuperados. Cabe recurso. Massarioli sustentou que as decisões foram colegiadas e apoiadas em pareceres especializados. A decisão também propõe apuração própria da consultoria Crédito & Mercado, sem concluir fraude ou vantagem ilícita da empresa. O ressarcimento determinado não significa que os recursos já retornaram ao instituto.',
+        [sources.saoRoqueDecision], { label: 'Fiscalização previdenciária · decisão recorrível' }),
+      post('news-reputation-messages-october', 'Mensagens de 2024 e 2025 mostram interlocução sobre publicações nas redes',
+        'A Folha publicou em 21 de outubro conversas extraídas pela PF entre Vorcaro e Ana Matos, então responsável pela comunicação do Master. Nos diálogos de 2024 e 2025, ele comenta sua relação com Nikolas Ferreira e pede interlocução com Pablo Marçal após publicações sobre o banco. A reportagem descreve ações de gestão de imagem; as equipes dos dois e a comunicação de Vorcaro não responderam até a publicação. A data da notícia é distinta da data das mensagens, que isoladamente não demonstram participação dos citados nas fraudes investigadas.',
+        [sources.reputationMessages], { label: 'Mensagens noticiadas · contexto e respostas' }),
     ]),
   ];
 }
